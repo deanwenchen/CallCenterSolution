@@ -43,10 +43,10 @@ public static class CallCenterServiceCollectionExtensions
         RegisterImplementations<ICapability>(services, assemblies);
         RegisterImplementations<IBusinessAction>(services, assemblies);
         RegisterImplementations<IWorkflowDefinitionProvider>(services, assemblies);
-        RegisterImplementations<IIntentDefinitionProvider>(services, moduleAssemblies);
-        RegisterImplementations<IIntentCapabilityRouteProvider>(services, moduleAssemblies);
-        RegisterImplementations<ICapabilityWorkflowRouteProvider>(services, moduleAssemblies);
-        RegisterImplementations<IWorkflowPermissionProvider>(services, moduleAssemblies);
+        RegisterImplementations<IIntentDefinitionProvider>(services, assemblies);
+        RegisterImplementations<IIntentCapabilityRouteProvider>(services, assemblies);
+        RegisterImplementations<ICapabilityWorkflowRouteProvider>(services, assemblies);
+        RegisterImplementations<IWorkflowPermissionProvider>(services, assemblies);
 
         services.AddSingleton<ICapabilityRegistry, CapabilityRegistry>();
         services.AddSingleton<IBusinessActionRegistry, BusinessActionRegistry>();

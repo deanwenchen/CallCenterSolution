@@ -18,7 +18,6 @@
     <ProjectReference Include="..\CallCenter.BusinessActions\CallCenter.BusinessActions.csproj" />
     <ProjectReference Include="..\CallCenter.Workflows\CallCenter.Workflows.csproj" />
     <ProjectReference Include="..\CallCenter.Composition\CallCenter.Composition.csproj" />
-    <ProjectReference Include="..\CallCenter.Modules\CallCenter.Modules.csproj" />
   </ItemGroup>
 
 </Project>

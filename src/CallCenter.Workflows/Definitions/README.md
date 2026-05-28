@@ -19,10 +19,10 @@ IBusinessAction              -> 实现流程里的 Step
 商品退货示例：
 
 ```text
-CallCenter.Modules/ProductReturn/ProductReturnConfiguration.cs
-CallCenter.Modules/ProductReturn/ProductReturnCapability.cs
-CallCenter.Modules/ProductReturn/ProductReturnWorkflowDefinitions.cs
-CallCenter.Modules/ProductReturn/ProductReturnBusinessActions.cs
+CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnConfiguration.cs
+CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnCapability.cs
+CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnWorkflowDefinitions.cs
+CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnBusinessActions.cs
 ```
 
 这样新增流程不需要改总注册表和核心配置，影响范围收在自己的模块项目里。
