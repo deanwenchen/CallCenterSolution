@@ -1,8 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/CallCenter.Api/CallCenter.Api.csproj" />
-    <Project Path="src/CallCenter.Application/CallCenter.Application.csproj" />
-    <Project Path="src/CallCenter.Domain/CallCenter.Domain.csproj" />
+    <Project Path="src/CallCenter.Core/CallCenter.Core.csproj" />
     <Project Path="src/CallCenter.Infrastructure/CallCenter.Infrastructure.csproj" />
     <Project Path="src/CallCenter.BusinessActions/CallCenter.BusinessActions.csproj" />
     <Project Path="src/CallCenter.Workflows/CallCenter.Workflows.csproj" />

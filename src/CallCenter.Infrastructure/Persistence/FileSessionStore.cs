@@ -1,7 +1,6 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using CallCenter.Application;
-using CallCenter.Domain;
+using CallCenter.Core;
 
 namespace CallCenter.Infrastructure;
 

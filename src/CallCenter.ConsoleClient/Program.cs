@@ -1,9 +1,8 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CallCenter.Application;
+using CallCenter.Core;
 using CallCenter.Composition;
-using CallCenter.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 Console.InputEncoding = Encoding.UTF8;

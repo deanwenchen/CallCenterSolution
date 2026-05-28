@@ -1,6 +1,5 @@
-using CallCenter.Domain;
-
-namespace CallCenter.Application;
+﻿
+namespace CallCenter.Core;
 
 /// <summary>
 /// 会话网关实现，负责入口治理、会话状态路由以及 Workflow 启动/恢复。

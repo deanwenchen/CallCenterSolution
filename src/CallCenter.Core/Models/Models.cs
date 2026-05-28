@@ -1,4 +1,4 @@
-namespace CallCenter.Domain;
+﻿namespace CallCenter.Core;
 
 /// <summary>
 /// 用户消息经过意图识别后得到的标准意图类型。

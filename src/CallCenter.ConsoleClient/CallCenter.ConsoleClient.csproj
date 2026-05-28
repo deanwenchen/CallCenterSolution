@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CallCenter.Application\CallCenter.Application.csproj" />
-    <ProjectReference Include="..\CallCenter.Domain\CallCenter.Domain.csproj" />
+    <ProjectReference Include="..\CallCenter.Core\CallCenter.Core.csproj" />
     <ProjectReference Include="..\CallCenter.Infrastructure\CallCenter.Infrastructure.csproj" />
     <ProjectReference Include="..\CallCenter.BusinessActions\CallCenter.BusinessActions.csproj" />
     <ProjectReference Include="..\CallCenter.Workflows\CallCenter.Workflows.csproj" />

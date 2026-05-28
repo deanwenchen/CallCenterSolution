@@ -1,4 +1,4 @@
-namespace CallCenter.Domain;
+﻿namespace CallCenter.Core;
 
 /// <summary>
 /// 一条可配置意图规则。

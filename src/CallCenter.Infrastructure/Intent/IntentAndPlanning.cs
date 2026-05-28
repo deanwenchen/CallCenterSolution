@@ -1,6 +1,5 @@
-using System.Text.RegularExpressions;
-using CallCenter.Application;
-using CallCenter.Domain;
+﻿using System.Text.RegularExpressions;
+using CallCenter.Core;
 
 namespace CallCenter.Infrastructure;
 

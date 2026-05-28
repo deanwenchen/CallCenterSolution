@@ -1,6 +1,5 @@
-using CallCenter.Application;
+﻿using CallCenter.Core;
 using CallCenter.Composition;
-using CallCenter.Domain;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);

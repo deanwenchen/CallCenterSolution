@@ -1,6 +1,5 @@
-using System.Collections.Concurrent;
-using CallCenter.Application;
-using CallCenter.Domain;
+﻿using System.Collections.Concurrent;
+using CallCenter.Core;
 
 namespace CallCenter.Infrastructure;
 

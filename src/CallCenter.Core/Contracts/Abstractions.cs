@@ -1,6 +1,5 @@
-using CallCenter.Domain;
-
-namespace CallCenter.Application;
+﻿
+namespace CallCenter.Core;
 
 /// <summary>
 /// 会话入口编排接口，负责从用户消息驱动完整客服处理链路。

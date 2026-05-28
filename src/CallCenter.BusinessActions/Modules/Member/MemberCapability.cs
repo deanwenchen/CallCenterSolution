@@ -1,5 +1,4 @@
-﻿using CallCenter.Application;
-using CallCenter.Domain;
+﻿using CallCenter.Core;
 
 namespace CallCenter.BusinessActions.Modules.Member;
 
