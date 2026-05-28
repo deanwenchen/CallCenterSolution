@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CallCenter.Application\CallCenter.Application.csproj" />
+    <ProjectReference Include="..\CallCenter.Domain\CallCenter.Domain.csproj" />
+    <ProjectReference Include="D:\GitCode\agent-framework\dotnet\src\Microsoft.Agents.AI.Workflows\Microsoft.Agents.AI.Workflows.csproj" />
+  </ItemGroup>
+
+</Project>
