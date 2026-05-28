@@ -8,7 +8,7 @@
     <Project Path="src/CallCenter.Workflows/CallCenter.Workflows.csproj" />
     <Project Path="src/CallCenter.ConsoleClient/CallCenter.ConsoleClient.csproj" />
     <Project Path="src/CallCenter.Composition/CallCenter.Composition.csproj" />
-    <Project Path="src/CallCenter.Modules.ProductReturn/CallCenter.Modules.ProductReturn.csproj" />
+    <Project Path="src/CallCenter.Modules/CallCenter.Modules.csproj" />
   </Folder>
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI.Abstractions/Microsoft.Agents.AI.Abstractions.csproj" />
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI.Workflows.Generators/Microsoft.Agents.AI.Workflows.Generators.csproj" />

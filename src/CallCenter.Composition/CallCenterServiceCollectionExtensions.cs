@@ -61,7 +61,7 @@ public static class CallCenterServiceCollectionExtensions
     {
         Assembly[] defaultAssemblies =
         [
-            typeof(RefundCapability).Assembly,
+            typeof(CapabilityRegistry).Assembly,
             typeof(QueryOrderBusinessAction).Assembly,
             typeof(WorkflowDefinitionRegistry).Assembly
         ];
