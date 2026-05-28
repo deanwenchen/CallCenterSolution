@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using CallCenter.Application;
 using CallCenter.Composition;
 using CallCenter.Domain;
+using CallCenter.Modules.ProductReturn;
 using Microsoft.Extensions.DependencyInjection;
 
 Console.InputEncoding = Encoding.UTF8;
@@ -245,6 +246,6 @@ void PrintError(Exception ex)
 static ServiceProvider BuildServices()
 {
     var services = new ServiceCollection();
-    services.AddCallCenter();
+    services.AddCallCenter(typeof(ProductReturnModule).Assembly);
     return services.BuildServiceProvider(validateScopes: true);
 }

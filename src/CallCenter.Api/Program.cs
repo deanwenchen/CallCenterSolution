@@ -1,6 +1,7 @@
 using CallCenter.Application;
 using CallCenter.Composition;
 using CallCenter.Domain;
+using CallCenter.Modules.ProductReturn;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-builder.Services.AddCallCenter();
+builder.Services.AddCallCenter(typeof(ProductReturnModule).Assembly);
 
 var app = builder.Build();
 

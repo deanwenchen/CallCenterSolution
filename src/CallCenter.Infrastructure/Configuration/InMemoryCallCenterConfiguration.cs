@@ -15,7 +15,6 @@ public sealed class InMemoryCallCenterConfiguration :
     private static readonly IntentDefinition[] IntentDefinitions =
     [
         new("Refund", IntentType.Refund, ["refund", "退款"], 0.9),
-        new("ProductReturn", IntentType.Refund, ["product return", "return goods", "商品退货", "退货入库"], 0.9),
         new("Logistics", IntentType.Logistics, ["logistics", "tracking", "物流", "快递"], 0.9),
         new("Invoice", IntentType.Invoice, ["invoice", "发票"], 0.9),
         new("Crm", IntentType.Crm, ["crm", "tag", "标签"], 0.9),
@@ -27,7 +26,6 @@ public sealed class InMemoryCallCenterConfiguration :
     private static readonly IntentCapabilityRoute[] IntentCapabilityRoutes =
     [
         Route("Refund", "Refund", CapabilityType.Refund),
-        Route("ProductReturn", "ProductReturn", CapabilityType.Unknown),
         Route("Logistics", "Logistics", CapabilityType.Logistics),
         Route("Invoice", "Invoice", CapabilityType.Invoice),
         Route("Crm", "Crm", CapabilityType.Crm),
@@ -44,15 +42,13 @@ public sealed class InMemoryCallCenterConfiguration :
         Workflow("Subscribe", "SubscribeWorkflow"),
         Workflow("Member", "MemberWorkflow"),
         Workflow("Coupon", "CouponWorkflow"),
-        Workflow("HumanAgent", "HumanHandoffWorkflow"),
-        Workflow("ProductReturn", "ProductReturnWorkflow")
+        Workflow("HumanAgent", "HumanHandoffWorkflow")
     ];
 
     private static readonly WorkflowPermissionDefinition[] WorkflowPermissions =
     [
         Permission("RefundWorkflow", ["QueryOrder", "CheckRefundRule", "WaitUserConfirm", "ExecuteRefund", "RestoreCoupon", "SendNotification"], ["Order.GetOrder", "Finance.Refund", "Member.RestoreCoupon", "WeCom.SendMessage"]),
         Permission("ManualRefundWorkflow", ["QueryOrder", "CheckRefundRule", "WaitUserConfirm", "HumanHandoff"], ["Order.GetOrder"]),
-        Permission("ProductReturnWorkflow", ["QueryOrder", "CheckProductReturnRule", "WaitUserConfirm", "CreateProductReturnOrder", "SendNotification"], ["Order.GetOrder", "WeCom.SendMessage"]),
         Permission("LogisticsWorkflow", ["QueryLogistics", "SendNotification"], ["Logistics.Query", "WeCom.SendMessage"]),
         Permission("InvoiceWorkflow", ["CreateInvoice", "SendNotification"], ["Invoice.Create", "WeCom.SendMessage"]),
         Permission("CrmWorkflow", ["AddCrmTag"], ["CRM.AddTag"]),
