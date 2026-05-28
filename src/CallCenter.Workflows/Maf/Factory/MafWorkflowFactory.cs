@@ -7,7 +7,7 @@ namespace CallCenter.Workflows;
 /// <summary>
 /// 将平台无关的 WorkflowDefinition 转换为 MAF Workflow 实例。
 /// </summary>
-public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionRegistry, IWorkflowPermissionProvider permissionProvider)
+public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionRegistry, IEnumerable<IWorkflowPermissionProvider> permissionProviders)
 {
     /// <summary>
     /// 根据 Workflow 定义创建可执行的 MAF Workflow。
@@ -27,14 +27,14 @@ public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionReg
         HashSet<string> reachableStepNames = GetReachableStepNames(definition, firstStep.Name);
 
         // 首个 Executor 的输入是 WorkflowExecutionRequest，负责把入口请求转换为首个业务动作上下文。
-        executors[firstStep.Name] = new StartBusinessActionExecutor(firstStep, businessActionRegistry, permissionProvider);
+        executors[firstStep.Name] = new StartBusinessActionExecutor(firstStep, businessActionRegistry, permissionProviders);
 
         foreach (WorkflowStepDefinition step in definition.Steps.Where(step =>
                      reachableStepNames.Contains(step.Name) &&
                      !string.Equals(step.Name, firstStep.Name, StringComparison.OrdinalIgnoreCase)))
         {
             // 后续 Executor 的输入统一是上一个 BusinessActionResult，形成 MAF Workflow 内部的数据流。
-            executors[step.Name] = new BusinessActionStepExecutor(step, businessActionRegistry, permissionProvider);
+            executors[step.Name] = new BusinessActionStepExecutor(step, businessActionRegistry, permissionProviders);
         }
 
         // MAF Workflow 是业务动作的唯一运行入口；恢复时从 CurrentStep 构建续跑子图，避免重跑已完成步骤。

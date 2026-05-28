@@ -7,7 +7,7 @@ namespace CallCenter.Infrastructure;
 /// <summary>
 /// 配置驱动的意图识别器。
 /// </summary>
-public sealed partial class ConfiguredIntentRecognizer(IIntentDefinitionProvider intentDefinitionProvider) : IIntentRecognizer
+public sealed partial class ConfiguredIntentRecognizer(IEnumerable<IIntentDefinitionProvider> intentDefinitionProviders) : IIntentRecognizer
 {
     public async Task<IntentResult> RecognizeAsync(
         SessionContext session,
@@ -16,9 +16,7 @@ public sealed partial class ConfiguredIntentRecognizer(IIntentDefinitionProvider
     {
         Dictionary<string, string> entities = ExtractEntities(message);
         string normalized = message.ToLowerInvariant();
-        IReadOnlyCollection<IntentDefinition> definitions = await intentDefinitionProvider
-            .GetIntentDefinitionsAsync(cancellationToken)
-            .ConfigureAwait(false);
+        IntentDefinition[] definitions = await LoadIntentDefinitionsAsync(cancellationToken).ConfigureAwait(false);
 
         IntentDefinition? matched = definitions
             .Where(definition => definition.Keywords.Any(keyword => normalized.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
@@ -33,6 +31,20 @@ public sealed partial class ConfiguredIntentRecognizer(IIntentDefinitionProvider
         }
 
         return new IntentResult(matched.Intent, matched.Confidence, entities, matched.Key);
+    }
+
+    private async Task<IntentDefinition[]> LoadIntentDefinitionsAsync(CancellationToken cancellationToken)
+    {
+        var definitions = new List<IntentDefinition>();
+        foreach (IIntentDefinitionProvider provider in intentDefinitionProviders)
+        {
+            definitions.AddRange(await provider.GetIntentDefinitionsAsync(cancellationToken).ConfigureAwait(false));
+        }
+
+        return definitions
+            .GroupBy(definition => definition.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .ToArray();
     }
 
     internal static Dictionary<string, string> ExtractEntities(string message)
@@ -72,7 +84,7 @@ public sealed partial class ConfiguredIntentRecognizer(IIntentDefinitionProvider
 /// <summary>
 /// 配置驱动的 Planner。
 /// </summary>
-public sealed class ConfiguredPlanner(IIntentCapabilityRouteProvider routeProvider) : IPlanner
+public sealed class ConfiguredPlanner(IEnumerable<IIntentCapabilityRouteProvider> routeProviders) : IPlanner
 {
     public async Task<CapabilitySelection> SelectCapabilityAsync(
         IntentResult intent,
@@ -84,8 +96,7 @@ public sealed class ConfiguredPlanner(IIntentCapabilityRouteProvider routeProvid
             return new CapabilitySelection(CapabilityType.HumanAgent, "Low confidence intent routed to human agent.");
         }
 
-        IReadOnlyCollection<IntentCapabilityRoute> routes = await routeProvider.GetRoutesAsync(cancellationToken)
-            .ConfigureAwait(false);
+        IntentCapabilityRoute[] routes = await LoadRoutesAsync(cancellationToken).ConfigureAwait(false);
 
         IntentCapabilityRoute? route = routes.FirstOrDefault(
             item => string.Equals(item.IntentKey, intent.Key, StringComparison.OrdinalIgnoreCase));
@@ -96,5 +107,19 @@ public sealed class ConfiguredPlanner(IIntentCapabilityRouteProvider routeProvid
         }
 
         return new CapabilitySelection(route.Capability, route.Reason, route.CapabilityKey);
+    }
+
+    private async Task<IntentCapabilityRoute[]> LoadRoutesAsync(CancellationToken cancellationToken)
+    {
+        var routes = new List<IntentCapabilityRoute>();
+        foreach (IIntentCapabilityRouteProvider provider in routeProviders)
+        {
+            routes.AddRange(await provider.GetRoutesAsync(cancellationToken).ConfigureAwait(false));
+        }
+
+        return routes
+            .GroupBy(route => route.IntentKey, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.Last())
+            .ToArray();
     }
 }

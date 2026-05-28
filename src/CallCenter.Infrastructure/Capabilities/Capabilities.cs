@@ -79,7 +79,7 @@ public sealed class RefundCapability : ICapability
 /// </summary>
 public sealed class InvoiceCapability : StaticWorkflowCapability
 {
-    public InvoiceCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Invoice, "InvoiceWorkflow", routeProvider)
+    public InvoiceCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Invoice, "InvoiceWorkflow", routeProviders)
     {
     }
 }
@@ -89,7 +89,7 @@ public sealed class InvoiceCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class LogisticsCapability : StaticWorkflowCapability
 {
-    public LogisticsCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Logistics, "LogisticsWorkflow", routeProvider)
+    public LogisticsCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Logistics, "LogisticsWorkflow", routeProviders)
     {
     }
 }
@@ -99,7 +99,7 @@ public sealed class LogisticsCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class CrmCapability : StaticWorkflowCapability
 {
-    public CrmCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Crm, "CrmWorkflow", routeProvider)
+    public CrmCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Crm, "CrmWorkflow", routeProviders)
     {
     }
 }
@@ -109,7 +109,7 @@ public sealed class CrmCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class SubscribeCapability : StaticWorkflowCapability
 {
-    public SubscribeCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Subscribe, "SubscribeWorkflow", routeProvider)
+    public SubscribeCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Subscribe, "SubscribeWorkflow", routeProviders)
     {
     }
 }
@@ -119,7 +119,7 @@ public sealed class SubscribeCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class MemberCapability : StaticWorkflowCapability
 {
-    public MemberCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Member, "MemberWorkflow", routeProvider)
+    public MemberCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Member, "MemberWorkflow", routeProviders)
     {
     }
 }
@@ -129,7 +129,7 @@ public sealed class MemberCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class CouponCapability : StaticWorkflowCapability
 {
-    public CouponCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.Coupon, "CouponWorkflow", routeProvider)
+    public CouponCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.Coupon, "CouponWorkflow", routeProviders)
     {
     }
 }
@@ -139,7 +139,7 @@ public sealed class CouponCapability : StaticWorkflowCapability
 /// </summary>
 public sealed class HumanAgentCapability : StaticWorkflowCapability
 {
-    public HumanAgentCapability(ICapabilityWorkflowRouteProvider routeProvider) : base(CapabilityType.HumanAgent, "HumanHandoffWorkflow", routeProvider)
+    public HumanAgentCapability(IEnumerable<ICapabilityWorkflowRouteProvider> routeProviders) : base(CapabilityType.HumanAgent, "HumanHandoffWorkflow", routeProviders)
     {
     }
 }
@@ -149,14 +149,14 @@ public sealed class HumanAgentCapability : StaticWorkflowCapability
 /// </summary>
 public abstract class StaticWorkflowCapability : ICapability
 {
-    private readonly ICapabilityWorkflowRouteProvider? _routeProvider;
+    private readonly IEnumerable<ICapabilityWorkflowRouteProvider> _routeProviders;
     private readonly string _defaultWorkflowName;
 
-    protected StaticWorkflowCapability(CapabilityType type, string workflowName, ICapabilityWorkflowRouteProvider? routeProvider = null)
+    protected StaticWorkflowCapability(CapabilityType type, string workflowName, IEnumerable<ICapabilityWorkflowRouteProvider>? routeProviders = null)
     {
         Type = type;
         _defaultWorkflowName = workflowName;
-        _routeProvider = routeProvider;
+        _routeProviders = routeProviders ?? [];
     }
 
     public string Key => Type.ToString();
@@ -181,12 +181,12 @@ public abstract class StaticWorkflowCapability : ICapability
         CancellationToken cancellationToken = default)
     {
         CapabilityWorkflowRoute? route = null;
-        if (_routeProvider is not null)
+        foreach (ICapabilityWorkflowRouteProvider routeProvider in _routeProviders)
         {
-            IReadOnlyCollection<CapabilityWorkflowRoute> routes = await _routeProvider.GetRoutesAsync(cancellationToken)
+            IReadOnlyCollection<CapabilityWorkflowRoute> routes = await routeProvider.GetRoutesAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            route = routes.FirstOrDefault(item => string.Equals(item.CapabilityKey, Key, StringComparison.OrdinalIgnoreCase));
+            route = routes.LastOrDefault(item => string.Equals(item.CapabilityKey, Key, StringComparison.OrdinalIgnoreCase)) ?? route;
         }
 
         string selectedWorkflow = route?.WorkflowName ?? _defaultWorkflowName;

@@ -11,7 +11,7 @@ namespace CallCenter.Workflows;
 internal sealed class StartBusinessActionExecutor(
     WorkflowStepDefinition step,
     IBusinessActionRegistry businessActionRegistry,
-    IWorkflowPermissionProvider permissionProvider) : Executor<WorkflowExecutionRequest, BusinessActionResult>(step.Name, declareCrossRunShareable: false)
+    IEnumerable<IWorkflowPermissionProvider> permissionProviders) : Executor<WorkflowExecutionRequest, BusinessActionResult>(step.Name, declareCrossRunShareable: false)
 {
     /// <summary>
     /// 执行 Workflow 的首个业务动作。
@@ -34,7 +34,7 @@ internal sealed class StartBusinessActionExecutor(
         }
 
         // MAF Executor 只做运行时适配：把 Workflow 消息转换为业务动作上下文。
-        return await ExecuteBusinessActionAsync(step, businessActionRegistry, permissionProvider, message.Session, message.WorkflowName, message.Message, data, cancellationToken)
+        return await ExecuteBusinessActionAsync(step, businessActionRegistry, permissionProviders, message.Session, message.WorkflowName, message.Message, data, cancellationToken)
             .ConfigureAwait(false);
     }
 }
@@ -45,7 +45,7 @@ internal sealed class StartBusinessActionExecutor(
 internal sealed class BusinessActionStepExecutor(
     WorkflowStepDefinition step,
     IBusinessActionRegistry businessActionRegistry,
-    IWorkflowPermissionProvider permissionProvider) : Executor<BusinessActionResult, BusinessActionResult>(step.Name, declareCrossRunShareable: false)
+    IEnumerable<IWorkflowPermissionProvider> permissionProviders) : Executor<BusinessActionResult, BusinessActionResult>(step.Name, declareCrossRunShareable: false)
 {
     /// <summary>
     /// 执行 Workflow 的后续业务动作。
@@ -66,7 +66,7 @@ internal sealed class BusinessActionStepExecutor(
 
         string userMessage = message.Data.GetValueOrDefault("lastUserMessage") ?? string.Empty;
         // 后续 Step 保留上一轮用户消息，主要用于 WaitUserConfirm 等人工确认 Step 判断用户回复。
-        return await ExecuteBusinessActionAsync(step, businessActionRegistry, permissionProvider, message.Session, message.WorkflowName, userMessage, message.Data, cancellationToken)
+        return await ExecuteBusinessActionAsync(step, businessActionRegistry, permissionProviders, message.Session, message.WorkflowName, userMessage, message.Data, cancellationToken)
             .ConfigureAwait(false);
     }
 }
@@ -91,7 +91,7 @@ internal static class BusinessActionExecutorSupport
     public static async Task<BusinessActionResult> ExecuteBusinessActionAsync(
         WorkflowStepDefinition step,
         IBusinessActionRegistry businessActionRegistry,
-        IWorkflowPermissionProvider permissionProvider,
+        IEnumerable<IWorkflowPermissionProvider> permissionProviders,
         SessionContext session,
         string workflowName,
         string message,
@@ -102,7 +102,7 @@ internal static class BusinessActionExecutorSupport
 
         // 运行时通过注册表解析 BusinessAction，Workflow 定义只保存动作名称。
         // 这样可以保证业务动作只能被 Workflow Step 调用，而不会从入口层直接执行。
-        await EnsureBusinessActionAllowedAsync(permissionProvider, workflowName, step.BusinessActionName, cancellationToken)
+        await EnsureBusinessActionAllowedAsync(permissionProviders, workflowName, step.BusinessActionName, cancellationToken)
             .ConfigureAwait(false);
 
         IBusinessAction businessAction = businessActionRegistry.Resolve(step.BusinessActionName);
@@ -144,7 +144,7 @@ internal static class BusinessActionExecutorSupport
         {
             // 失败补偿只在 Step 配置了 CompensationBusinessActionName 时触发。
             // 当前退款流程用它表达“退款失败后尝试恢复优惠券”等兜底动作。
-            await EnsureBusinessActionAllowedAsync(permissionProvider, workflowName, step.CompensationBusinessActionName, cancellationToken)
+            await EnsureBusinessActionAllowedAsync(permissionProviders, workflowName, step.CompensationBusinessActionName, cancellationToken)
                 .ConfigureAwait(false);
             IBusinessAction compensation = businessActionRegistry.Resolve(step.CompensationBusinessActionName);
             var compensationContext = new BusinessActionContext(session, workflowName, $"{step.Name}_COMPENSATE", message, failedData);
@@ -165,17 +165,20 @@ internal static class BusinessActionExecutorSupport
     }
 
     private static async Task EnsureBusinessActionAllowedAsync(
-        IWorkflowPermissionProvider permissionProvider,
+        IEnumerable<IWorkflowPermissionProvider> permissionProviders,
         string workflowName,
         string businessActionName,
         CancellationToken cancellationToken)
     {
-        WorkflowPermissionDefinition? permission = await permissionProvider.GetPermissionAsync(workflowName, cancellationToken)
-            .ConfigureAwait(false);
+        WorkflowPermissionDefinition? permission = null;
+        foreach (IWorkflowPermissionProvider permissionProvider in permissionProviders)
+        {
+            permission = await permissionProvider.GetPermissionAsync(workflowName, cancellationToken).ConfigureAwait(false) ?? permission;
+        }
 
         if (permission is null)
         {
-            return;
+            throw new InvalidOperationException($"Workflow '{workflowName}' does not have permission configuration.");
         }
 
         if (!permission.BusinessActions.Contains(businessActionName, StringComparer.OrdinalIgnoreCase))

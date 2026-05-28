@@ -6,7 +6,7 @@ namespace CallCenter.Infrastructure;
 /// <summary>
 /// 本地内存版外部系统网关，用于模拟订单、财务、会员、物流、CRM 等系统响应。
 /// </summary>
-public sealed class InMemoryExternalSystemGateway(IWorkflowPermissionProvider permissionProvider) : IExternalSystemGateway
+public sealed class InMemoryExternalSystemGateway(IEnumerable<IWorkflowPermissionProvider> permissionProviders) : IExternalSystemGateway
 {
     /// <summary>
     /// 根据 SystemName 和 OperationName 返回模拟外部系统响应。
@@ -49,13 +49,16 @@ public sealed class InMemoryExternalSystemGateway(IWorkflowPermissionProvider pe
             return;
         }
 
-        WorkflowPermissionDefinition? permission = await permissionProvider
-            .GetPermissionAsync(call.WorkflowName, cancellationToken)
-            .ConfigureAwait(false);
+        WorkflowPermissionDefinition? permission = null;
+        foreach (IWorkflowPermissionProvider permissionProvider in permissionProviders)
+        {
+            permission = await permissionProvider.GetPermissionAsync(call.WorkflowName, cancellationToken)
+                .ConfigureAwait(false) ?? permission;
+        }
 
         if (permission is null)
         {
-            return;
+            throw new InvalidOperationException($"Workflow '{call.WorkflowName}' does not have permission configuration.");
         }
 
         string toolName = $"{call.SystemName}.{call.OperationName}";
@@ -122,7 +125,7 @@ public sealed class InMemoryExternalSystemGateway(IWorkflowPermissionProvider pe
 /// <summary>
 /// 预留的生产 MCP 外部系统网关，用于将 ExternalSystemCall 映射到 MAF MCP tool 调用。
 /// </summary>
-public sealed class MafMcpExternalSystemGateway(IWorkflowPermissionProvider permissionProvider) : IExternalSystemGateway
+public sealed class MafMcpExternalSystemGateway(IEnumerable<IWorkflowPermissionProvider> permissionProviders) : IExternalSystemGateway
 {
     /// <summary>
     /// 调用真实 MAF MCP 工具。当前为生产接入预留，尚未实现。
@@ -138,13 +141,21 @@ public sealed class MafMcpExternalSystemGateway(IWorkflowPermissionProvider perm
     {
         if (!string.IsNullOrWhiteSpace(call.WorkflowName))
         {
-            WorkflowPermissionDefinition? permission = permissionProvider
-                .GetPermissionAsync(call.WorkflowName, cancellationToken)
-                .GetAwaiter()
-                .GetResult();
+            WorkflowPermissionDefinition? permission = null;
+            foreach (IWorkflowPermissionProvider permissionProvider in permissionProviders)
+            {
+                permission = permissionProvider.GetPermissionAsync(call.WorkflowName, cancellationToken)
+                    .GetAwaiter()
+                    .GetResult() ?? permission;
+            }
 
             string toolName = $"{call.SystemName}.{call.OperationName}";
-            if (permission is not null && !permission.Tools.Contains(toolName, StringComparer.OrdinalIgnoreCase))
+            if (permission is null)
+            {
+                throw new InvalidOperationException($"Workflow '{call.WorkflowName}' does not have permission configuration.");
+            }
+
+            if (!permission.Tools.Contains(toolName, StringComparer.OrdinalIgnoreCase))
             {
                 throw new InvalidOperationException($"Tool '{toolName}' is not allowed in workflow '{call.WorkflowName}'.");
             }
