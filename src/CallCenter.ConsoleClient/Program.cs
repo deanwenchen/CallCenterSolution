@@ -203,7 +203,7 @@ void PrintCatalog()
 {
     foreach (WorkflowDefinition workflow in workflowRegistry.GetAll().OrderBy(workflow => workflow.Name))
     {
-        Console.WriteLine($"{workflow.Name} [{workflow.Capability}]");
+        Console.WriteLine($"{workflow.Name} [{workflow.DisplayCapability}]");
         foreach (WorkflowStepDefinition step in workflow.Steps)
         {
             string human = step.HumanInTheLoop ? " human-in-loop" : string.Empty;

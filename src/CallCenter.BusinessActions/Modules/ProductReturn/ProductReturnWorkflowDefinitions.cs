@@ -26,7 +26,8 @@ public sealed class ProductReturnWorkflowDefinitions : IWorkflowDefinitionProvid
                 Edge("WAIT_USER_CONFIRM", "CREATE_RETURN_ORDER"),
                 Edge("CREATE_RETURN_ORDER", "SEND_NOTIFICATION")
             ],
-            nameof(WorkflowState))
+            nameof(WorkflowState),
+            CapabilityKey: "ProductReturn")
     ];
 
     private static WorkflowStepDefinition Step(

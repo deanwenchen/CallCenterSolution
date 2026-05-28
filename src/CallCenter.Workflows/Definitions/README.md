@@ -14,7 +14,7 @@ ICapability                  -> 选择该流程
 IBusinessAction              -> 实现流程里的 Step
 ```
 
-启动时 Host 把模块程序集传给 `CallCenter.Composition`，Composition 会扫描并注册这些类型。
+启动时 `CallCenter.Composition` 会扫描业务工程，并注册这些类型。
 
 商品退货示例：
 
@@ -25,4 +25,4 @@ CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnWorkflowDefinition
 CallCenter.BusinessActions/Modules/ProductReturn/ProductReturnBusinessActions.cs
 ```
 
-这样新增流程不需要改总注册表和核心配置，影响范围收在自己的模块项目里。
+这样新增流程不需要改总注册表和核心配置，影响范围收在自己的模块文件夹里。

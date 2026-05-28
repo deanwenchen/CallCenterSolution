@@ -176,12 +176,17 @@ public sealed record WorkflowSelection(
 /// <param name="Steps">Workflow 中包含的 Step 定义。</param>
 /// <param name="Edges">Step 之间的流转边定义。</param>
 /// <param name="StateModel">状态模型名称，用于标识该流程使用的持久化状态结构。</param>
+/// <param name="CapabilityKey">可选能力标识，用于自定义能力。</param>
 public sealed record WorkflowDefinition(
     string Name,
     CapabilityType Capability,
     IReadOnlyList<WorkflowStepDefinition> Steps,
     IReadOnlyList<WorkflowEdgeDefinition> Edges,
-    string StateModel);
+    string StateModel,
+    string? CapabilityKey = null)
+{
+    public string DisplayCapability => CapabilityKey ?? Capability.ToString();
+}
 
 /// <summary>
 /// Workflow 中单个 Step 的静态定义。

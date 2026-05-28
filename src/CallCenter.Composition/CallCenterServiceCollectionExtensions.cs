@@ -34,11 +34,6 @@ public static class CallCenterServiceCollectionExtensions
         services.AddSingleton<IExternalSystemGateway, InMemoryExternalSystemGateway>();
         services.AddSingleton<IKnowledgeService, InMemoryKnowledgeService>();
         services.AddSingleton<IHumanAgentService, InMemoryHumanAgentService>();
-        services.AddSingleton<InMemoryCallCenterConfiguration>();
-        services.AddSingleton<IIntentDefinitionProvider>(provider => provider.GetRequiredService<InMemoryCallCenterConfiguration>());
-        services.AddSingleton<IIntentCapabilityRouteProvider>(provider => provider.GetRequiredService<InMemoryCallCenterConfiguration>());
-        services.AddSingleton<ICapabilityWorkflowRouteProvider>(provider => provider.GetRequiredService<InMemoryCallCenterConfiguration>());
-        services.AddSingleton<IWorkflowPermissionProvider>(provider => provider.GetRequiredService<InMemoryCallCenterConfiguration>());
 
         RegisterImplementations<ICapability>(services, assemblies);
         RegisterImplementations<IBusinessAction>(services, assemblies);
