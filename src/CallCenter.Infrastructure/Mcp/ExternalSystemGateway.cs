@@ -122,12 +122,12 @@ public sealed class InMemoryExternalSystemGateway(IEnumerable<IWorkflowPermissio
 }
 
 /// <summary>
-/// 预留的生产 MCP 外部系统网关，用于将 ExternalSystemCall 映射到 MAF MCP tool 调用。
+/// 预留的生产 MCP 外部系统网关，用于将 ExternalSystemCall 映射到 Agent Framework MCP tool 调用。
 /// </summary>
-public sealed class MafMcpExternalSystemGateway(IEnumerable<IWorkflowPermissionProvider> permissionProviders) : IExternalSystemGateway
+public sealed class AgentFrameworkMcpExternalSystemGateway(IEnumerable<IWorkflowPermissionProvider> permissionProviders) : IExternalSystemGateway
 {
     /// <summary>
-    /// 调用真实 MAF MCP 工具。当前为生产接入预留，尚未实现。
+    /// 调用真实 Agent Framework MCP 工具。当前为生产接入预留，尚未实现。
     /// </summary>
     /// <typeparam name="TRequest">请求体类型。</typeparam>
     /// <typeparam name="TResponse">响应体类型。</typeparam>
@@ -160,6 +160,6 @@ public sealed class MafMcpExternalSystemGateway(IEnumerable<IWorkflowPermissionP
             }
         }
 
-        throw new NotImplementedException("Production implementation must invoke external systems through MAF MCP.");
+        throw new NotImplementedException("Production implementation must invoke external systems through Agent Framework MCP.");
     }
 }

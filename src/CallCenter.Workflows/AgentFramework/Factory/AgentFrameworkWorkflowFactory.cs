@@ -4,16 +4,16 @@ using Microsoft.Agents.AI.Workflows;
 namespace CallCenter.Workflows;
 
 /// <summary>
-/// 将平台无关的 WorkflowDefinition 转换为 MAF Workflow 实例。
+/// 将平台无关的 WorkflowDefinition 转换为 Agent Framework Workflow 实例。
 /// </summary>
-public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionRegistry, IEnumerable<IWorkflowPermissionProvider> permissionProviders)
+public sealed class AgentFrameworkWorkflowFactory(IBusinessActionRegistry businessActionRegistry, IEnumerable<IWorkflowPermissionProvider> permissionProviders)
 {
     /// <summary>
-    /// 根据 Workflow 定义创建可执行的 MAF Workflow。
+    /// 根据 Workflow 定义创建可执行的 Agent Framework Workflow。
     /// </summary>
     /// <param name="definition">Workflow 静态定义。</param>
     /// <param name="startStepName">可选起始 Step，用于恢复流程时构建子图。</param>
-    /// <returns>MAF Workflow 实例。</returns>
+    /// <returns>Agent Framework Workflow 实例。</returns>
     public Workflow Create(WorkflowDefinition definition, string? startStepName = null)
     {
         if (definition.Steps.Count == 0)
@@ -32,11 +32,11 @@ public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionReg
                      reachableStepNames.Contains(step.Name) &&
                      !string.Equals(step.Name, firstStep.Name, StringComparison.OrdinalIgnoreCase)))
         {
-            // 后续 Executor 的输入统一是上一个 BusinessActionResult，形成 MAF Workflow 内部的数据流。
+            // 后续 Executor 的输入统一是上一个 BusinessActionResult，形成 Agent Framework Workflow 内部的数据流。
             executors[step.Name] = new BusinessActionStepExecutor(step, businessActionRegistry, permissionProviders);
         }
 
-        // MAF Workflow 是业务动作的唯一运行入口；恢复时从 CurrentStep 构建续跑子图，避免重跑已完成步骤。
+        // Agent Framework Workflow 是业务动作的唯一运行入口；恢复时从 CurrentStep 构建续跑子图，避免重跑已完成步骤。
         WorkflowBuilder builder = new(executors[firstStep.Name]);
         builder.WithName(definition.Name)
             .WithDescription($"{definition.Capability} capability workflow");
@@ -58,7 +58,7 @@ public sealed class MafWorkflowFactory(IBusinessActionRegistry businessActionReg
         }
 
         WorkflowStepDefinition outputStep = definition.Steps.Last(step => reachableStepNames.Contains(step.Name));
-        // Workflow 输出取可达子图的最后一个 Step，最终由 MafWorkflowRuntime 转换为 ConversationResponse。
+        // Workflow 输出取可达子图的最后一个 Step，最终由 AgentFrameworkWorkflowRuntime 转换为 ConversationResponse。
         builder.WithOutputFrom(executors[outputStep.Name]);
         return builder.Build();
     }

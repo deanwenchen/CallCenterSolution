@@ -9,7 +9,7 @@ public sealed class ProductReturnCapability(IEnumerable<ICapabilityWorkflowRoute
 {
     public string Key => "ProductReturn";
 
-    public CapabilityType Type => CapabilityType.Unknown;
+    public CapabilityType Type => CapabilityType.ProductReturn;
 
     public async Task<WorkflowSelection> SelectWorkflowAsync(
         IntentResult intent,

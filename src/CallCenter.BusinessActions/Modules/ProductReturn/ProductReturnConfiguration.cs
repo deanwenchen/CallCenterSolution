@@ -15,7 +15,7 @@ public sealed class ProductReturnConfiguration :
     {
         IReadOnlyCollection<IntentDefinition> definitions =
         [
-            new("ProductReturn", IntentType.Refund, ["product return", "return goods", "商品退货", "退货入库"], 0.9)
+            new("ProductReturn", IntentType.ProductReturn, ["product return", "return goods", "商品退货", "退货入库"], 0.65)
         ];
 
         return Task.FromResult(definitions);
@@ -25,7 +25,7 @@ public sealed class ProductReturnConfiguration :
     {
         IReadOnlyCollection<IntentCapabilityRoute> routes =
         [
-            new("ProductReturn", "ProductReturn", CapabilityType.Unknown, "ProductReturn -> ProductReturn")
+            new("ProductReturn", "ProductReturn", CapabilityType.ProductReturn, "ProductReturn -> ProductReturn")
         ];
 
         return Task.FromResult(routes);

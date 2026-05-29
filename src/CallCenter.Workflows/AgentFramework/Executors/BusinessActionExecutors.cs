@@ -5,7 +5,7 @@ using static CallCenter.Workflows.BusinessActionExecutorSupport;
 namespace CallCenter.Workflows;
 
 /// <summary>
-/// MAF 首个 Step Executor，负责把 WorkflowExecutionRequest 转换为业务动作上下文。
+/// Agent Framework 首个 Step Executor，负责把 WorkflowExecutionRequest 转换为业务动作上下文。
 /// </summary>
 internal sealed class StartBusinessActionExecutor(
     WorkflowStepDefinition step,
@@ -16,7 +16,7 @@ internal sealed class StartBusinessActionExecutor(
     /// 执行 Workflow 的首个业务动作。
     /// </summary>
     /// <param name="message">Workflow 执行请求。</param>
-    /// <param name="context">MAF Workflow 上下文。</param>
+    /// <param name="context">Agent Framework Workflow 上下文。</param>
     /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>业务动作结果。</returns>
     public override async ValueTask<BusinessActionResult> HandleAsync(
@@ -32,14 +32,14 @@ internal sealed class StartBusinessActionExecutor(
             data[key] = value;
         }
 
-        // MAF Executor 只做运行时适配：把 Workflow 消息转换为业务动作上下文。
+        // Agent Framework Executor 只做运行时适配：把 Workflow 消息转换为业务动作上下文。
         return await ExecuteBusinessActionAsync(step, businessActionRegistry, permissionProviders, message.Session, message.WorkflowName, message.Message, data, cancellationToken)
             .ConfigureAwait(false);
     }
 }
 
 /// <summary>
-/// MAF 后续 Step Executor，负责把上一个业务动作结果传给下一个业务动作。
+/// Agent Framework 后续 Step Executor，负责把上一个业务动作结果传给下一个业务动作。
 /// </summary>
 internal sealed class BusinessActionStepExecutor(
     WorkflowStepDefinition step,
@@ -50,7 +50,7 @@ internal sealed class BusinessActionStepExecutor(
     /// 执行 Workflow 的后续业务动作。
     /// </summary>
     /// <param name="message">上一个 Step 的业务动作结果。</param>
-    /// <param name="context">MAF Workflow 上下文。</param>
+    /// <param name="context">Agent Framework Workflow 上下文。</param>
     /// <param name="cancellationToken">取消令牌。</param>
     /// <returns>业务动作结果。</returns>
     public override async ValueTask<BusinessActionResult> HandleAsync(

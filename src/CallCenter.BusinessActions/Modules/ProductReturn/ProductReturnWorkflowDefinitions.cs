@@ -11,7 +11,7 @@ public sealed class ProductReturnWorkflowDefinitions : IWorkflowDefinitionProvid
     [
         new WorkflowDefinition(
             "ProductReturnWorkflow",
-            CapabilityType.Unknown,
+            CapabilityType.ProductReturn,
             [
                 Step("GET_ORDER", "QueryOrder"),
                 Step("CHECK_RETURN_RULE", "CheckProductReturnRule"),

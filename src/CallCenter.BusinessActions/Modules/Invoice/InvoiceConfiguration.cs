@@ -13,7 +13,7 @@ public sealed class InvoiceConfiguration :
 {
     public Task<IReadOnlyCollection<IntentDefinition>> GetIntentDefinitionsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Invoice", IntentType.Invoice, ["invoice", "发票"], 0.9)]);
+        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Invoice", IntentType.Invoice, ["invoice", "发票"], 0.65)]);
     }
 
     public Task<IReadOnlyCollection<IntentCapabilityRoute>> GetRoutesAsync(CancellationToken cancellationToken = default)

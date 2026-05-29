@@ -15,7 +15,7 @@ public sealed class RefundConfiguration :
     {
         return Task.FromResult<IReadOnlyCollection<IntentDefinition>>(
         [
-            new("Refund", IntentType.Refund, ["refund", "退款"], 0.9)
+            new("Refund", IntentType.Refund, ["refund", "退款"], 0.65)
         ]);
     }
 

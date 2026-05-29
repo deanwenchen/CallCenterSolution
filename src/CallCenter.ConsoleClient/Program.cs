@@ -27,6 +27,15 @@ var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
 
 PrintWelcome();
 
+// 调试用模拟问法流程放在这里。
+// 需要断点调试完整链路时，把 RunDebugConversationDemo 改成 true。
+bool RunDebugConversationDemo = false;
+if (RunDebugConversationDemo)
+{
+    await RunDebugConversationDemoAsync(gateway).ConfigureAwait(false);
+    return;
+}
+
 while (!exitRequested)
 {
     Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -239,6 +248,107 @@ void PrintError(Exception ex)
     Console.WriteLine(ex.Message);
     Console.ResetColor();
     Console.WriteLine();
+}
+
+async Task RunDebugConversationDemoAsync(IConversationGateway demoGateway)
+{
+    var scenarios = new (string Name, string UserId, string[] Messages, Dictionary<string, string>? Metadata)[]
+    {
+        (
+            "退款流程：先申请退款，再确认继续",
+            "debug-refund-user",
+            [
+                "refund order ORD-10001 amount 99",
+                "yes"
+            ],
+            null
+        ),
+        (
+            "退货流程：先申请退货，再确认继续",
+            "debug-return-user",
+            [
+                "product return order ORD-10002 amount 129",
+                "yes"
+            ],
+            null
+        ),
+        (
+            "发票流程：直接开票",
+            "debug-invoice-user",
+            [
+                "create invoice for order ORD-20001 invoice title ACME amount 100"
+            ],
+            null
+        ),
+        (
+            "物流流程：查询订单物流",
+            "debug-logistics-user",
+            [
+                "track logistics for order ORD-30001"
+            ],
+            null
+        ),
+        (
+            "会员流程：查询会员积分",
+            "debug-member-user",
+            [
+                "show my member points"
+            ],
+            null
+        ),
+        (
+            "优惠券流程：发券",
+            "debug-coupon-user",
+            [
+                "issue coupon for me"
+            ],
+            null
+        ),
+        (
+            "人工客服流程：明确转人工",
+            "debug-human-user",
+            [
+                "human agent please"
+            ],
+            null
+        ),
+        (
+            "黑名单拦截：通过 metadata 模拟风控拒绝",
+            "debug-blocked-user",
+            [
+                "refund order ORD-90001 amount 10"
+            ],
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["blacklisted"] = "true"
+            }
+        )
+    };
+
+    foreach ((string name, string scenarioUserId, string[] messages, Dictionary<string, string>? scenarioMetadata) in scenarios)
+    {
+        string demoSessionId = $"debug-{Guid.NewGuid():N}";
+        Console.WriteLine($"=== {name} ===");
+        Console.WriteLine($"session: {demoSessionId}");
+
+        foreach (string message in messages)
+        {
+            var request = new ConversationRequest(
+                demoSessionId,
+                scenarioUserId,
+                "console-debug",
+                "default",
+                message,
+                AuthToken: "console-token",
+                Metadata: scenarioMetadata is null
+                    ? null
+                    : new Dictionary<string, string>(scenarioMetadata, StringComparer.OrdinalIgnoreCase));
+
+            Console.WriteLine($"> {message}");
+            ConversationResponse response = await demoGateway.HandleAsync(request).ConfigureAwait(false);
+            PrintResponse(response);
+        }
+    }
 }
 
 static ServiceProvider BuildServices()

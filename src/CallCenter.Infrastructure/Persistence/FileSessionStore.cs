@@ -22,7 +22,7 @@ public sealed class FileSessionStore : ISessionStore
     /// </summary>
     public FileSessionStore()
     {
-        // 会话状态独立于 MAF checkpoint，保存“哪个会话正在哪个 Workflow/Step”。
+        // 会话状态独立于 Agent Framework checkpoint，保存“哪个会话正在哪个 Workflow/Step”。
         _directory = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "session-state"));
         _directory.Create();
     }

@@ -161,6 +161,20 @@ public interface IIntentRecognizer
 }
 
 /// <summary>
+/// 大模型客户端抽象，只负责文本推理，不绑定具体供应商。
+/// </summary>
+public interface IModelClient
+{
+    /// <summary>
+    /// 根据消息列表调用模型并返回文本结果。
+    /// </summary>
+    /// <param name="request">模型调用请求。</param>
+    /// <param name="cancellationToken">取消令牌。</param>
+    /// <returns>模型调用结果。</returns>
+    Task<ModelChatResponse> CompleteAsync(ModelChatRequest request, CancellationToken cancellationToken = default);
+}
+
+/// <summary>
 /// 任务规划接口，负责从意图映射到业务能力。
 /// </summary>
 public interface IPlanner

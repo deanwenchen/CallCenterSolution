@@ -13,7 +13,7 @@ Capabilities/
   Capability registry and workflow selection policies.
 
 Mcp/
-  External system gateway and future MAF MCP adapter.
+  External system gateway and future Agent Framework MCP adapter.
 
 Persistence/
   Session state stores.

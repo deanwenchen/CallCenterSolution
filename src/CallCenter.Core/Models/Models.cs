@@ -21,6 +21,8 @@ public enum IntentType
     Member,
     /// <summary>优惠券、折扣券、抵扣券相关意图。</summary>
     Coupon,
+    /// <summary>商品退货相关意图。</summary>
+    ProductReturn,
     /// <summary>明确需要人工客服或模型兜底的意图。</summary>
     HumanAgent
 }
@@ -46,6 +48,8 @@ public enum CapabilityType
     Member,
     /// <summary>优惠券能力。</summary>
     Coupon,
+    /// <summary>商品退货能力。</summary>
+    ProductReturn,
     /// <summary>人工客服能力。</summary>
     HumanAgent
 }
@@ -224,8 +228,8 @@ public sealed record WorkflowEdgeDefinition(
 /// <param name="WorkflowName">Workflow 名称。</param>
 /// <param name="Status">Workflow 当前状态。</param>
 /// <param name="CurrentStep">当前停留或最后完成的 Step。</param>
-/// <param name="CheckpointSessionId">MAF checkpoint session 标识。</param>
-/// <param name="CheckpointId">MAF checkpoint 标识。</param>
+/// <param name="CheckpointSessionId">Agent Framework checkpoint session 标识。</param>
+/// <param name="CheckpointId">Agent Framework checkpoint 标识。</param>
 /// <param name="Data">跨轮会话和跨 Step 传递的业务数据。</param>
 public sealed record WorkflowState(
     string WorkflowInstanceId,
@@ -300,8 +304,8 @@ public sealed record WorkflowExecutionRequest(
 /// <param name="Status">Workflow 状态。</param>
 /// <param name="CurrentStep">当前 Step。</param>
 /// <param name="Message">返回给会话层的消息。</param>
-/// <param name="CheckpointSessionId">MAF checkpoint session 标识。</param>
-/// <param name="CheckpointId">MAF checkpoint 标识。</param>
+/// <param name="CheckpointSessionId">Agent Framework checkpoint session 标识。</param>
+/// <param name="CheckpointId">Agent Framework checkpoint 标识。</param>
 /// <param name="Data">Workflow 累积业务数据。</param>
 public sealed record WorkflowExecutionResult(
     string WorkflowInstanceId,

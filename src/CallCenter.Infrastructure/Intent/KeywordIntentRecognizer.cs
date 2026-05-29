@@ -4,9 +4,9 @@ using CallCenter.Core;
 namespace CallCenter.Infrastructure;
 
 /// <summary>
-/// 配置驱动的意图识别器。
+/// 基于配置关键词和本地正则实体抽取的意图识别器。
 /// </summary>
-public sealed partial class ConfiguredIntentRecognizer(IEnumerable<IIntentDefinitionProvider> intentDefinitionProviders) : IIntentRecognizer
+public sealed partial class KeywordIntentRecognizer(IEnumerable<IIntentDefinitionProvider> intentDefinitionProviders) : IIntentRecognizer
 {
     public async Task<IntentResult> RecognizeAsync(
         SessionContext session,
@@ -14,22 +14,33 @@ public sealed partial class ConfiguredIntentRecognizer(IEnumerable<IIntentDefini
         CancellationToken cancellationToken = default)
     {
         Dictionary<string, string> entities = ExtractEntities(message);
-        string normalized = message.ToLowerInvariant();
         IntentDefinition[] definitions = await LoadIntentDefinitionsAsync(cancellationToken).ConfigureAwait(false);
 
         IntentDefinition? matched = definitions
-            .Where(definition => definition.Keywords.Any(keyword => normalized.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
+            .Where(definition => definition.Keywords.Any(keyword => MatchesKeyword(message, keyword)))
             .OrderByDescending(definition => definition.Confidence)
             .FirstOrDefault();
 
         if (matched is null)
         {
             IntentType fallbackIntent = message.Length > 120 ? IntentType.HumanAgent : IntentType.Unknown;
-            double fallbackConfidence = fallbackIntent == IntentType.HumanAgent ? 0.55 : 0.2;
+            double fallbackConfidence = fallbackIntent == IntentType.HumanAgent ? 0.4 : 0.2;
             return new IntentResult(fallbackIntent, fallbackConfidence, entities);
         }
 
         return new IntentResult(matched.Intent, matched.Confidence, entities, matched.Key);
+    }
+
+    private static bool MatchesKeyword(string message, string keyword)
+    {
+        // Chinese keywords use substring matching since CJK has no word boundaries.
+        if (keyword.Any(c => c >= '一' && c <= '鿿'))
+        {
+            return message.Contains(keyword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // English keywords use word-boundary matching to avoid false positives (e.g., "tag" in "luggage").
+        return Regex.IsMatch(message, $@"\b{Regex.Escape(keyword)}\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     }
 
     private async Task<IntentDefinition[]> LoadIntentDefinitionsAsync(CancellationToken cancellationToken)
@@ -78,47 +89,4 @@ public sealed partial class ConfiguredIntentRecognizer(IEnumerable<IIntentDefini
 
     [GeneratedRegex(@"(?:invoice title|发票抬头)\s*[:：]?\s*(?<title>[\w\u4e00-\u9fa5\- ]{2,40})", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex InvoiceTitleRegex();
-}
-
-/// <summary>
-/// 配置驱动的 Planner。
-/// </summary>
-public sealed class ConfiguredPlanner(IEnumerable<IIntentCapabilityRouteProvider> routeProviders) : IPlanner
-{
-    public async Task<CapabilitySelection> SelectCapabilityAsync(
-        IntentResult intent,
-        SessionContext session,
-        CancellationToken cancellationToken = default)
-    {
-        if (intent.Confidence < 0.5)
-        {
-            return new CapabilitySelection(CapabilityType.HumanAgent, "Low confidence intent routed to human agent.");
-        }
-
-        IntentCapabilityRoute[] routes = await LoadRoutesAsync(cancellationToken).ConfigureAwait(false);
-
-        IntentCapabilityRoute? route = routes.FirstOrDefault(
-            item => string.Equals(item.IntentKey, intent.Key, StringComparison.OrdinalIgnoreCase));
-
-        if (route is null)
-        {
-            return new CapabilitySelection(CapabilityType.HumanAgent, $"No capability route configured for intent {intent.Key}.");
-        }
-
-        return new CapabilitySelection(route.Capability, route.Reason, route.CapabilityKey);
-    }
-
-    private async Task<IntentCapabilityRoute[]> LoadRoutesAsync(CancellationToken cancellationToken)
-    {
-        var routes = new List<IntentCapabilityRoute>();
-        foreach (IIntentCapabilityRouteProvider provider in routeProviders)
-        {
-            routes.AddRange(await provider.GetRoutesAsync(cancellationToken).ConfigureAwait(false));
-        }
-
-        return routes
-            .GroupBy(route => route.IntentKey, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.Last())
-            .ToArray();
-    }
 }

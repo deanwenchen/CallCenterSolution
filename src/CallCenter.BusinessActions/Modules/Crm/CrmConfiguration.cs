@@ -13,7 +13,7 @@ public sealed class CrmConfiguration :
 {
     public Task<IReadOnlyCollection<IntentDefinition>> GetIntentDefinitionsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Crm", IntentType.Crm, ["crm", "tag", "标签"], 0.9)]);
+        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Crm", IntentType.Crm, ["crm", "tag", "标签"], 0.65)]);
     }
 
     public Task<IReadOnlyCollection<IntentCapabilityRoute>> GetRoutesAsync(CancellationToken cancellationToken = default)

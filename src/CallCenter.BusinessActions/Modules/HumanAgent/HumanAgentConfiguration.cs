@@ -15,7 +15,7 @@ public sealed class HumanAgentConfiguration :
     {
         return Task.FromResult<IReadOnlyCollection<IntentDefinition>>(
         [
-            new("HumanAgent", IntentType.HumanAgent, ["human", "agent", "人工", "客服"], 0.9)
+            new("HumanAgent", IntentType.HumanAgent, ["human", "agent", "人工", "客服"], 0.65)
         ]);
     }
 

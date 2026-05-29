@@ -13,4 +13,4 @@ Shared/
 
 Add a new business flow under `Modules/<FlowName>/`.
 
-Keep this project free of MAF-specific types. MAF adapters belong in `CallCenter.Workflows/Maf`.
+Keep this project free of Agent Framework-specific types. Agent Framework adapters belong in `CallCenter.Workflows/AgentFramework`.

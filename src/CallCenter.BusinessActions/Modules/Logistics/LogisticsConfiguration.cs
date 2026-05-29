@@ -13,7 +13,7 @@ public sealed class LogisticsConfiguration :
 {
     public Task<IReadOnlyCollection<IntentDefinition>> GetIntentDefinitionsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Logistics", IntentType.Logistics, ["logistics", "tracking", "物流", "快递"], 0.9)]);
+        return Task.FromResult<IReadOnlyCollection<IntentDefinition>>([new("Logistics", IntentType.Logistics, ["logistics", "tracking", "物流", "快递"], 0.65)]);
     }
 
     public Task<IReadOnlyCollection<IntentCapabilityRoute>> GetRoutesAsync(CancellationToken cancellationToken = default)

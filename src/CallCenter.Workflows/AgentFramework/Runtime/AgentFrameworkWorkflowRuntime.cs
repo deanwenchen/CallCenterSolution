@@ -5,26 +5,26 @@ using Microsoft.Agents.AI.Workflows.Checkpointing;
 namespace CallCenter.Workflows;
 
 /// <summary>
-/// 基于 MAF InProcessExecution 的 Workflow Runtime 实现。
+/// 基于 Microsoft Agent Framework InProcessExecution 的 Workflow Runtime 实现。
 /// </summary>
-public sealed class MafWorkflowRuntime : IWorkflowRuntime, IDisposable
+public sealed class AgentFrameworkWorkflowRuntime : IWorkflowRuntime, IDisposable
 {
     private readonly IWorkflowDefinitionRegistry _definitionRegistry;
-    private readonly MafWorkflowFactory _workflowFactory;
+    private readonly AgentFrameworkWorkflowFactory _workflowFactory;
     private readonly FileSystemJsonCheckpointStore _checkpointStore;
     private readonly CheckpointManager _checkpointManager;
 
     /// <summary>
-    /// 初始化 MAF Workflow Runtime，并创建本地 checkpoint 管理器。
+    /// 初始化 Agent Framework Workflow Runtime，并创建本地 checkpoint 管理器。
     /// </summary>
     /// <param name="definitionRegistry">Workflow 定义注册表。</param>
-    /// <param name="workflowFactory">MAF Workflow 工厂。</param>
-    public MafWorkflowRuntime(IWorkflowDefinitionRegistry definitionRegistry, MafWorkflowFactory workflowFactory)
+    /// <param name="workflowFactory">Agent Framework Workflow 工厂。</param>
+    public AgentFrameworkWorkflowRuntime(IWorkflowDefinitionRegistry definitionRegistry, AgentFrameworkWorkflowFactory workflowFactory)
     {
         _definitionRegistry = definitionRegistry;
         _workflowFactory = workflowFactory;
 
-        // Checkpoint 用于审计和后续增强为 MAF ExternalRequest 恢复；会话续跑由 WorkflowState 持久化驱动。
+        // Checkpoint 用于审计和后续增强为 Agent Framework ExternalRequest 恢复；会话续跑由 WorkflowState 持久化驱动。
         var checkpointDirectory = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "workflow-checkpoints"));
         _checkpointStore = new FileSystemJsonCheckpointStore(checkpointDirectory);
         _checkpointManager = CheckpointManager.CreateJson(_checkpointStore);
@@ -107,11 +107,11 @@ public sealed class MafWorkflowRuntime : IWorkflowRuntime, IDisposable
         string workflowInstanceId = $"{sessionId}:{workflowName}";
 
         // lastBusinessActionResult 保存最新完成 Step 的结果，用于推导最终会话状态。
-        // lastCheckpoint 保存 MAF 超步检查点，便于后续审计或增强为真实检查点恢复。
+        // lastCheckpoint 保存 Agent Framework 超步检查点，便于后续审计或增强为真实检查点恢复。
         BusinessActionResult? lastBusinessActionResult = null;
         CheckpointInfo? lastCheckpoint = null;
 
-        // 当前使用 MAF 的进程内执行模式。Workflow 构建、Executor 调度、边条件判断都由 MAF Runtime 完成。
+        // 当前使用 Agent Framework 的进程内执行模式。Workflow 构建、Executor 调度、边条件判断都由 Agent Framework Runtime 完成。
         await using StreamingRun run = await InProcessExecution.RunStreamingAsync(
                 workflow,
                 request,
@@ -128,13 +128,13 @@ public sealed class MafWorkflowRuntime : IWorkflowRuntime, IDisposable
                 lastBusinessActionResult = businessActionResult;
             }
 
-            // WorkflowOutputEvent 表示 MAF Workflow 已产出最终输出。
+            // WorkflowOutputEvent 表示 Agent Framework Workflow 已产出最终输出。
             if (evt is WorkflowOutputEvent { Data: BusinessActionResult outputResult })
             {
                 lastBusinessActionResult = outputResult;
             }
 
-            // SuperStepCompletedEvent 携带 Checkpoint 信息，当前用于记录 MAF 运行轨迹。
+            // SuperStepCompletedEvent 携带 Checkpoint 信息，当前用于记录 Agent Framework 运行轨迹。
             if (evt is SuperStepCompletedEvent { CompletionInfo.Checkpoint: { } checkpoint })
             {
                 lastCheckpoint = checkpoint;

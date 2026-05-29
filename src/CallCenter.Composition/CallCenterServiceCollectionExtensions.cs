@@ -3,6 +3,7 @@ using CallCenter.Core;
 using CallCenter.BusinessActions;
 using CallCenter.Infrastructure;
 using CallCenter.Workflows;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CallCenter.Composition;
@@ -17,10 +18,21 @@ public static class CallCenterServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddCallCenter(this IServiceCollection services, params Assembly[] moduleAssemblies)
     {
+        return AddCallCenter(services, configuration: null, moduleAssemblies);
+    }
+
+    /// <summary>
+    /// 注册客服系统核心服务，并从配置读取可选的大模型客户端设置。
+    /// </summary>
+    public static IServiceCollection AddCallCenter(this IServiceCollection services, IConfiguration? configuration, params Assembly[] moduleAssemblies)
+    {
         Assembly[] assemblies = ResolveAssemblies(moduleAssemblies);
+
+        services.AddSingleton(CreateQwenModelClientOptions(configuration));
 
         services.AddScoped<IConversationGateway, ConversationGateway>();
 
+        services.AddSingleton<HttpClient>();
         services.AddSingleton<IAuthenticationService, MetadataAuthenticationService>();
         services.AddSingleton<IAuthorizationService, MetadataAuthorizationService>();
         services.AddSingleton<IRateLimiter, FixedWindowRateLimiter>();
@@ -29,8 +41,10 @@ public static class CallCenterServiceCollectionExtensions
         services.AddSingleton<IObservabilitySink, FileObservabilitySink>();
         services.AddSingleton<ISessionStore, FileSessionStore>();
         services.AddSingleton<IConversationContextFactory, ConversationContextFactory>();
-        services.AddSingleton<IIntentRecognizer, ConfiguredIntentRecognizer>();
-        services.AddSingleton<IPlanner, ConfiguredPlanner>();
+        services.AddSingleton<KeywordIntentRecognizer>();
+        services.AddSingleton<IModelClient, AgentFrameworkQwenModelClient>();
+        services.AddSingleton<IIntentRecognizer, HybridIntentRecognizer>();
+        services.AddSingleton<IPlanner, IntentCapabilityPlanner>();
         services.AddSingleton<IExternalSystemGateway, InMemoryExternalSystemGateway>();
         services.AddSingleton<IKnowledgeService, InMemoryKnowledgeService>();
         services.AddSingleton<IHumanAgentService, InMemoryHumanAgentService>();
@@ -46,10 +60,44 @@ public static class CallCenterServiceCollectionExtensions
         services.AddSingleton<ICapabilityRegistry, CapabilityRegistry>();
         services.AddSingleton<IBusinessActionRegistry, BusinessActionRegistry>();
         services.AddSingleton<IWorkflowDefinitionRegistry, WorkflowDefinitionRegistry>();
-        services.AddSingleton<MafWorkflowFactory>();
-        services.AddSingleton<IWorkflowRuntime, MafWorkflowRuntime>();
+        services.AddSingleton<AgentFrameworkWorkflowFactory>();
+        services.AddSingleton<IWorkflowRuntime, AgentFrameworkWorkflowRuntime>();
 
         return services;
+    }
+
+    private static QwenModelClientOptions CreateQwenModelClientOptions(IConfiguration? configuration)
+    {
+        var options = new QwenModelClientOptions();
+        IConfigurationSection? section = configuration?.GetSection("ModelClient");
+        if (section is not null)
+        {
+            options.Endpoint = ReadSetting(section["Endpoint"], options.Endpoint) ?? options.Endpoint;
+            options.ApiKey = ReadSetting(section["ApiKey"], options.ApiKey);
+            options.Model = ReadSetting(section["Model"], options.Model) ?? options.Model;
+            options.Temperature = ReadDouble(section["Temperature"], options.Temperature);
+            options.TimeoutSeconds = ReadInt(section["TimeoutSeconds"], options.TimeoutSeconds);
+        }
+
+        options.ApiKey = ReadSetting(Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY"), options.ApiKey);
+        options.Model = ReadSetting(Environment.GetEnvironmentVariable("DASHSCOPE_MODEL_NAME"), options.Model) ?? options.Model;
+
+        return options;
+    }
+
+    private static string? ReadSetting(string? value, string? currentValue)
+    {
+        return string.IsNullOrWhiteSpace(value) ? currentValue : value;
+    }
+
+    private static double ReadDouble(string? value, double currentValue)
+    {
+        return double.TryParse(value, out double parsed) ? parsed : currentValue;
+    }
+
+    private static int ReadInt(string? value, int currentValue)
+    {
+        return int.TryParse(value, out int parsed) ? parsed : currentValue;
     }
 
     private static Assembly[] ResolveAssemblies(Assembly[] moduleAssemblies)
