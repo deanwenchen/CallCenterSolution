@@ -10,13 +10,15 @@ namespace CallCenter.Workflows.Refund.Executors;
 internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundExecuted>
 {
     private readonly IFinanceMcpClient _financeService;
+    private bool _failOnce;
 
-    public ExecuteRefundExecutor(IFinanceMcpClient financeService) : base("ExecuteRefund")
+    public ExecuteRefundExecutor(IFinanceMcpClient financeService, bool failOnce = false) : base("ExecuteRefund")
     {
         _financeService = financeService;
+        _failOnce = failOnce;
     }
 
-    public ExecuteRefundExecutor() : this(null!) { }
+    public ExecuteRefundExecutor() : this(null!, false) { }
 
     public override async ValueTask<RefundExecuted> HandleAsync(UserConfirmation message, IWorkflowContext context, CancellationToken cancellationToken = default)
     {
@@ -24,6 +26,13 @@ internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundE
         {
             await context.YieldOutputAsync(new RefundNotification("退款已取消"), cancellationToken);
             return new RefundExecuted(null);
+        }
+
+        // Test hook: simulate failure for Saga compensation testing
+        if (_failOnce)
+        {
+            _failOnce = false;
+            throw new InvalidOperationException("Simulated refund failure for testing");
         }
 
         var order = await context.ReadStateAsync<OrderInfo>("order", scopeName: "Refund", cancellationToken);

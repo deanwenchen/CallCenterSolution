@@ -1,11 +1,85 @@
-// TODO: PRD Section 5.4 场景2 — Saga Compensation (failure compensation + retry strategy 1min/5min/30min)
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace CallCenter.Framework.Saga;
+
+public class SagaCompensationException : Exception
+{
+    public string FailedStep { get; }
+    public string CompensationStep { get; }
+    public Exception OriginalException { get; }
+
+    public SagaCompensationException(string failedStep, string compensationStep, Exception original, string message)
+        : base(message, original)
+    {
+        FailedStep = failedStep;
+        CompensationStep = compensationStep;
+        OriginalException = original;
+    }
+}
 
 public class SagaBuilder
 {
-    // TODO: Implement "if A fails, execute B compensation" pattern
-    // TODO: Implement retry strategy: 1min, 5min, 30min
-    public SagaBuilder OnFailure(string step, Func<Task> compensation) => this;
-    public SagaBuilder WithRetry(int maxRetries, params TimeSpan[] delays) => this;
-    public Task ExecuteAsync() => Task.CompletedTask;
+    private readonly List<(string Step, Func<CancellationToken, Task> Compensation)> _compensations = new();
+    private int _maxRetries = 3;
+    private TimeSpan[] _delays = { TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(30) };
+
+    public SagaBuilder OnFailure(string step, Func<CancellationToken, Task> compensation)
+    {
+        _compensations.Add((step, compensation));
+        return this;
+    }
+
+    public SagaBuilder WithRetry(int maxRetries, params TimeSpan[] delays)
+    {
+        _maxRetries = maxRetries;
+        _delays = delays;
+        return this;
+    }
+
+    public async Task ExecuteAsync(Func<CancellationToken, Task> action, CancellationToken ct = default)
+    {
+        var lastException = (Exception?)null;
+
+        // Try the action with retries
+        for (int attempt = 0; attempt <= _maxRetries; attempt++)
+        {
+            try
+            {
+                await action(ct);
+                return; // Success
+            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                lastException = ex;
+                if (attempt < _maxRetries && attempt < _delays.Length)
+                {
+                    await Task.Delay(_delays[attempt], ct);
+                }
+            }
+        }
+
+        // All retries exhausted — execute compensation
+        foreach (var (step, compensation) in _compensations)
+        {
+            try
+            {
+                await compensation(ct);
+            }
+            catch (Exception compEx)
+            {
+                throw new SagaCompensationException(
+                    step,
+                    compensation.Method.Name,
+                    lastException ?? compEx,
+                    $"Compensation for step '{step}' failed: {compEx.Message}");
+            }
+        }
+    }
 }
