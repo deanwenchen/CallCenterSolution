@@ -8,6 +8,19 @@
 
 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作 — 整个链路无需人工干预。
 
+## Current Milestone: v1.1 Technical Debt Closure
+
+**Goal:** 收尾 v1.0 全部 Active 需求，补齐 Framework 能力，提升 ConsoleDemo 完整性
+
+**Target features:**
+- 意图切换（IR-04/IR-05）— 退款中切换意图能正确终止旧流程并启动新流程；异常输入能挂起并重新识别
+- 超时提示（CD-04）— 30 分钟不活跃提醒 + 60 分钟终止
+- Agent Pipeline（FW-05）— 6 层管道：SafetyInput → Logging → Compaction → ToolApproval → LLM → SafetyOutput
+- Compaction（FW-07）— 8000 token 阈值、保留 8 轮、小模型摘要
+- Audit Logger（FW-08）— 自动捕获 Workflow Step 输入/输出
+- Saga 补偿（FW-09）— 失败补偿 + 重试策略（1min/5min/30min）
+- 扩展流程（BE-01）— 新增业务模块 7 步流程文档化
+
 ## Requirements
 
 ### Validated
@@ -26,9 +39,11 @@
 - [ ] **IR-04**: 用户中途切换意图 → 终止旧流程 → 启动新流程
 - [ ] **IR-05**: 用户回复不在预期范围 → 重新意图识别
 - [ ] **FW-05**: Agent Pipeline 6 层管道
-- [ ] **FW-07~FW-09**: Compaction / Audit Logger / Saga 补偿 — 空壳
+- [ ] **FW-07**: Compaction 扩展方法（8000 token 阈值）
+- [ ] **FW-08**: Audit Logger（自动捕获 Workflow Step 输入/输出）
+- [ ] **FW-09**: Saga 补偿（失败补偿 + 重试策略）
 - [ ] **CD-04**: 30 分钟超时提示
-- [ ] **BE-01**: 新增业务模块 7 步流程（复制 → 重命名 → 修改 → 完成）
+- [ ] **BE-01**: 新增业务模块 7 步流程
 
 ### Out of Scope
 
