@@ -1,7 +1,11 @@
 <Solution>
-
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI.Abstractions/Microsoft.Agents.AI.Abstractions.csproj" />
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI.Workflows.Generators/Microsoft.Agents.AI.Workflows.Generators.csproj" />
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI.Workflows/Microsoft.Agents.AI.Workflows.csproj" />
   <Project Path="../../GitCode/agent-framework/dotnet/src/Microsoft.Agents.AI/Microsoft.Agents.AI.csproj" />
+  <Project Path="src/CallCenter.Shared/CallCenter.Shared.csproj" />
+  <Project Path="src/CallCenter.Framework/CallCenter.Framework.csproj" />
+  <Project Path="src/CallCenter.Workflows/CallCenter.Workflows.csproj" />
+  <Project Path="src/CallCenter.AgentHost/CallCenter.AgentHost.csproj" />
+  <Project Path="src/CallCenter.ConsoleDemo/CallCenter.ConsoleDemo.csproj" />
 </Solution>
