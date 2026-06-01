@@ -23,7 +23,7 @@
 
 ### Phase 5: Intent Switching + Timeout
 
-- [ ] Phase 5: Intent Switching + Timeout (1/1 plans) — planned 2026-06-01
+- [x] Phase 5: Intent Switching + Timeout (1/1 plans) — completed 2026-06-01
 
 **Goal:** 实现意图切换（退款中改换货）、异常输入重新识别、30 分钟超时提示
 

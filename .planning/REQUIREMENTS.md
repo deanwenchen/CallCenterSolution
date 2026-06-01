@@ -64,9 +64,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IR-04 | Phase 5 | Pending |
-| IR-05 | Phase 5 | Pending |
-| CD-04 | Phase 5 | Pending |
+| IR-04 | Phase 5 | Complete |
+| IR-05 | Phase 5 | Complete |
+| CD-04 | Phase 5 | Complete |
 | FW-05 | Phase 6 | Pending |
 | FW-07 | Phase 6 | Pending |
 | FW-08 | Phase 7 | Pending |
