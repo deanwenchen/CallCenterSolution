@@ -2,29 +2,29 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Technical Debt Closure
-status: planning
-last_updated: "2026-06-01T13:00:00.000Z"
+status: executed
+last_updated: "2026-06-01T14:00:00.000Z"
 last_activity: 2026-06-01
 progress:
   total_phases: 4
   completed_phases: 4
   total_plans: 2
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 100
 ---
 
 # STATE.md
 
-Current phase: 06
+Current phase: 07
 Active plans: —
-Current task: Phase 05 complete — ready for next phase
+Current task: Phase 06 complete — ready for next phase
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
-**Current focus:** Phase 06 — Agent Pipeline + Compaction (next)
+**Current focus:** Phase 07 — Audit Logger + Saga Compensation (next)
 
 ## Phase Progress
 
@@ -35,9 +35,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 | 3     | Complete | 3/3         | 100%     |
 | 4     | Complete | 4/4         | 100%     |
 | 5     | Complete   | 3/3         | 100%     |
-| 6     | Planned    | 2/2         | 0%       |
+| 6     | Complete   | 2/2         | 100%     |
 
-Tasks: 27/35 complete
+Tasks: 35/35 complete
 
 ## Build Status
 
@@ -55,20 +55,42 @@ Tasks: 27/35 complete
 | D-03 Implemented | HandleRequest→HandleRequestAsync with Func<string, CancellationToken, Task<IntentResult?>> callback |
 | D-04 Implemented | Unrecognized confirm reply → RecognizeIntentAsync → branch on greeting/unknown/new |
 
+### Phase 06-01
+
+| Decision | Description |
+|----------|-------------|
+| D-01 Implemented | KeywordFilter: 12 blocked keywords, case-insensitive match |
+| D-02 Implemented | PromptInjectionDetector: 9 injection patterns |
+| D-03 Implemented | SafetyInputFilter: PII → keyword → injection pipeline |
+| D-04 Implemented | SafetyOutputFilter: PII redact only |
+| D-05 Implemented | SafetyPipelineAgent: DelegatingChatClient wrapper |
+| D-06 Implemented | ToolApprovalAgent: interface + default (always allow) |
+| D-07 Implemented | JsonlLogger: thread-safe JSONL writer to .logs/ |
+| D-08 Implemented | CompactionExtensions: MAF CompactionProvider + PipelineCompactionStrategy |
+| D-09 Implemented | StandardPipelineFactory: 6-layer assembly |
+
+### Phase 06-02
+
+| Decision | Description |
+|----------|-------------|
+| D-10 Implemented | ConsoleDemo wires pipeline via StandardPipelineFactory |
+| D-11 Implemented | EntryPoint receives piped IChatClient |
+| D-12 Implemented | ServiceCollectionExtensions registers JsonlLogger |
+
 ## Last Session
 
 **Timestamp:** 2026-06-01
-**Stopped At:** Phase 05 executed — 3 tasks complete, build passes 0/0
+**Stopped At:** Phase 06 executed — both plans complete, build 0/0
 **Resume File:** None
 
 ## Current Position
 
-Phase: 06 (next)
+Phase: 07 (next)
 Plan: —
 Status: Ready to plan
-Last activity: 2026-06-01 — Phase 05 complete
+Last activity: 2026-06-01 — Phase 06 complete
 
 ## Operator Next Steps
 
-- /gsd:plan-phase 6 — plan Agent Pipeline + Compaction
-- /gsd:discuss-phase 6 — discuss design decisions first
+- /gsd:discuss-phase 7 — discuss Audit Logger + Saga design
+- /gsd:plan-phase 7 — plan Audit Logger + Saga Compensation

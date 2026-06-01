@@ -67,8 +67,8 @@
 | IR-04 | Phase 5 | Complete |
 | IR-05 | Phase 5 | Complete |
 | CD-04 | Phase 5 | Complete |
-| FW-05 | Phase 6 | Pending |
-| FW-07 | Phase 6 | Pending |
+| FW-05 | Phase 6 | Complete |
+| FW-07 | Phase 6 | Complete |
 | FW-08 | Phase 7 | Pending |
 | FW-09 | Phase 7 | Pending |
 | BE-01 | Phase 8 | Pending |

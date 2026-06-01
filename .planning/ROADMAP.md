@@ -39,7 +39,7 @@
 
 ### Phase 6: Agent Pipeline + Compaction
 
-- [ ] Phase 6: Agent Pipeline + Compaction (2/2 plans) — planned 2026-06-01
+- [x] Phase 6: Agent Pipeline + Compaction (2/2 plans) — completed 2026-06-01
 
 **Goal:** 实现 6 层 Agent Pipeline 和 Compaction 扩展方法
 
