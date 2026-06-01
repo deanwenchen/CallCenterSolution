@@ -15,16 +15,16 @@ progress:
 
 # STATE.md
 
-Current phase: 03
-Active plans: 03-01, 03-02
-Current task: Plan 03-02 complete - main loop integration with CheckpointManager
+Current phase: 05
+Active plans: 05-01
+Current task: Phase 05 planned — intent switching + timeout
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
-**Current focus:** Phase 03 — consoledemo main loop event handling
+**Current focus:** Phase 05 — intent switching + timeout handling
 
 ## Phase Progress
 
@@ -32,8 +32,9 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 |-------|------------|-------------|----------|
 | 1     | Complete | 16/16       | 100%     |
 | 2     | Complete | 4/4         | 100%     |
-| 3     | In Progress | 3/3         | 67%      |
-| 4     | Pending    | 4/4         | 0%       |
+| 3     | Complete | 3/3         | 100%     |
+| 4     | Complete | 4/4         | 100%     |
+| 5     | Planned    | 3/3         | 0%       |
 
 Tasks: 24/32 complete
 
