@@ -83,8 +83,13 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — ExecuteRefundExecutor cancel path fix + remove System.Text.Json from .csproj
-- [ ] 04-02-PLAN.md — Framework component verification + build verification + manual acceptance testing
+**Wave 1**
+
+- [x] 04-01-PLAN.md — ExecuteRefundExecutor cancel path fix + remove System.Text.Json from .csproj
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 04-02-PLAN.md — Framework component verification + build verification + manual acceptance testing
 
 ---
 
