@@ -80,6 +80,12 @@ Plans:
 
 **Requirements:** WF-04, FW-01, FW-03, FW-04
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — ExecuteRefundExecutor cancel path fix + remove System.Text.Json from .csproj
+- [ ] 04-02-PLAN.md — Framework component verification + build verification + manual acceptance testing
+
 ---
 
 ## Phase Order
