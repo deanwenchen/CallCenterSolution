@@ -60,9 +60,9 @@ Plans:
 
 - [x] 03-01-PLAN.md — Session state tracking (lastActivity) + passive timeout + intent switch detection
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2** *(completed)*
 
-- [ ] 03-02-PLAN.md — Checkpoint resume + error recovery + main loop integration + event handling edge cases
+- [x] 03-02-PLAN.md — Checkpoint resume + error recovery + main loop integration + event handling edge cases
 
 ---
 
