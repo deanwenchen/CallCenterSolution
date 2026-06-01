@@ -80,12 +80,20 @@ public class EntryPoint
         await _sessionStore.RemoveAsync("activeWorkflow", sessionId, ct);
     }
 
+    public async Task<DateTime?> GetLastActivityAsync(string sessionId, CancellationToken ct = default)
+    {
+        return await _sessionStore.GetAsync<DateTime>("lastActivity", sessionId, ct);
+    }
+
     public async Task<ProcessResult> ProcessAsync(
         string sessionId,
         string userMessage,
         Workflow refundWorkflow,
         CancellationToken ct = default)
     {
+        // Update last activity timestamp on every user input
+        await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
+
         var activeWorkflow = await GetActiveWorkflowAsync(sessionId, ct);
 
         if (!string.IsNullOrEmpty(activeWorkflow))
