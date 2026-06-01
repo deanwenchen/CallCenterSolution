@@ -1,11 +1,14 @@
+#pragma warning disable MAAI001
 using System.ClientModel;
 using CallCenter.AgentHost;
+using CallCenter.AgentHost.Skills;
 using CallCenter.Framework;
 using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Session;
 using CallCenter.Shared.Mcp;
 using CallCenter.Shared.Services;
 using CallCenter.Workflows.Refund;
+using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using OpenAI;
@@ -39,8 +42,11 @@ eventBus.Subscribe<RefundCompletedEvent>(async e =>
 // Build workflow
 var refundWorkflow = RefundWorkflow.Build(orderService, financeService, memberService, eventBus);
 
+// Create SkillsProvider with RefundSkill registered
+var skillsProvider = new AgentSkillsProvider(new RefundSkill());
+
 // Create EntryPoint
-var entryPoint = new EntryPoint(chatClient, sessionStore);
+var entryPoint = new EntryPoint(chatClient, sessionStore, skillsProvider);
 
 // Main chat loop
 Console.WriteLine("=== CallCenter AI Demo ===");

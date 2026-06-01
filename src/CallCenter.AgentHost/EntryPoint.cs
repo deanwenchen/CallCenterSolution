@@ -1,4 +1,5 @@
 using System.ClientModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using CallCenter.Framework.Parsing;
 using CallCenter.Framework.Session;
@@ -28,12 +29,13 @@ public record NoIntentResult(string Response) : ProcessResult;
 public record TimeoutResult(bool IsWarning, string Message) : ProcessResult;
 public record IntentSwitchResult(string OldWorkflow, string NewIntent) : ProcessResult;
 
+[Experimental("MAAI001")]
 public class EntryPoint
 {
     private readonly AIAgent _intentAgent;
     private readonly InMemorySessionStore _sessionStore;
 
-    public EntryPoint(IChatClient chatClient, InMemorySessionStore sessionStore)
+    public EntryPoint(IChatClient chatClient, InMemorySessionStore sessionStore, AgentSkillsProvider? skillsProvider = null)
     {
         _sessionStore = sessionStore;
 
@@ -48,7 +50,8 @@ public class EntryPoint
                 ChatOptions = new()
                 {
                     Instructions = systemPrompt,
-                }
+                },
+                AIContextProviders = skillsProvider != null ? [skillsProvider] : null,
             });
     }
 
