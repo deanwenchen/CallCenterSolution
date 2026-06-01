@@ -27,6 +27,7 @@ var financeService = new MockFinanceService();
 var memberService = new MockMemberService();
 var eventBus = new InMemoryBusinessEventBus();
 var sessionStore = new InMemorySessionStore();
+var checkpointManager = CheckpointManager.Default;
 
 // Subscribe to events
 eventBus.Subscribe<RefundCompletedEvent>(async e =>
@@ -60,8 +61,24 @@ while (true)
     switch (result)
     {
         case ResumeExistingResult:
-            Console.WriteLine("[系统] 退款流程已在进行中，请继续当前流程。");
-            // Phase 3 will implement full Resume from checkpoint
+            await ResumeWorkflow(refundWorkflow, userMessage, checkpointManager, sessionStore, sessionId);
+            break;
+
+        case TimeoutResult timeout:
+            if (timeout.IsWarning)
+            {
+                Console.WriteLine($"\n[超时警告] {timeout.Message}");
+                Console.WriteLine("您可以继续对话，或开始新的流程。");
+            }
+            else
+            {
+                Console.WriteLine($"\n[会话终止] {timeout.Message}");
+            }
+            break;
+
+        case IntentSwitchResult switchResult:
+            Console.WriteLine($"\n[系统] 已终止 {switchResult.OldWorkflow} 流程，正在处理新意图: {switchResult.NewIntent}");
+            Console.WriteLine($"[系统] 意图 '{switchResult.NewIntent}' 暂未实现（Phase 3 仅支持退款流程）");
             break;
 
         case NoIntentResult noIntent:
@@ -70,14 +87,16 @@ while (true)
 
         case StartWorkflowResult start:
             Console.WriteLine($"[意图: refund, 订单: {start.InitialMessage.OrderId ?? "(未提供)"}]");
-            await RunWorkflow(refundWorkflow, start.InitialMessage);
+            await RunWorkflow(refundWorkflow, start.InitialMessage, checkpointManager, sessionStore, sessionId);
             break;
     }
 }
 
-static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage)
+static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId)
 {
-    await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, initialMessage);
+    CheckpointInfo? lastCheckpoint = null;
+
+    await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, initialMessage, checkpointManager);
 
     await foreach (WorkflowEvent evt in run.WatchStreamAsync())
     {
@@ -90,24 +109,114 @@ static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage)
 
             case WorkflowOutputEvent outputEvt:
                 Console.WriteLine($"\n[结果] {outputEvt.Data}");
-                goto EndWorkflow;
+                // Save final checkpoint and clear activeWorkflow on success
+                if (lastCheckpoint != null)
+                {
+                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                }
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                return;
+
+            case SuperStepCompletedEvent ssc:
+                // Capture checkpoint from each super step
+                if (ssc.CompletionInfo?.Checkpoint != null)
+                {
+                    lastCheckpoint = ssc.CompletionInfo.Checkpoint;
+                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                }
+                break;
 
             case WorkflowErrorEvent errEvt:
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"\n[错误] {errEvt.Exception?.Message}");
+                var executorId = errEvt.Exception?.Source ?? "workflow";
+                var reason = errEvt.Exception?.Message ?? "未知错误";
+                Console.WriteLine($"\n[错误] 工作流失败: {executorId} - {reason}");
                 Console.ResetColor();
-                goto EndWorkflow;
+                // Clear activeWorkflow on error
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                // Leave checkpoint for debugging
+                return;
 
             case ExecutorFailedEvent failEvt:
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"\n[执行器失败] {failEvt.ExecutorId}: {failEvt.Data}");
+                Console.WriteLine($"\n[错误] 工作流失败: {failEvt.ExecutorId} - {failEvt.Data}");
                 Console.ResetColor();
-                goto EndWorkflow;
+                // Clear activeWorkflow on error
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                // Leave checkpoint for debugging
+                return;
         }
     }
+}
 
-EndWorkflow:
-    Console.WriteLine();
+static async Task ResumeWorkflow(Workflow workflow, string userMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId)
+{
+    // Load checkpoint from session store
+    var checkpoint = await sessionStore.GetAsync<CheckpointInfo>("lastCheckpoint", sessionId);
+    if (checkpoint == null)
+    {
+        Console.WriteLine("[系统] 未找到断点记录，请重新启动流程");
+        await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+        return;
+    }
+
+    Console.WriteLine("[系统] 从断点恢复退款流程...");
+    CheckpointInfo? lastCheckpoint = checkpoint;
+
+    await using StreamingRun run = await InProcessExecution.ResumeStreamingAsync(workflow, checkpoint, checkpointManager);
+
+    await foreach (WorkflowEvent evt in run.WatchStreamAsync())
+    {
+        switch (evt)
+        {
+            case RequestInfoEvent reqEvt:
+                // Per D-01/D-02: User input directly becomes the RequestPort response
+                // The user's current input (userMessage) is sent as the response
+                Console.WriteLine($"[DEBUG] 发送用户输入到工作流: {userMessage}");
+                var response = reqEvt.Request.CreateResponse(new RefundIntent(userMessage, "U100"));
+                await run.SendResponseAsync(response);
+                break;
+
+            case WorkflowOutputEvent outputEvt:
+                Console.WriteLine($"\n[结果] {outputEvt.Data}");
+                // Save final checkpoint and clear activeWorkflow on success
+                if (lastCheckpoint != null)
+                {
+                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                }
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                return;
+
+            case SuperStepCompletedEvent ssc:
+                // Capture checkpoint from each super step
+                if (ssc.CompletionInfo?.Checkpoint != null)
+                {
+                    lastCheckpoint = ssc.CompletionInfo.Checkpoint;
+                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                }
+                break;
+
+            case WorkflowErrorEvent errEvt:
+                Console.ForegroundColor = ConsoleColor.Red;
+                var executorId = errEvt.Exception?.Source ?? "workflow";
+                var reason = errEvt.Exception?.Message ?? "未知错误";
+                Console.WriteLine($"\n[错误] 工作流失败: {executorId} - {reason}");
+                Console.ResetColor();
+                // Clear activeWorkflow on error
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                // Leave checkpoint for debugging
+                return;
+
+            case ExecutorFailedEvent failEvt:
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n[错误] 工作流失败: {failEvt.ExecutorId} - {failEvt.Data}");
+                Console.ResetColor();
+                // Clear activeWorkflow on error
+                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                // Leave checkpoint for debugging
+                return;
+        }
+    }
 }
 
 static ExternalResponse HandleRequest(ExternalRequest request)
@@ -120,6 +229,7 @@ static ExternalResponse HandleRequest(ExternalRequest request)
             case RefundSignal.NeedOrderId:
                 Console.Write("请提供订单号: ");
                 var orderId = Console.ReadLine() ?? "";
+                Console.WriteLine($"[DEBUG] 收到订单号: {orderId}");
                 return request.CreateResponse(new RefundIntent(orderId, "U100"));
         }
     }
@@ -130,7 +240,16 @@ static ExternalResponse HandleRequest(ExternalRequest request)
         Console.WriteLine($"订单 {confirmReq.OrderId}: {confirmReq.ProductName} ¥{confirmReq.Amount:F2}");
         Console.Write("确认退款？(回复'确认'或'取消'): ");
         var reply = Console.ReadLine();
-        return request.CreateResponse(new UserConfirmation(reply == "确认"));
+        var confirmed = reply == "确认";
+        if (reply == "取消")
+        {
+            Console.WriteLine("[系统] 已取消退款");
+        }
+        else if (!confirmed)
+        {
+            Console.WriteLine($"[系统] 未识别回复 '{reply}'，视为取消");
+        }
+        return request.CreateResponse(new UserConfirmation(confirmed));
     }
 
     throw new NotSupportedException($"Unknown request type: {request.PortInfo.PortId}");
