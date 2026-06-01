@@ -17,6 +17,12 @@ internal sealed class RestoreCouponExecutor : Executor<RefundExecuted, CouponRes
 
     public override async ValueTask<CouponRestored> HandleAsync(RefundExecuted message, IWorkflowContext context, CancellationToken cancellationToken = default)
     {
+        if (message.Result == null)
+        {
+            // User cancelled refund, no coupon to restore
+            return new CouponRestored(null);
+        }
+
         await _memberService.RestoreCouponAsync("U100", "CPN-2024", cancellationToken);
         return new CouponRestored("CPN-2024");
     }

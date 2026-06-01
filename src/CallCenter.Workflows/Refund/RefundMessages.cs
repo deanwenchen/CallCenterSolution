@@ -20,8 +20,8 @@ public record ConfirmRefundRequest(decimal Amount, string OrderId, string Produc
 // Port → ExecuteRefundExecutor response (user confirmation)
 public record UserConfirmation(bool Confirmed);
 
-// ExecuteRefundExecutor output
-public record RefundExecuted(RefundResult Result);
+// ExecuteRefundExecutor output (Result is null when user cancelled)
+public record RefundExecuted(RefundResult? Result);
 
 // RestoreCouponExecutor output
 public record CouponRestored(string? CouponId);

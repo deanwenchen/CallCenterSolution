@@ -22,8 +22,8 @@ internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundE
     {
         if (!message.Confirmed)
         {
-            await context.SendMessageAsync(RefundSignal.Cancelled, cancellationToken: cancellationToken);
-            throw new InvalidOperationException("User cancelled refund");
+            await context.YieldOutputAsync(new RefundNotification("退款已取消"), cancellationToken);
+            return new RefundExecuted(null);
         }
 
         var order = await context.ReadStateAsync<OrderInfo>("order", scopeName: "Refund", cancellationToken);

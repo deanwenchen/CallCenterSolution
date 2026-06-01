@@ -21,12 +21,19 @@ internal sealed class SendNotificationExecutor : Executor<CouponRestored>
     {
         var refundResult = await context.ReadStateAsync<RefundResult>("refundResult", scopeName: "Refund", cancellationToken);
 
+        if (refundResult == null)
+        {
+            // Cancelled path — refund already notified in ExecuteRefundExecutor
+            await context.YieldOutputAsync(new RefundNotification("退款流程已结束"), cancellationToken);
+            return;
+        }
+
         await _eventBus.PublishAsync(new RefundCompletedEvent(
             SessionId: "demo-session",
             UserId: "U100",
-            OrderId: refundResult?.OrderId ?? "unknown",
-            RefundAmount: refundResult?.Amount ?? 0), cancellationToken);
+            OrderId: refundResult.OrderId,
+            RefundAmount: refundResult.Amount), cancellationToken);
 
-        await context.YieldOutputAsync(new RefundNotification($"退款 {refundResult?.RefundId ?? "REF-xxx"} 已处理完成，预计 3-5 个工作日到账"), cancellationToken);
+        await context.YieldOutputAsync(new RefundNotification($"退款 {refundResult.RefundId} 已处理完成，预计 3-5 个工作日到账"), cancellationToken);
     }
 }
