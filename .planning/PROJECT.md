@@ -36,8 +36,8 @@
 
 ### Active
 
-- [ ] **FW-05**: Agent Pipeline 6 层管道
-- [ ] **FW-07**: Compaction 扩展方法（8000 token 阈值）
+- ✓ **FW-05**: Agent Pipeline 6 层管道 — Phase 6
+- ✓ **FW-07**: Compaction 扩展方法（8000 token 阈值）— Phase 6
 - [ ] **FW-08**: Audit Logger（自动捕获 Workflow Step 输入/输出）
 - [ ] **FW-09**: Saga 补偿（失败补偿 + 重试策略）
 - [ ] **BE-01**: 新增业务模块 7 步流程
@@ -84,6 +84,9 @@
 | Checkpoint 管理使用 CheckpointManager.Default | MAF 框架标准模式 | ✓ Good |
 | 30 分钟超时只警告不清 workflow | Phase 5 修复：原来 30 分钟分支错误地清除了 activeWorkflow | ✓ Good |
 | HandleRequest → HandleRequestAsync + 意图重识别回调 | Phase 5 实现：IR-05 确认时意外输入触发重新意图识别 | ✓ Good |
+| 6 层 Pipeline 通过 StandardPipelineFactory 组装 | Phase 6 实现：SafetyInput → Logging → Compaction → ToolApproval → LLM → SafetyOutput | ✓ Good |
+| Compaction 使用 MAF CompactionProvider | Phase 6 实现：PipelineCompactionStrategy (8000 token, 8 turns, qwen-plus) | ✓ Good |
+| KeywordFilter + PromptInjectionDetector 基础规则硬编码 | Phase 6 实现：12 个关键词 + 9 个注入模式 | ✓ Good |
 
 ## Evolution
 
