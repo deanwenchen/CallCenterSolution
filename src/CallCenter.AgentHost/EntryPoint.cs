@@ -108,8 +108,7 @@ public class EntryPoint
 
         if (elapsed.TotalMinutes >= 30)
         {
-            await ClearActiveWorkflowAsync(sessionId, ct);
-            return ProcessResult.TimeoutWarning("Warning: 30 minutes of inactivity. Active workflow has been cleared. You can start a new conversation.");
+            return ProcessResult.TimeoutWarning("Warning: 30 minutes of inactivity. Session will terminate after 60 minutes of inactivity.");
         }
 
         return null;

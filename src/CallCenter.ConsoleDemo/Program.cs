@@ -83,8 +83,8 @@ while (true)
             break;
 
         case IntentSwitchResult switchResult:
-            Console.WriteLine($"\n[系统] 已终止 {switchResult.OldWorkflow} 流程，正在处理新意图: {switchResult.NewIntent}");
-            Console.WriteLine($"[系统] 意图 '{switchResult.NewIntent}' 暂未实现（Phase 3 仅支持退款流程）");
+            Console.WriteLine($"\n[系统] 已终止 {switchResult.OldWorkflow} 流程");
+            Console.WriteLine($"[系统] 新意图 '{switchResult.NewIntent}' 暂未实现");
             break;
 
         case NoIntentResult noIntent:
@@ -93,12 +93,12 @@ while (true)
 
         case StartWorkflowResult start:
             Console.WriteLine($"[意图: refund, 订单: {start.InitialMessage.OrderId ?? "(未提供)"}]");
-            await RunWorkflow(refundWorkflow, start.InitialMessage, checkpointManager, sessionStore, sessionId);
+            await RunWorkflow(refundWorkflow, start.InitialMessage, checkpointManager, sessionStore, sessionId, entryPoint.RecognizeIntentAsync);
             break;
     }
 }
 
-static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId)
+static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId, Func<string, CancellationToken, Task<IntentResult?>> recognizeIntent)
 {
     CheckpointInfo? lastCheckpoint = null;
 
@@ -109,7 +109,7 @@ static async Task RunWorkflow(Workflow workflow, RefundIntent initialMessage, Ch
         switch (evt)
         {
             case RequestInfoEvent reqEvt:
-                var response = HandleRequest(reqEvt.Request);
+                var response = await HandleRequestAsync(reqEvt.Request, recognizeIntent, sessionStore, sessionId);
                 await run.SendResponseAsync(response);
                 break;
 
@@ -225,7 +225,12 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
     }
 }
 
-static ExternalResponse HandleRequest(ExternalRequest request)
+static async Task<ExternalResponse> HandleRequestAsync(
+    ExternalRequest request,
+    Func<string, CancellationToken, Task<IntentResult?>> recognizeIntent,
+    InMemorySessionStore sessionStore,
+    string sessionId,
+    CancellationToken ct = default)
 {
     // Try RefundSignal (from InfoPort)
     if (request.TryGetDataAs<RefundSignal>(out var signal))
@@ -246,16 +251,36 @@ static ExternalResponse HandleRequest(ExternalRequest request)
         Console.WriteLine($"订单 {confirmReq.OrderId}: {confirmReq.ProductName} ¥{confirmReq.Amount:F2}");
         Console.Write("确认退款？(回复'确认'或'取消'): ");
         var reply = Console.ReadLine();
-        var confirmed = reply == "确认";
+        if (reply == "确认")
+        {
+            return request.CreateResponse(new UserConfirmation(true));
+        }
         if (reply == "取消")
         {
             Console.WriteLine("[系统] 已取消退款");
+            return request.CreateResponse(new UserConfirmation(false));
         }
-        else if (!confirmed)
+
+        // Unrecognized reply — re-recognize intent (IR-05)
+        var intent = await recognizeIntent(reply ?? "", ct);
+        if (intent == null || intent.Intent == "unknown")
         {
-            Console.WriteLine($"[系统] 未识别回复 '{reply}'，视为取消");
+            Console.WriteLine($"[系统] 未识别回复 '{reply}'，已取消退款");
+            return request.CreateResponse(new UserConfirmation(false));
         }
-        return request.CreateResponse(new UserConfirmation(confirmed));
+        if (intent.Intent == "greeting")
+        {
+            Console.WriteLine("\n[系统] 你好！有什么可以帮助你的？");
+            Console.WriteLine("[系统] 退款流程已挂起，请确认后重新开始");
+            await sessionStore.RemoveAsync("activeWorkflow", sessionId, ct);
+            return request.CreateResponse(new UserConfirmation(false));
+        }
+
+        // New workflow intent — suspend current workflow, switch intent
+        Console.WriteLine($"\n[系统] 已终止 RefundWorkflow 流程");
+        Console.WriteLine($"[系统] 新意图 '{intent.Intent}' 暂未实现");
+        await sessionStore.RemoveAsync("activeWorkflow", sessionId, ct);
+        return request.CreateResponse(new UserConfirmation(false));
     }
 
     throw new NotSupportedException($"Unknown request type: {request.PortInfo.PortId}");
