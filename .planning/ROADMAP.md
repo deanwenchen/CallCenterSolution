@@ -74,6 +74,8 @@
 
 ### Phase 8: Business Extensibility Guide
 
+- [ ] Phase 8: Business Extensibility Guide (2/2 plans) — planned 2026-06-01
+
 **Goal:** 建立新增业务模块 7 步流程文档化，验证扩展性
 
 **Success Criteria**:
