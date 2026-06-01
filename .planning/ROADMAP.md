@@ -58,7 +58,7 @@ Build a console-based refund workflow demo using Microsoft Agent Framework .NET 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Session state tracking (lastActivity) + passive timeout + intent switch detection
+- [x] 03-01-PLAN.md — Session state tracking (lastActivity) + passive timeout + intent switch detection
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
