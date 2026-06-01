@@ -50,6 +50,12 @@ Build a console-based refund workflow demo using Microsoft Agent Framework .NET 
 
 **Requirements:** CD-01, CD-02, CD-03, IR-03
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Session state tracking (lastActivity) + passive timeout + intent switch detection
+- [ ] 03-02-PLAN.md — Checkpoint resume + error recovery + main loop integration + event handling edge cases
+
 ---
 
 ### Phase 4: Verification + Edge Cases
