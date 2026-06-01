@@ -46,8 +46,8 @@ eventBus.Subscribe<RefundCompletedEvent>(async e =>
 // Build workflow
 var refundWorkflow = RefundWorkflow.Build(orderService, financeService, memberService, eventBus);
 
-// Create SkillsProvider with RefundSkill registered
-var skillsProvider = new AgentSkillsProvider(new RefundSkill());
+// Create SkillsProvider with RefundSkill and ExchangeSkill registered
+var skillsProvider = new AgentSkillsProvider(new RefundSkill(), new ExchangeSkill());
 
 // Build pipeline: SafetyInput → Logging → Compaction → ToolApproval → LLM → SafetyOutput
 var sessionId = "demo-session";
