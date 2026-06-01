@@ -1,4 +1,5 @@
 using CallCenter.Framework.EventBus;
+using CallCenter.Framework.Logging;
 using CallCenter.Framework.Session;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IBusinessEventBus, InMemoryBusinessEventBus>();
         services.AddSingleton<InMemorySessionStore>();
+        services.AddSingleton<Logging.JsonlLogger>();
         return services;
     }
 }

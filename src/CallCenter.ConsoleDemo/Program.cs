@@ -4,6 +4,8 @@ using CallCenter.AgentHost;
 using CallCenter.AgentHost.Skills;
 using CallCenter.Framework;
 using CallCenter.Framework.EventBus;
+using CallCenter.Framework.Logging;
+using CallCenter.Framework.Pipeline;
 using CallCenter.Framework.Session;
 using CallCenter.Shared.Mcp;
 using CallCenter.Shared.Services;
@@ -45,14 +47,24 @@ var refundWorkflow = RefundWorkflow.Build(orderService, financeService, memberSe
 // Create SkillsProvider with RefundSkill registered
 var skillsProvider = new AgentSkillsProvider(new RefundSkill());
 
-// Create EntryPoint
-var entryPoint = new EntryPoint(chatClient, sessionStore, skillsProvider);
+// Build pipeline: SafetyInput → Logging → Compaction → ToolApproval → LLM → SafetyOutput
+var sessionId = "demo-session";
+
+var summarizerClient = StandardPipelineFactory.CreateSummarizerClient(
+    new OpenAIClient(
+        new ApiKeyCredential(apiKey),
+        new OpenAIClientOptions { Endpoint = new Uri("https://dashscope.aliyuncs.com/compatible-mode/v1") }),
+    "qwen-plus");
+
+var logger = new JsonlLogger();
+var pipelineClient = StandardPipelineFactory.CreatePipeline(chatClient, summarizerClient, sessionId, logger);
+
+// Create EntryPoint with piped client (not raw)
+var entryPoint = new EntryPoint(pipelineClient, sessionStore, skillsProvider);
 
 // Main chat loop
 Console.WriteLine("=== CallCenter AI Demo ===");
 Console.WriteLine("输入消息开始（如'我要退款，订单A001'），输入'quit'退出。\n");
-
-var sessionId = "demo-session";
 
 while (true)
 {

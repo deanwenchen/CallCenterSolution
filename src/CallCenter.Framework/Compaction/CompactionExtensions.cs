@@ -1,36 +1,46 @@
-// TODO: PRD Section 7.3.3 — Compaction (8000 token threshold, preserve 8 turns, small model summary)
+using System;
+using Microsoft.Agents.AI;
+using Microsoft.Agents.AI.Compaction;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CallCenter.Framework.Compaction;
 
 public static class CompactionExtensions
 {
-    public static IServiceCollection AddCallCenterCompaction(this IServiceCollection services)
+    public static IServiceCollection AddCallCenterCompaction(
+        this IServiceCollection services,
+        string summarizerModel = "qwen-plus")
     {
-        // TODO: Implement compaction with MAF CompactionProvider
-        // Default: 8000 token threshold, preserve 8 recent turns, small model summary
+        // CompactionProvider requires a ChatClient for summarization at runtime.
+        // The actual wiring happens in StandardPipelineFactory where both clients are available.
+        // This registration point exists for DI consistency but the provider is constructed inline.
         return services;
     }
 
-    public static CompactionBuilder UseSummarization(this IServiceCollection services, Action<CompactionOptions>? configure = null)
+    public static ChatClientBuilder UseCallCenterCompaction(
+        this ChatClientBuilder builder,
+        IChatClient summarizerClient,
+        int tokenThreshold = 8000,
+        int preserveRecentTurns = 8)
     {
-        var options = new CompactionOptions();
-        configure?.Invoke(options);
-        // TODO: Configure MAF CompactionProvider with options
-        return new CompactionBuilder();
-    }
-}
+        var pipeline = new PipelineCompactionStrategy(
+            // Mild: summarize old conversation fragments
+            new SummarizationCompactionStrategy(
+                summarizerClient,
+                CompactionTriggers.TokensExceed(tokenThreshold),
+                summarizationPrompt: "请用一句话简洁总结以下对话内容："),
+            // Aggressive: keep only recent turns
+            new SlidingWindowCompactionStrategy(
+                CompactionTriggers.TurnsExceed(preserveRecentTurns)));
 
-public class CompactionBuilder
-{
-    public CompactionBuilder WithTokenThreshold(int threshold) => this;
-    public CompactionBuilder PreserveRecentTurns(int turns) => this;
-    public CompactionBuilder WithSmallModel(string model) => this;
+        return builder.UseAIContextProviders(new CompactionProvider(pipeline));
+    }
 }
 
 public class CompactionOptions
 {
     public int TokenThreshold { get; set; } = 8000;
     public int PreserveRecentTurns { get; set; } = 8;
-    public string SmallModel { get; set; } = "gpt-4o-mini";
+    public string SmallModel { get; set; } = "qwen-plus";
 }

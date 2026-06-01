@@ -1,9 +1,26 @@
-// TODO: PRD Section 7.3.2 — Prompt injection detection
+using System;
+
 namespace CallCenter.Framework.Safety;
 
 public static class PromptInjectionDetector
 {
-    // TODO: Implement prompt injection pattern detection
-    // Common patterns: "忽略之前指令", "ignore previous instructions", system prompt leaks
-    public static bool Detect(string input) => false;
+    private static readonly string[] InjectionPatterns = new[]
+    {
+        "忽略之前", "ignore previous", "ignore above",
+        "system prompt", "system指令",
+        "you are now", "你现在是",
+        "扮演系统", "绕过安全",
+        " disregard", "override instructions",
+    };
+
+    public static bool Detect(string input)
+    {
+        var lower = input.ToLowerInvariant();
+        foreach (var pattern in InjectionPatterns)
+        {
+            if (lower.Contains(pattern))
+                return true;
+        }
+        return false;
+    }
 }
