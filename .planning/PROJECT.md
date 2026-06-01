@@ -40,7 +40,7 @@
 - ✓ **FW-07**: Compaction 扩展方法（8000 token 阈值）— Phase 6
 - ✓ **FW-08**: Audit Logger（自动捕获 Workflow Step 输入/输出）— Phase 7
 - ✓ **FW-09**: Saga 补偿（失败补偿 + 重试策略）— Phase 7
-- [ ] **BE-01**: 新增业务模块 7 步流程
+- ✓ **BE-01**: 新增业务模块 7 步流程 — Phase 8
 
 - ✓ **IR-04**: 用户中途切换意图 → 终止旧流程 → 启动新流程 — Phase 5
 - ✓ **IR-05**: 用户回复不在预期范围 → 重新意图识别 — Phase 5

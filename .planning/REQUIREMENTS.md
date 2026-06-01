@@ -71,7 +71,7 @@
 | FW-07 | Phase 6 | Complete |
 | FW-08 | Phase 7 | Complete |
 | FW-09 | Phase 7 | Complete |
-| BE-01 | Phase 8 | Pending |
+| BE-01 | Phase 8 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 8 total
