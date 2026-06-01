@@ -53,7 +53,7 @@ Build a console-based refund workflow demo using Microsoft Agent Framework .NET 
 
 **Requirements:** CD-01, CD-02, CD-03, IR-03
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 **Wave 1**

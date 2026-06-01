@@ -9,15 +9,17 @@
 
 - [ ] **WF-01**: 退款流程支持 6 步执行：GetOrder → CheckRefundRule → WaitConfirm → ExecuteRefund → RestoreCoupon → SendNotification
 - [ ] **WF-02**: 流程缺少参数时自动回 RequestPort 询问用户（动态追问机制）
-- [ ] **WF-03**: 用户确认退款前暂停流程，展示订单信息和退款金额
-- [ ] **WF-04**: 用户取消退款时流程终止并输出取消通知
-- [ ] **WF-05**: 退款规则校验：7 天内 + 已签收 + 非特殊品类
+- [ ] **WF-03**: 用户确认退款前暂停流程，通过 RequestPort 展示订单信息、商品名称、退款金额
+- [ ] **WF-04**: 用户回复"取消"时发送 RefundSignal.Cancelled，流程终止并输出取消通知
+- [ ] **WF-05**: 退款规则校验：7 天内 + 已签收 + 非特殊品类，退款金额 = 原价 - 优惠券分摊
 
 ### Intent Recognition
 
 - [ ] **IR-01**: Entry Point 实现 LLM 意图识别（DashScope → StructuredOutputParser → IntentResult）
-- [ ] **IR-02**: Entry Point 检查 activeWorkflow 决定 Resume 或新启动
-- [ ] **IR-03**: 无意图消息走闲聊回复，不启动 Workflow
+- [ ] **IR-02**: Entry Point 检查 StateBag["activeWorkflow"] 决定 Resume（从 checkpoint 恢复）或新启动
+- [x] **IR-03**: 无意图消息（闲聊/问候）不启动 Workflow，走对话 Agent 自然回复
+- [ ] **IR-04**: 用户中途切换意图（退款中改换货）→ 终止旧流程 → 清除 activeWorkflow → 启动新流程
+- [ ] **IR-05**: 用户回复不在预期范围（如确认时回复"我要投诉"）→ 当前流程挂起 → 重新意图识别
 
 ### MCP Client
 
@@ -27,27 +29,37 @@
 
 ### AgentClassSkill
 
-- [ ] **SK-01**: RefundSkill 通过 AgentClassSkill 定义（Frontmatter + Instructions + Scripts）
-- [ ] **SK-02**: Skill 注册到 AgentSkillsProvider
+- [ ] **SK-01**: RefundSkill 通过 AgentClassSkill 定义（Frontmatter + Instructions + Scripts: get_recent_orders, execute_refund）
+- [ ] **SK-02**: Skill 注册到 AgentSkillsProvider，LLM 通过 Frontmatter description 自动发现
 
 ### Framework
 
-- [ ] **FW-01**: EventBus 实现业务事件发布/订阅（RefundCompletedEvent）
-- [ ] **FW-02**: StructuredOutputParser 将 LLM JSON 转为强类型对象
-- [ ] **FW-03**: Safety Pipeline 实现 PII 脱敏（手机号/身份证/银行卡）
-- [ ] **FW-04**: Agent Pipeline 6 层管道（简化实现）
+- [ ] **FW-01**: EventBus 实现业务事件发布/订阅，事件携带上下文（sessionId, userId, orderId, 金额）
+- [ ] **FW-02**: EventBus 支持 RefundCompletedEvent 和 RiskAlertEvent 两种事件
+- [ ] **FW-03**: StructuredOutputParser 将 LLM JSON 转为强类型对象（自动注入 JSON Schema，解析失败自动重试）
+- [ ] **FW-04**: Safety Pipeline 实现 PII 脱敏（手机号/身份证/银行卡正则脱敏）
+- [ ] **FW-05**: Agent Pipeline 6 层管道（SafetyInput → Logging → Compaction → ToolApproval → LLM → SafetyOutput）
+- [ ] **FW-06**: Session Store 管理 StateBag（activeWorkflow, currentStep），Demo 使用 InMemorySessionStore
+- [ ] **FW-07**: Compaction 扩展方法（8000 token 阈值，保留 8 轮，小模型摘要）— 空壳
+- [ ] **FW-08**: Audit Logger 空壳（TODO: 自动捕获 Workflow Step 输入/输出）
+- [ ] **FW-09**: Saga 补偿空壳（TODO: 失败补偿 + 重试策略 1min/5min/30min）
 
 ### Data
 
 - [ ] **DT-01**: MockOrderService 支持 3 个测试订单（A001 可退 / A002 超期 / A003 未签收）
-- [ ] **DT-02**: MockFinanceService 返回模拟退款结果
-- [ ] **DT-03**: MockMemberService 返回模拟优惠券数据
+- [ ] **DT-02**: MockFinanceService 返回模拟退款结果（RefundId: "RF-xxx", Status: "success"）
+- [ ] **DT-03**: MockMemberService 返回模拟优惠券数据（CouponId: "CPN-2024", Discount: 20.00）
 
 ### Console Demo
 
-- [ ] **CD-01**: 控制台主循环：读输入 → 意图识别 → 启动/恢复 Workflow → 事件处理
-- [ ] **CD-02**: RequestInfoEvent 处理：RefundInfoPort 参数收集 + RefundConfirmPort 确认
-- [ ] **CD-03**: WorkflowOutputEvent / ErrorEvent 展示
+- [x] **CD-01**: 控制台主循环：读输入 → 意图识别 → 启动/恢复 Workflow → 事件处理
+- [x] **CD-02**: RequestInfoEvent 处理：RefundInfoPort 参数收集 + RefundConfirmPort 确认
+- [x] **CD-03**: WorkflowOutputEvent / ErrorEvent / ExecutorFailedEvent 展示
+- [ ] **CD-04**: 30 分钟超时提示（Gateway 检测最后活跃时间 → 提醒 → 再 30 分钟终止）— 简化实现
+
+### Business Extensibility
+
+- [ ] **BE-01**: 新增业务模块 7 步流程（复制 → 重命名 → 修改 Workflow → 修改 Executors → 新增 Skill → 注册 → 完成）
 
 ## v2 Requirements
 
@@ -60,20 +72,20 @@
 ### Observability
 
 - **OB-01**: OpenTelemetry 集成
-- **OB-02**: Audit Trail 审计日志
+- **OB-02**: Audit Trail 防篡改审计存储
 - **OB-03**: Langfuse 集成
 
 ### Session Persistence
 
-- **SP-01**: RedisSessionStore 三合一实现
-- **SP-02**: Checkpoint 外部持久化
-- **SP-03**: TTL 自动过期
+- **SP-01**: RedisSessionStore 三合一实现（聊天历史 + Session 序列化 + Checkpoint）
+- **SP-02**: TTL 自动过期（30/90 天）
+- **SP-03**: 分布式多实例共享 Redis
 
 ### Safety
 
 - **SF-01**: KeywordFilter 关键词拦截
 - **SF-02**: PromptInjectionDetector 注入检测
-- **SF-03**: SafetyOutputFilter 输出过滤
+- **SF-03**: SafetyOutputFilter 输出过滤（高风险转人工）
 
 ## Out of Scope
 
@@ -83,8 +95,6 @@
 | 真实 MCP Server 调用 | Mock 服务验证流程，接口签名一致 |
 | Knowledge Layer (FAQ/RAG) | 旁路系统，后续实现 |
 | Human Agent Layer | 人工客服接管，后续实现 |
-| Compaction 消息压缩 | 控制台交互消息量小 |
-| Saga 补偿机制 | Workflow 异常处理直接写在 Executor |
 
 ## Traceability
 
@@ -97,7 +107,9 @@
 | WF-05 | Phase 1 | Pending |
 | IR-01 | Phase 1 | Pending |
 | IR-02 | Phase 1 | Pending |
-| IR-03 | Phase 1 | Pending |
+| IR-03 | Phase 1 | Complete |
+| IR-04 | Phase 1 | Pending |
+| IR-05 | Phase 1 | Pending |
 | MC-01 | Phase 1 | Pending |
 | MC-02 | Phase 1 | Pending |
 | MC-03 | Phase 1 | Pending |
@@ -107,18 +119,25 @@
 | FW-02 | Phase 1 | Pending |
 | FW-03 | Phase 1 | Pending |
 | FW-04 | Phase 1 | Pending |
+| FW-05 | Phase 1 | Pending |
+| FW-06 | Phase 1 | Pending |
+| FW-07 | Phase 1 | Pending |
+| FW-08 | Phase 1 | Pending |
+| FW-09 | Phase 1 | Pending |
 | DT-01 | Phase 1 | Pending |
 | DT-02 | Phase 1 | Pending |
 | DT-03 | Phase 1 | Pending |
-| CD-01 | Phase 1 | Pending |
-| CD-02 | Phase 1 | Pending |
-| CD-03 | Phase 1 | Pending |
+| CD-01 | Phase 1 | Complete |
+| CD-02 | Phase 1 | Complete |
+| CD-03 | Phase 1 | Complete |
+| CD-04 | Phase 1 | Pending |
+| BE-01 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 23
+- v1 requirements: 32 total
+- Mapped to phases: 32
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-01*
-*Last updated: 2026-06-01 after initial definition*
+*Last updated: 2026-06-01 after spec alignment audit*
