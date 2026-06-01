@@ -17,11 +17,16 @@ public record ProcessResult
     public static ProcessResult ResumeExisting() => new ResumeExistingResult();
     public static ProcessResult StartWorkflow(RefundIntent initialMessage) => new StartWorkflowResult(initialMessage);
     public static ProcessResult NoIntent(string response) => new NoIntentResult(response);
+    public static ProcessResult TimeoutWarning(string msg) => new TimeoutResult(true, msg);
+    public static ProcessResult TimeoutTerminate(string msg) => new TimeoutResult(false, msg);
+    public static ProcessResult IntentSwitch(string oldWf, string newIntent) => new IntentSwitchResult(oldWf, newIntent);
 }
 
 public record ResumeExistingResult : ProcessResult;
 public record StartWorkflowResult(RefundIntent InitialMessage) : ProcessResult;
 public record NoIntentResult(string Response) : ProcessResult;
+public record TimeoutResult(bool IsWarning, string Message) : ProcessResult;
+public record IntentSwitchResult(string OldWorkflow, string NewIntent) : ProcessResult;
 
 public class EntryPoint
 {
@@ -85,31 +90,82 @@ public class EntryPoint
         return await _sessionStore.GetAsync<DateTime>("lastActivity", sessionId, ct);
     }
 
+    public async Task<ProcessResult?> CheckTimeoutAsync(string sessionId, CancellationToken ct = default)
+    {
+        var lastActivity = await GetLastActivityAsync(sessionId, ct);
+        if (lastActivity == null) return null; // First input, no timeout check
+
+        var elapsed = DateTime.UtcNow - lastActivity.Value;
+
+        if (elapsed.TotalMinutes >= 60)
+        {
+            await ClearActiveWorkflowAsync(sessionId, ct);
+            return ProcessResult.TimeoutTerminate("Session terminated due to 60 minutes of inactivity.");
+        }
+
+        if (elapsed.TotalMinutes >= 30)
+        {
+            await ClearActiveWorkflowAsync(sessionId, ct);
+            return ProcessResult.TimeoutWarning("Warning: 30 minutes of inactivity. Active workflow has been cleared. You can start a new conversation.");
+        }
+
+        return null;
+    }
+
     public async Task<ProcessResult> ProcessAsync(
         string sessionId,
         string userMessage,
         Workflow refundWorkflow,
         CancellationToken ct = default)
     {
-        // Update last activity timestamp on every user input
+        // a. Set lastActivity timestamp (from Task 1)
         await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
+
+        // b. Check timeout first - if timeout result, return it immediately
+        var timeoutResult = await CheckTimeoutAsync(sessionId, ct);
+        if (timeoutResult != null)
+        {
+            return timeoutResult;
+        }
 
         var activeWorkflow = await GetActiveWorkflowAsync(sessionId, ct);
 
+        // c. Check if activeWorkflow exists
         if (!string.IsNullOrEmpty(activeWorkflow))
         {
-            if (activeWorkflow == "RefundWorkflow")
+            var intent = await RecognizeIntentAsync(userMessage, ct);
+
+            // greeting/unknown during active workflow returns NoIntent without clearing workflow
+            if (intent == null || intent.Intent is "unknown" or "greeting")
+            {
+                var response = intent?.Intent switch
+                {
+                    "greeting" => "你好！有什么可以帮助你的？",
+                    _ => "抱歉，我不太明白。你可以说'我要退款'来开始退款流程。",
+                };
+                return ProcessResult.NoIntent(response);
+            }
+
+            // Same intent - resume existing workflow
+            if (activeWorkflow == "RefundWorkflow" && intent.Intent == "refund")
             {
                 return ProcessResult.ResumeExisting();
             }
-            await ClearActiveWorkflowAsync(sessionId, ct);
+
+            // Intent switch - terminate old workflow, return IntentSwitch result
+            if (activeWorkflow == "RefundWorkflow" && intent.Intent != "refund")
+            {
+                await ClearActiveWorkflowAsync(sessionId, ct);
+                return ProcessResult.IntentSwitch("RefundWorkflow", intent.Intent);
+            }
         }
 
-        var intent = await RecognizeIntentAsync(userMessage, ct);
+        // d. No activeWorkflow - recognize intent and start new workflow or reply naturally
+        var newIntent = await RecognizeIntentAsync(userMessage, ct);
 
-        if (intent == null || intent.Intent is "unknown" or "greeting")
+        if (newIntent == null || newIntent.Intent is "unknown" or "greeting")
         {
-            var response = intent?.Intent switch
+            var response = newIntent?.Intent switch
             {
                 "greeting" => "你好！有什么可以帮助你的？",
                 _ => "抱歉，我不太明白。你可以说'我要退款'来开始退款流程。",
@@ -117,10 +173,10 @@ public class EntryPoint
             return ProcessResult.NoIntent(response);
         }
 
-        if (intent.Intent == "refund")
+        if (newIntent.Intent == "refund")
         {
             await SetActiveWorkflowAsync(sessionId, "RefundWorkflow", ct);
-            return ProcessResult.StartWorkflow(new RefundIntent(intent.OrderId, "U100"));
+            return ProcessResult.StartWorkflow(new RefundIntent(newIntent.OrderId, "U100"));
         }
 
         return ProcessResult.NoIntent("抱歉，我不太明白。你可以说'我要退款'来开始退款流程。");
