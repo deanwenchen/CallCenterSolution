@@ -58,6 +58,8 @@
 
 ### Phase 7: Audit Logger + Saga Compensation
 
+- [ ] Phase 7: Audit Logger + Saga Compensation (2/2 plans) — planned 2026-06-01
+
 **Goal:** 实现 Workflow 步骤审计日志和失败补偿机制
 
 **Success Criteria**:
