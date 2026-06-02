@@ -1,30 +1,30 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Technical Debt Closure
-status: complete
-last_updated: "2026-06-01T16:30:00.000Z"
-last_activity: 2026-06-01
+milestone: v2.0
+milestone_name: TBD
+status: planning
+last_updated: "2026-06-02T00:00:00.000Z"
+last_activity: 2026-06-02
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
 
-Current phase: 08
+Current phase: Planning next milestone
 Active plans: —
-Current task: Phase 07 complete — ready for next phase
+Current task: v1.1 complete — planning v2.0
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-01)
+See: .planning/PROJECT.md (updated 2026-06-02)
 
 **Core value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
-**Current focus:** Phase 08 — Business Extensibility Guide (next)
+**Current focus:** Planning v2.0 milestone
 
 ## Phase Progress
 
@@ -41,32 +41,23 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 Tasks: 35/35 complete
 
-## Build Status
+## Milestone: v1.1 Technical Debt Closure — SHIPPED 2026-06-01
 
-- `dotnet build`: 0 errors, 0 warnings
-- All 5 projects compile: Shared, Framework, Workflows, AgentHost, ConsoleDemo
-
-## Milestone: v1.1 Technical Debt Closure — COMPLETE
-
-All 8 phases completed on 2026-06-01.
-
-## Decisions Made
-
-See individual phase STATE.md sections and .planning/PROJECT.md Key Decisions table.
+All 8 phases completed. See .planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md
 
 ## Last Session
 
-**Timestamp:** 2026-06-01
-**Stopped At:** Milestone v1.1 complete — all 8 phases shipped
+**Timestamp:** 2026-06-02
+**Stopped At:** v1.1 milestone archived
 **Resume File:** None
 
 ## Current Position
 
-Phase: Milestone complete
+Phase: Milestone complete — planning next
 Plan: —
-Status: Ready for /gsd:complete-milestone
-Last activity: 2026-06-01 — Milestone v1.1 complete
+Status: Ready for /gsd:new-milestone
+Last activity: 2026-06-02 — Milestone v1.1 archived
 
 ## Operator Next Steps
 
-- /gsd:complete-milestone — archive milestone and prepare v2
+- /gsd:new-milestone — start v2.0 milestone planning
