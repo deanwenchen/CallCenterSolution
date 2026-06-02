@@ -1,6 +1,7 @@
 using System.ClientModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using CallCenter.Framework.Parsing;
 using CallCenter.Framework.Session;
 using CallCenter.Workflows.Refund;
@@ -11,7 +12,10 @@ using OpenAI;
 
 namespace CallCenter.AgentHost;
 
-public record IntentResult(string Intent, string? Workflow, string? OrderId);
+public record IntentResult(
+    [property: JsonPropertyName("intent")] string Intent,
+    [property: JsonPropertyName("workflow")] string? Workflow,
+    [property: JsonPropertyName("orderId")] string? OrderId);
 
 public record ProcessResult
 {
