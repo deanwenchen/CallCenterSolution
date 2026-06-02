@@ -1,5 +1,6 @@
 #pragma warning disable MAAI001
 using System.ClientModel;
+using System.Threading.Channels;
 using CallCenter.AgentHost;
 using CallCenter.AgentHost.Skills;
 using CallCenter.Framework;
@@ -19,7 +20,7 @@ using OpenAI;
 
  var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY")
     ?? throw new InvalidOperationException("DASHSCOPE_API_KEY not set. Set it to your DashScope API key.");
- 
+
 var modelName = Environment.GetEnvironmentVariable("DASHSCOPE_MODEL_NAME") ?? "qwen3-vl-flash";
 
 // Create DashScope ChatClient (OpenAI compatible)
@@ -66,14 +67,26 @@ var pipelineClient = StandardPipelineFactory.CreatePipeline(chatClient, summariz
 var auditLogger = new AuditLogger(".audit");
 
 // Saga-enabled executor for testing (failOnce=false for normal operation)
-object? refundExecutor = null; // ExecuteRefundExecutor (internal, used via workflow)
-object? restoreCoupon = null; // RestoreCouponExecutor (internal, used via workflow)
+object? refundExecutor = null;
+object? restoreCoupon = null;
 
 // Build workflow with saga-capable executor
 var refundWorkflowWithAudit = RefundWorkflow.Build(orderService, financeService, memberService, eventBus);
 
 // Create EntryPoint with piped client (not raw)
 var entryPoint = new EntryPoint(pipelineClient, sessionStore, skillsProvider);
+
+// Single stdin reader feeding a channel. Only ONE consumer reads from the channel at a time.
+var inputChannel = Channel.CreateUnbounded<string>();
+_ = Task.Run(async () =>
+{
+    while (true)
+    {
+        var line = await Console.In.ReadLineAsync();
+        if (line == null) break;
+        await inputChannel.Writer.WriteAsync(line);
+    }
+});
 
 // Main chat loop
 Console.WriteLine("=== CallCenter AI Demo ===");
@@ -82,7 +95,7 @@ Console.WriteLine("输入消息开始（如'我要退款，订单A001'），输�
 while (true)
 {
     Console.Write("用户: ");
-    var userMessage = Console.ReadLine();
+    var userMessage = await inputChannel.Reader.ReadAsync();
     if (string.IsNullOrWhiteSpace(userMessage) || userMessage.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase))
         break;
 
@@ -92,7 +105,7 @@ while (true)
     switch (result)
     {
         case ResumeExistingResult:
-            await ResumeWorkflow(refundWorkflow, userMessage, checkpointManager, sessionStore, sessionId);
+            await ResumeWorkflow(refundWorkflow, userMessage, checkpointManager, sessionStore, sessionId, inputChannel);
             break;
 
         case TimeoutResult timeout:
@@ -118,7 +131,7 @@ while (true)
 
         case StartWorkflowResult start:
             Console.WriteLine($"[意图: refund, 订单: {start.InitialMessage.OrderId ?? "(未提供)"}]");
-            await RunWorkflow(refundWorkflowWithAudit, start.InitialMessage, checkpointManager, sessionStore, sessionId, entryPoint.RecognizeIntentAsync, auditLogger, refundExecutor, restoreCoupon);
+            await RunWorkflow(refundWorkflowWithAudit, start.InitialMessage, checkpointManager, sessionStore, sessionId, entryPoint.RecognizeIntentAsync, inputChannel, auditLogger, refundExecutor, restoreCoupon);
             break;
     }
 }
@@ -130,118 +143,127 @@ static async Task RunWorkflow(
     InMemorySessionStore sessionStore,
     string sessionId,
     Func<string, CancellationToken, Task<IntentResult?>> recognizeIntent,
+    Channel<string> inputChannel,
     AuditLogger? auditLogger = null,
     object? refundExecutor = null,
     object? restoreCoupon = null)
 {
     CheckpointInfo? lastCheckpoint = null;
 
-    await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, initialMessage, checkpointManager);
-
-    await foreach (WorkflowEvent evt in run.WatchStreamAsync())
+    // Retry loop: if workflow needs order ID, re-run after getting it
+    var currentMessage = initialMessage;
+    while (true)
     {
-        switch (evt)
+        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, currentMessage, checkpointManager);
+
+        bool needsOrderId = false;
+
+        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
         {
-            case RequestInfoEvent reqEvt:
-                await AuditTrailMiddleware.CaptureStepStart(auditLogger!, sessionId, "RequestInfo", reqEvt);
-                var response = await HandleRequestAsync(reqEvt.Request, recognizeIntent, sessionStore, sessionId);
-                await run.SendResponseAsync(response);
-                await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "RequestInfo", response);
-                break;
-
-            case WorkflowOutputEvent outputEvt:
-                Console.WriteLine($"\n[结果] {outputEvt.Data}");
-                await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "WorkflowOutput", outputEvt);
-                // Save final checkpoint and clear activeWorkflow on success
-                if (lastCheckpoint != null)
-                {
-                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
-                }
-                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
-
-                // Verify audit chain
-                if (auditLogger != null)
-                {
-                    var verifyResult = await auditLogger.VerifyChainAsync(sessionId);
-                    Console.WriteLine($"\n[审计] {verifyResult.Message}");
-                }
-                return;
-
-            case SuperStepCompletedEvent ssc:
-                // Capture checkpoint from each super step
-                if (ssc.CompletionInfo?.Checkpoint != null)
-                {
-                    lastCheckpoint = ssc.CompletionInfo.Checkpoint;
-                    await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
-                }
-                await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "SuperStep", ssc);
-                break;
-
-            case WorkflowErrorEvent errEvt:
-                Console.ForegroundColor = ConsoleColor.Red;
-                var executorId = errEvt.Exception?.Source ?? "workflow";
-                var reason = errEvt.Exception?.Message ?? "未知错误";
-                Console.WriteLine($"\n[错误] 工作流失败: {executorId} - {reason}");
-                Console.ResetColor();
-
-                await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, executorId, errEvt.Exception ?? new Exception(reason));
-
-                // Saga compensation: if ExecuteRefund failed, try RestoreCoupon
-                if (executorId == "ExecuteRefund" && restoreCoupon != null)
-                {
-                    Console.WriteLine("\n[补偿] 检测到 ExecuteRefund 失败，触发 Saga 补偿...");
-                    var compensationTriggered = false;
-                    try
+            switch (evt)
+            {
+                case RequestInfoEvent reqEvt:
+                    await AuditTrailMiddleware.CaptureStepStart(auditLogger!, sessionId, "RequestInfo", reqEvt);
+                    if (reqEvt.Request.TryGetDataAs<RefundSignal>(out var signal) && signal == RefundSignal.NeedOrderId)
                     {
-                        var saga = new SagaBuilder()
-                            .OnFailure("ExecuteRefund", async ct =>
-                            {
-                                Console.WriteLine("[补偿] 执行补偿: 恢复优惠券...");
-                                // RestoreCouponExecutor is internal — in production this would call
-                                // the executor directly. For demo: log the compensation path.
-                                compensationTriggered = true;
-                            })
-                            .WithRetry(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3));
+                        Console.Write("请提供订单号: ");
+                        var orderId = await inputChannel.Reader.ReadAsync() ?? "";
+                        await sessionStore.SetAsync("pendingOrderId", orderId, sessionId);
+                        currentMessage = currentMessage with { OrderId = orderId };
+                        needsOrderId = true;
+                    }
+                    else
+                    {
+                        var response = await HandleRequestAsync(reqEvt.Request, recognizeIntent, sessionStore, sessionId, inputChannel);
+                        await run.SendResponseAsync(response);
+                    }
+                    await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "RequestInfo", reqEvt);
+                    break;
 
-                        // Retry the original action (in real scenario this would re-execute refund)
-                        await saga.ExecuteAsync(async _ => throw errEvt.Exception!, default);
+                case WorkflowOutputEvent outputEvt:
+                    Console.WriteLine($"\n[结果] {outputEvt.Data}");
+                    await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "WorkflowOutput", outputEvt);
+                    if (lastCheckpoint != null)
+                    {
+                        await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                    }
+                    await sessionStore.RemoveAsync("activeWorkflow", sessionId);
 
-                        if (compensationTriggered)
+                    if (auditLogger != null)
+                    {
+                        var verifyResult = await auditLogger.VerifyChainAsync(sessionId);
+                        Console.WriteLine($"\n[审计] {verifyResult.Message}");
+                    }
+                    return;
+
+                case SuperStepCompletedEvent ssc:
+                    if (ssc.CompletionInfo?.Checkpoint != null)
+                    {
+                        lastCheckpoint = ssc.CompletionInfo.Checkpoint;
+                        await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
+                    }
+                    await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "SuperStep", ssc);
+                    break;
+
+                case WorkflowErrorEvent errEvt:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    var executorId = errEvt.Exception?.Source ?? "workflow";
+                    var reason = errEvt.Exception?.Message ?? "未知错误";
+                    Console.WriteLine($"\n[错误] 工作流失败: {executorId} - {reason}");
+                    Console.ResetColor();
+
+                    await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, executorId, errEvt.Exception ?? new Exception(reason));
+
+                    if (executorId == "ExecuteRefund" && restoreCoupon != null)
+                    {
+                        Console.WriteLine("\n[补偿] 检测到 ExecuteRefund 失败，触发 Saga 补偿...");
+                        var compensationTriggered = false;
+                        try
                         {
-                            Console.WriteLine("[补偿] 补偿完成");
-                            await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "SagaCompensation", new { Step = "ExecuteRefund", Compensation = "RestoreCoupon" });
+                            var saga = new SagaBuilder()
+                                .OnFailure("ExecuteRefund", async ct =>
+                                {
+                                    Console.WriteLine("[补偿] 执行补偿: 恢复优惠券...");
+                                    compensationTriggered = true;
+                                })
+                                .WithRetry(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3));
+
+                            await saga.ExecuteAsync(async _ => throw errEvt.Exception!, default);
+
+                            if (compensationTriggered)
+                            {
+                                Console.WriteLine("[补偿] 补偿完成");
+                                await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "SagaCompensation", new { Step = "ExecuteRefund", Compensation = "RestoreCoupon" });
+                            }
+                        }
+                        catch (SagaCompensationException sagaEx)
+                        {
+                            Console.WriteLine($"[补偿] 补偿失败: {sagaEx.Message}");
+                            await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, "SagaCompensation", sagaEx);
                         }
                     }
-                    catch (SagaCompensationException sagaEx)
-                    {
-                        Console.WriteLine($"[补偿] 补偿失败: {sagaEx.Message}");
-                        await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, "SagaCompensation", sagaEx);
-                    }
-                }
 
-                // Clear activeWorkflow on error
-                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
-                // Leave checkpoint for debugging
-                return;
+                    await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                    return;
 
-            case ExecutorFailedEvent failEvt:
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"\n[错误] 工作流失败: {failEvt.ExecutorId} - {failEvt.Data}");
-                Console.ResetColor();
+                case ExecutorFailedEvent failEvt:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"\n[错误] 工作流失败: {failEvt.ExecutorId} - {failEvt.Data}");
+                    Console.ResetColor();
 
-                await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, failEvt.ExecutorId ?? "unknown", new Exception($"Executor {failEvt.ExecutorId} failed: {failEvt.Data}"));
+                    await AuditTrailMiddleware.CaptureError(auditLogger!, sessionId, failEvt.ExecutorId ?? "unknown", new Exception($"Executor {failEvt.ExecutorId} failed: {failEvt.Data}"));
 
-                // Clear activeWorkflow on error
-                await sessionStore.RemoveAsync("activeWorkflow", sessionId);
-                // Leave checkpoint for debugging
-                return;
+                    await sessionStore.RemoveAsync("activeWorkflow", sessionId);
+                    return;
+            }
         }
+
+        if (!needsOrderId) break;
     }
 }
 
-static async Task ResumeWorkflow(Workflow workflow, string userMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId)
+static async Task ResumeWorkflow(Workflow workflow, string userMessage, CheckpointManager checkpointManager, InMemorySessionStore sessionStore, string sessionId, Channel<string> inputChannel)
 {
-    // Load checkpoint from session store
     var checkpoint = await sessionStore.GetAsync<CheckpointInfo>("lastCheckpoint", sessionId);
     if (checkpoint == null)
     {
@@ -260,21 +282,20 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
         switch (evt)
         {
             case RequestInfoEvent reqEvt:
-                // Check which RequestPort is waiting and send the correct response type
                 if (reqEvt.Request.TryGetDataAs<RefundSignal>(out _))
                 {
-                    // InfoPort is waiting — user provided order ID
-                    Console.WriteLine($"[DEBUG] 发送订单号到工作流: {userMessage}");
-                    var orderIdResponse = reqEvt.Request.CreateResponse(new RefundIntent(userMessage, "U100"));
+                    Console.Write("请提供订单号: ");
+                    var orderId = await inputChannel.Reader.ReadAsync() ?? "";
+                    var orderIdResponse = reqEvt.Request.CreateResponse(new RefundIntent(orderId, "U100"));
                     await run.SendResponseAsync(orderIdResponse);
                 }
                 else if (reqEvt.Request.TryGetDataAs<ConfirmRefundRequest>(out var confirmReq))
                 {
-                    // ConfirmPort is waiting — parse user's confirmation
                     Console.WriteLine($"订单 {confirmReq.OrderId}: {confirmReq.ProductName} ¥{confirmReq.Amount:F2}");
-                    Console.Write($"确认退款？(回复'确认'或'取消'): 用户输入 '{userMessage}' → ");
+                    Console.Write("确认退款？(回复'确认'或'取消'): ");
+                    var reply = await inputChannel.Reader.ReadAsync();
                     ExternalResponse confirmResponse;
-                    if (userMessage == "确认")
+                    if (reply == "确认")
                     {
                         Console.WriteLine("已确认");
                         confirmResponse = reqEvt.Request.CreateResponse(new UserConfirmation(true));
@@ -294,7 +315,6 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
 
             case WorkflowOutputEvent outputEvt:
                 Console.WriteLine($"\n[结果] {outputEvt.Data}");
-                // Save final checkpoint and clear activeWorkflow on success
                 if (lastCheckpoint != null)
                 {
                     await sessionStore.SetAsync("lastCheckpoint", lastCheckpoint, sessionId);
@@ -303,7 +323,6 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
                 return;
 
             case SuperStepCompletedEvent ssc:
-                // Capture checkpoint from each super step
                 if (ssc.CompletionInfo?.Checkpoint != null)
                 {
                     lastCheckpoint = ssc.CompletionInfo.Checkpoint;
@@ -317,18 +336,14 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
                 var reason = errEvt.Exception?.Message ?? "未知错误";
                 Console.WriteLine($"\n[错误] 工作流失败: {executorId} - {reason}");
                 Console.ResetColor();
-                // Clear activeWorkflow on error
                 await sessionStore.RemoveAsync("activeWorkflow", sessionId);
-                // Leave checkpoint for debugging
                 return;
 
             case ExecutorFailedEvent failEvt:
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"\n[错误] 工作流失败: {failEvt.ExecutorId} - {failEvt.Data}");
                 Console.ResetColor();
-                // Clear activeWorkflow on error
                 await sessionStore.RemoveAsync("activeWorkflow", sessionId);
-                // Leave checkpoint for debugging
                 return;
         }
     }
@@ -339,6 +354,7 @@ static async Task<ExternalResponse> HandleRequestAsync(
     Func<string, CancellationToken, Task<IntentResult?>> recognizeIntent,
     InMemorySessionStore sessionStore,
     string sessionId,
+    Channel<string> inputChannel,
     CancellationToken ct = default)
 {
     // Try RefundSignal (from InfoPort)
@@ -348,8 +364,9 @@ static async Task<ExternalResponse> HandleRequestAsync(
         {
             case RefundSignal.NeedOrderId:
                 Console.Write("请提供订单号: ");
-                var orderId = Console.ReadLine() ?? "";
-                Console.WriteLine($"[DEBUG] 收到订单号: {orderId}");
+                var orderId = await inputChannel.Reader.ReadAsync(ct) ?? "";
+                // Write to session store so GetOrderExecutor can pick it up
+                await sessionStore.SetAsync("pendingOrderId", orderId, sessionId, ct);
                 return request.CreateResponse(new RefundIntent(orderId, "U100"));
         }
     }
@@ -359,7 +376,7 @@ static async Task<ExternalResponse> HandleRequestAsync(
     {
         Console.WriteLine($"订单 {confirmReq.OrderId}: {confirmReq.ProductName} ¥{confirmReq.Amount:F2}");
         Console.Write("确认退款？(回复'确认'或'取消'): ");
-        var reply = Console.ReadLine();
+        var reply = await inputChannel.Reader.ReadAsync(ct);
         if (reply == "确认")
         {
             return request.CreateResponse(new UserConfirmation(true));

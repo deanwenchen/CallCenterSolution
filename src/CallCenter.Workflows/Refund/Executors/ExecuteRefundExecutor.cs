@@ -7,7 +7,6 @@ namespace CallCenter.Workflows.Refund.Executors;
 
 [SendsMessage(typeof(RefundExecuted))]
 [SendsMessage(typeof(RefundSignal))]
-[SendsMessage(typeof(RefundNotification))]
 internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundExecuted>
 {
     private readonly IFinanceMcpClient _financeService;
@@ -25,7 +24,8 @@ internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundE
     {
         if (!message.Confirmed)
         {
-            await context.YieldOutputAsync(new RefundNotification("退款已取消"), cancellationToken);
+            // User cancelled — return null result, downstream SendNotificationExecutor
+            // handles the cancellation notification.
             return new RefundExecuted(null);
         }
 

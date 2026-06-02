@@ -19,8 +19,18 @@ internal sealed class GetOrderExecutor : Executor<RefundIntent>
 
     public override async ValueTask HandleAsync(RefundIntent message, IWorkflowContext context, CancellationToken cancellationToken = default)
     {
+        // First check if order ID was provided via session store (for dynamic prompt scenarios)
+        var storedOrderId = await context.ReadStateAsync<string>("pendingOrderId", scopeName: "Refund", cancellationToken);
+        if (string.IsNullOrWhiteSpace(message.OrderId) && !string.IsNullOrWhiteSpace(storedOrderId))
+        {
+            message = message with { OrderId = storedOrderId };
+            await context.QueueStateUpdateAsync<string?>("pendingOrderId", null, scopeName: "Refund", cancellationToken);
+        }
+
         if (string.IsNullOrWhiteSpace(message.OrderId))
         {
+            // Signal that we need order ID — main loop will prompt and set pendingOrderId in session store,
+            // then re-invoke the workflow with the same RefundIntent.
             await context.SendMessageAsync(RefundSignal.NeedOrderId, cancellationToken: cancellationToken);
             return;
         }
