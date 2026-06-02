@@ -7,6 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CallCenter.AgentHost.Skills;
 
+/// <summary>
+/// 退款技能。
+/// 主要作用：让 MAF AIAgent 在识别到"我要退款"这类意图时，能够自动发现并调用退款相关能力。
+/// 包含两个脚本：get_recent_orders（查询最近订单）和 execute_refund（执行退款）。
+/// </summary>
 [Experimental("MAAI001")]
 public sealed class RefundSkill : AgentClassSkill<RefundSkill>
 {

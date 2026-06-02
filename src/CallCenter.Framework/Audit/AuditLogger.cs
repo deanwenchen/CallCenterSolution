@@ -24,7 +24,9 @@ public enum AuditVerificationStatus { Valid, Invalid, FileNotFound }
 public record AuditVerificationResult(AuditVerificationStatus Status, int? TamperedAtLine, string? Message);
 
 /// <summary>
-/// 审计日志记录器。将工作流每一步的输入/输出写入 .audit/{sessionId}.jsonl，
+/// 审计日志记录器。
+/// 主要作用：把工作流每一步的输入、输出和错误写成带哈希链的审计日志，方便追踪和防篡改校验。
+/// 将工作流每一步的输入/输出写入 .audit/{sessionId}.jsonl，
 /// 每条通过 SHA256 哈希链连接，形成不可篡改的审计链。
 /// </summary>
 public class AuditLogger

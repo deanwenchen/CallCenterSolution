@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 namespace CallCenter.Framework.EventBus;
 
 /// <summary>
-/// 内存事件总线实现。线程安全（ConcurrentDictionary 存储处理器）。
+/// 内存事件总线实现。
+/// 主要作用：在工作流和外部关注点（通知、分析、监控）之间做解耦，把事件发布和事件处理分开。
+/// 线程安全（ConcurrentDictionary 存储处理器）。
 /// 发布时采用 fire-and-forget 策略，慢处理器不会阻塞发布者。
 /// 适用于演示/开发环境；生产环境应使用持久化消息代理。
 /// </summary>

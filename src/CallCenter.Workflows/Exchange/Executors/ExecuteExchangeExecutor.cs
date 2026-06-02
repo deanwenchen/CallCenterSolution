@@ -7,6 +7,11 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Exchange.Executors;
 
+/// <summary>
+/// 执行换货执行器（骨架）。
+/// 主要作用：在用户确认后调用外部服务执行换货，并产出换货结果。
+/// 当前未实现，仅保留扩展点。
+/// </summary>
 [SendsMessage(typeof(ExchangeExecuted))]
 internal sealed class ExecuteExchangeExecutor : Executor<UserConfirmation, ExchangeExecuted>
 {

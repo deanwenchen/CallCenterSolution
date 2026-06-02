@@ -4,7 +4,9 @@ using System.Text.Json;
 namespace CallCenter.Framework.Session;
 
 /// <summary>
-/// 内存会话存储。使用两层字典：scope（如 sessionId）→ key → value。
+/// 内存会话存储。
+/// 主要作用：在一次会话生命周期内保存工作流状态、断点和临时变量，让流程能够继续执行。
+/// 使用两层字典：scope（如 sessionId）→ key → value。
 /// 线程安全（ConcurrentDictionary）。适用于演示/开发环境。
 /// 生产环境应使用 RedisSessionStore 实现持久化存储。
 /// 用于存储：activeWorkflow（当前工作流名）、lastCheckpoint（断点信息）、

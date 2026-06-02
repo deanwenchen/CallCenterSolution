@@ -9,7 +9,9 @@ using OpenAI;
 namespace CallCenter.Framework.Pipeline;
 
 /// <summary>
-/// 标准聊天管道工厂。创建 6 层委托链：
+/// 标准聊天管道工厂。
+/// 主要作用：把安全、日志、压缩、工具审批等横切能力统一组装到一次 LLM 调用链中。
+/// 创建 6 层委托链：
 /// SafetyInput(最外层) → Logging → Compaction → ToolApproval → LLM(最内层) → SafetyOutput
 /// 外层先执行，内层后执行，形成洋葱模型结构。
 /// </summary>
@@ -66,7 +68,7 @@ public static class StandardPipelineFactory
     }
 }
 
-// Wrapper: applies SafetyOutputFilter to assistant responses
+/// <summary>安全输出包装器。对 AI 响应应用 PII 脱敏，防止敏感信息泄露给用户。</summary>
 internal sealed class SafetyOutputDelegatingClient : DelegatingChatClient
 {
     public SafetyOutputDelegatingClient(IChatClient inner) : base(inner) { }
@@ -90,7 +92,7 @@ internal sealed class SafetyOutputDelegatingClient : DelegatingChatClient
     }
 }
 
-// Wrapper: logs requests and responses
+/// <summary>日志包装器。记录每次 LLM 请求和响应的内容到 JsonlLogger。</summary>
 internal sealed class LoggingDelegatingClient : DelegatingChatClient
 {
     private readonly JsonlLogger _logger;
@@ -120,7 +122,7 @@ internal sealed class LoggingDelegatingClient : DelegatingChatClient
     }
 }
 
-// Wrapper: applies SafetyInputFilter to user messages
+/// <summary>安全输入包装器。对用户消息应用安全过滤（PII 脱敏 + 关键词 + 注入检测）。</summary>
 internal sealed class SafetyInputDelegatingClient : DelegatingChatClient
 {
     public SafetyInputDelegatingClient(IChatClient inner) : base(inner) { }

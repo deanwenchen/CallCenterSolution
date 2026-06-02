@@ -8,6 +8,7 @@ namespace CallCenter.Workflows.Refund;
 
 /// <summary>
 /// 退款工作流定义。
+/// 主要作用：把退款业务拆成一组可恢复、可分支、可审计的工作流步骤，并串成完整执行链路。
 ///
 /// 流程步骤：
 /// 1. GetOrder         → 根据订单号查询订单信息，若无订单号则通过 InfoPort 追问用户

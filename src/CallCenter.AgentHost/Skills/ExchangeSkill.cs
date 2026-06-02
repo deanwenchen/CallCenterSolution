@@ -5,6 +5,11 @@ using Microsoft.Agents.AI;
 
 namespace CallCenter.AgentHost.Skills;
 
+/// <summary>
+/// 换货技能（骨架）。
+/// 主要作用：为后续 v2 的换货能力预留技能入口，让 Agent 可以识别"我要换货"这类意图。
+/// 当前仅提供 Frontmatter 描述，还没有脚本实现。
+/// </summary>
 [Experimental("MAAI001")]
 public sealed class ExchangeSkill : AgentClassSkill<ExchangeSkill>
 {

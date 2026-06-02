@@ -4,11 +4,12 @@ using CallCenter.Shared.Mcp;
 namespace CallCenter.Shared.Services;
 
 /// <summary>
-/// Mock implementation of IOrderMcpClient for demo/testing.
-/// Contains three hardcoded orders covering different refund scenarios:
-///   A001 — delivered, within 7 days, refundable (has coupon)
-///   A002 — delivered, over 30 days, not refundable (custom item)
-///   A003 — shipped (not yet delivered), not refundable
+/// Mock 订单服务。
+/// 主要作用：在没有真实订单系统时，提供固定订单数据，支撑退款/换货流程的本地演示和测试。
+/// 内置三个订单覆盖不同退款场景：
+///   A001 — 已签收、3 天内、可退（有优惠券）
+///   A002 — 已签收、30 天、不可退（定制商品）
+///   A003 — 已发货未签收、不可退
 /// </summary>
 public class MockOrderService : IOrderMcpClient
 {

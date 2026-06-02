@@ -7,6 +7,11 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Exchange.Executors;
 
+/// <summary>
+/// 换货订单查询执行器（骨架）。
+/// 主要作用：作为换货流程第一步，负责根据订单号查询订单，并在缺少订单号时触发追问。
+/// 当前未实现，仅保留扩展点。
+/// </summary>
 [SendsMessage(typeof(ExchangeOrderFound))]
 internal sealed class GetExchangeOrderExecutor : Executor<ExchangeSignal, ExchangeOrderFound>
 {

@@ -17,7 +17,8 @@ public class SafetyViolationException : Exception
 }
 
 /// <summary>
-/// 多阶段输入安全过滤器。在消息到达 LLM 之前应用。
+/// 多阶段输入安全过滤器。
+/// 主要作用：在用户消息进入 LLM 之前做预处理，拦截危险输入、减少敏感信息泄露风险。
 /// 管道顺序：PII 脱敏 → 关键词拦截 → 提示注入检测。
 /// 任一阶段可抛出 SafetyViolationException，短路整个管道。
 /// </summary>

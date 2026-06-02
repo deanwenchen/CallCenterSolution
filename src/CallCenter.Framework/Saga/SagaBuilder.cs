@@ -22,7 +22,9 @@ public class SagaCompensationException : Exception
 }
 
 /// <summary>
-/// Saga 构建器。重试 + 补偿模式。失败时先重试，耗尽后执行补偿回滚。
+/// Saga 构建器。
+/// 主要作用：为有副作用的业务步骤提供“失败重试 + 最终补偿回滚”能力，避免流程半成功半失败。
+/// 重试 + 补偿模式。失败时先重试，耗尽后执行补偿回滚。
 /// </summary>
 public class SagaBuilder
 {

@@ -55,6 +55,7 @@ public record IntentSwitchResult(string OldWorkflow, string NewIntent) : Process
 
 /// <summary>
 /// 用户输入处理入口。
+/// 主要作用：承接用户每次输入，完成意图识别、会话超时检查、工作流路由与切换控制。
 /// 职责：1) 通过 LLM 识别用户意图 2) 管理会话超时 3) 路由到对应工作流。
 /// 路由逻辑：
 ///   - 无活跃工作流 → 识别意图 → refund 启动 RefundWorkflow，否则回复自然语言

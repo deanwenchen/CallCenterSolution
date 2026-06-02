@@ -3,13 +3,14 @@
 namespace CallCenter.Framework.Session;
 
 /// <summary>
-/// Placeholder for Redis-backed session persistence.
-/// In production, this will store:
-///   - Chat history for context window compaction
-///   - Serialized agent sessions for resume
-///   - Workflow checkpoints for long-running workflows
-///   - TTL auto-expiration (30/90 days configurable)
-/// Currently throws NotImplementedException — use InMemorySessionStore for demo.
+/// Redis 会话存储（占位符）。
+/// 主要作用：在生产环境中把会话状态、聊天历史和工作流断点持久化到 Redis，支持恢复和过期管理。
+/// 演示阶段未实现，当前使用 InMemorySessionStore 替代。
+/// 生产环境需存储三项内容：
+///   - 聊天历史（用于上下文压缩）
+///   - Agent 会话序列化（用于恢复对话）
+///   - 工作流断点（用于长运行工作流恢复）
+///   - 支持自动过期（30/90 天可配置）
 /// </summary>
 public class RedisSessionStore
 {

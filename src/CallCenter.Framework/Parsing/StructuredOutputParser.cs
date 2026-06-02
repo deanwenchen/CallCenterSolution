@@ -4,6 +4,7 @@ namespace CallCenter.Framework.Parsing;
 
 /// <summary>
 /// LLM 结构化输出解析器。
+/// 主要作用：把大模型返回的 JSON 文本安全地转成强类型对象，供业务代码直接使用。
 /// 1. 剥离 Markdown 代码围栏（```json ... ```），这是 LLM 常用的 JSON 包装格式
 /// 2. 将 JSON 反序列化为指定类型 TOutput
 /// 3. 解析失败时返回 null（不抛异常）

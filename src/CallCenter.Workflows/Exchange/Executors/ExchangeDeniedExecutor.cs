@@ -6,6 +6,11 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Exchange.Executors;
 
+/// <summary>
+/// 换货拒绝执行器（骨架）。
+/// 主要作用：当换货规则校验失败时，输出拒绝信息并终止流程。
+/// 当前未实现，仅保留扩展点。
+/// </summary>
 [SendsMessage(typeof(ExchangeNotification))]
 internal sealed class ExchangeDeniedExecutor : Executor<ExchangeRuleResult, ExchangeNotification>
 {
