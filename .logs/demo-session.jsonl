@@ -125,3 +125,57 @@
 {"Timestamp":"2026-06-02T02:45:40.7656345Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022A001\u0022}","TokenCount":1030}
 {"Timestamp":"2026-06-02T02:45:40.9183405Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u4F60\u597D","TokenCount":null}
 {"Timestamp":"2026-06-02T02:45:41.3396522Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022greeting\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022}","TokenCount":638}
+{"Timestamp":"2026-06-02T02:51:38.9712964Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:51:40.0034073Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:51:40.0192997Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:51:40.4930755Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T02:53:23.0985021Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:53:23.9073489Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:53:23.9181179Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:53:24.3990299Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T02:54:09.7569890Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:54:10.5031514Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:54:10.5132097Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:54:10.9794762Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T02:56:54.8502941Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:56:57.0637165Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:56:57.0954901Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:56:57.5657252Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T02:57:39.3048146Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:57:40.0880206Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:57:40.0990021Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:57:40.5450788Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T02:58:51.1102668Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:58:51.8669930Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T02:58:51.8783006Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T02:58:52.3862758Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T03:00:44.5562755Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T03:00:45.3556771Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T03:00:45.3661822Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T03:00:45.8319505Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T03:02:42.5793753Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:02:45.1322326Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":653}
+{"Timestamp":"2026-06-02T03:02:45.1642964Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:02:46.0369837Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":975}
+{"Timestamp":"2026-06-02T03:02:46.0654349Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:02:46.5566364Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022A001\u0022}","TokenCount":1030}
+{"Timestamp":"2026-06-02T03:03:05.6490404Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T03:03:06.4510043Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":647}
+{"Timestamp":"2026-06-02T03:03:06.4692785Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E","TokenCount":null}
+{"Timestamp":"2026-06-02T03:03:06.9757048Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022\u0022}","TokenCount":934}
+{"Timestamp":"2026-06-02T03:03:26.0856001Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A002","TokenCount":null}
+{"Timestamp":"2026-06-02T03:03:26.8414839Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":653}
+{"Timestamp":"2026-06-02T03:03:26.8532745Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A002","TokenCount":null}
+{"Timestamp":"2026-06-02T03:03:27.5152476Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022A002\u0022}","TokenCount":944}
+{"Timestamp":"2026-06-02T03:03:48.1839882Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u4F60\u597D","TokenCount":null}
+{"Timestamp":"2026-06-02T03:03:48.8788292Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022greeting\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022}","TokenCount":638}
+{"Timestamp":"2026-06-02T03:04:07.5726220Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:04:08.4194320Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":653}
+{"Timestamp":"2026-06-02T03:04:08.4305672Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:04:08.9136830Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022A001\u0022}","TokenCount":944}
+{"Timestamp":"2026-06-02T03:04:29.6548740Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:04:30.3967446Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"","TokenCount":653}
+{"Timestamp":"2026-06-02T03:04:30.4086050Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u6211\u8981\u9000\u6B3E\uFF0C\u8BA2\u5355A001","TokenCount":null}
+{"Timestamp":"2026-06-02T03:04:30.9421804Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022refund\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022, \u0022orderId\u0022: \u0022A001\u0022}","TokenCount":944}
+{"Timestamp":"2026-06-02T03:04:31.0862695Z","SessionId":"demo-session","Direction":"request","Tool":null,"Content":"\u4F60\u597D","TokenCount":null}
+{"Timestamp":"2026-06-02T03:04:31.4923675Z","SessionId":"demo-session","Direction":"response","Tool":null,"Content":"{\u0022intent\u0022: \u0022greeting\u0022, \u0022workflow\u0022: \u0022RefundWorkflow\u0022}","TokenCount":638}
