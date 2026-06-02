@@ -2,6 +2,11 @@ using System.Collections.Concurrent;
 
 namespace CallCenter.Framework.EventBus;
 
+/// <summary>
+/// In-memory event bus implementation using ConcurrentDictionary for thread-safe handler storage.
+/// Fire-and-forget dispatch — handlers are invoked without awaiting, so slow handlers won't block publishers.
+/// Suitable for demo/dev; production should use a durable message broker.
+/// </summary>
 public class InMemoryBusinessEventBus : IBusinessEventBus
 {
     private readonly ConcurrentDictionary<Type, List<Delegate>> _handlers = new();
@@ -14,6 +19,8 @@ public class InMemoryBusinessEventBus : IBusinessEventBus
             {
                 if (handler is Func<T, Task> func)
                 {
+                    // Fire-and-forget: handlers run without blocking the publisher.
+                    // In production, consider awaiting with timeout or using a queue.
                     _ = func.Invoke(evt);
                 }
             }
@@ -28,6 +35,7 @@ public class InMemoryBusinessEventBus : IBusinessEventBus
         return new Subscription(this, typeof(T), handler);
     }
 
+    /// <summary>Represents an active subscription. Disposing removes the handler.</summary>
     private class Subscription : IDisposable
     {
         private readonly InMemoryBusinessEventBus _bus;

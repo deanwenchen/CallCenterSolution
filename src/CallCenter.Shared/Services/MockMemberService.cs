@@ -3,6 +3,10 @@ using CallCenter.Shared.Mcp;
 
 namespace CallCenter.Shared.Services;
 
+/// <summary>
+/// Mock implementation of IMemberMcpClient for demo/testing.
+/// Returns a fixed coupon (CPN-2024, ¥20 discount) and always succeeds on restore.
+/// </summary>
 public class MockMemberService : IMemberMcpClient
 {
     public Task<CouponInfo?> GetCouponAsync(string userId, CancellationToken ct = default)

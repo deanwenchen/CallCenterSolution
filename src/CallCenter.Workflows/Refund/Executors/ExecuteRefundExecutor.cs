@@ -7,6 +7,7 @@ namespace CallCenter.Workflows.Refund.Executors;
 
 [SendsMessage(typeof(RefundExecuted))]
 [SendsMessage(typeof(RefundSignal))]
+[SendsMessage(typeof(RefundNotification))]
 internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundExecuted>
 {
     private readonly IFinanceMcpClient _financeService;

@@ -6,6 +6,13 @@ using Microsoft.Extensions.AI;
 
 namespace CallCenter.Framework.Safety;
 
+/// <summary>
+/// A DelegatingChatClient that applies safety filters to both input and output.
+/// Applied as part of the StandardPipeline (outermost layer for input, innermost for output).
+/// Note: StandardPipelineFactory now uses separate SafetyInputDelegatingClient and
+/// SafetyOutputDelegatingClient wrappers instead of this class for finer-grained pipeline control.
+/// This class is retained for backward compatibility.
+/// </summary>
 public class SafetyPipelineAgent : DelegatingChatClient
 {
     public SafetyPipelineAgent(IChatClient inner) : base(inner) { }

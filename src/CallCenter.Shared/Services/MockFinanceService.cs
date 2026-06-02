@@ -3,6 +3,10 @@ using CallCenter.Shared.Mcp;
 
 namespace CallCenter.Shared.Services;
 
+/// <summary>
+/// Mock implementation of IFinanceMcpClient for demo/testing.
+/// Always returns a successful refund result with a generated refund ID.
+/// </summary>
 public class MockFinanceService : IFinanceMcpClient
 {
     public Task<RefundResult> RefundAsync(string orderId, decimal amount, CancellationToken ct = default)

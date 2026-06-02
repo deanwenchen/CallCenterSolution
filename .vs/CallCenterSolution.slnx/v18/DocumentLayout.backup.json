@@ -1,10 +1,41 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Claude\\CallCenterSolution\\",
+  "WorkspaceRootPath": "D:\\Claude\\CallCenterSolution1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DDE35912-8D03-D6B1-DF1F-B8C7683FF195}|src\\CallCenter.ConsoleClient\\CallCenter.ConsoleClient.csproj|d:\\claude\\callcentersolution\\src\\callcenter.consoleclient\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DDE35912-8D03-D6B1-DF1F-B8C7683FF195}|src\\CallCenter.ConsoleClient\\CallCenter.ConsoleClient.csproj|solutionrelative:src\\callcenter.consoleclient\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A172AB43-B7AB-9F9B-189C-6B3FDA8CABF2}|src\\CallCenter.ConsoleDemo\\CallCenter.ConsoleDemo.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.consoledemo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A172AB43-B7AB-9F9B-189C-6B3FDA8CABF2}|src\\CallCenter.ConsoleDemo\\CallCenter.ConsoleDemo.csproj|solutionrelative:src\\callcenter.consoledemo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\waituserconfirmexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\waituserconfirmexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\sendnotificationexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\sendnotificationexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\restorecouponexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\restorecouponexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\refunddeniedexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\refunddeniedexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\getorderexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\getorderexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\executerefundexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\executerefundexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.workflows\\refund\\executors\\checkrefundruleexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FBFB380-77BB-9BB6-58F9-871AF63C0083}|src\\CallCenter.Workflows\\CallCenter.Workflows.csproj|solutionrelative:src\\callcenter.workflows\\refund\\executors\\checkrefundruleexecutor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Claude\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,28 +45,120 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
-            },
-            {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "D:\\Claude\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
-              "RelativeDocumentMoniker": "src\\CallCenter.ConsoleClient\\Program.cs",
-              "ToolTip": "D:\\Claude\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
-              "RelativeToolTip": "src\\CallCenter.ConsoleClient\\Program.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.ConsoleDemo\\Program.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.ConsoleDemo\\Program.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.ConsoleDemo\\Program.cs",
+              "RelativeToolTip": "src\\CallCenter.ConsoleDemo\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-29T01:30:44.744Z",
+              "WhenOpened": "2026-06-02T00:40:42.521Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WaitUserConfirmExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\WaitUserConfirmExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\WaitUserConfirmExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\WaitUserConfirmExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\WaitUserConfirmExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:24.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SendNotificationExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\SendNotificationExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\SendNotificationExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\SendNotificationExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\SendNotificationExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:23.756Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RestoreCouponExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\RestoreCouponExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\RestoreCouponExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\RestoreCouponExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\RestoreCouponExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:23.181Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RefundDeniedExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\RefundDeniedExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\RefundDeniedExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\RefundDeniedExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\RefundDeniedExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:22.177Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GetOrderExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\GetOrderExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\GetOrderExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\GetOrderExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\GetOrderExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:21.631Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ExecuteRefundExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\ExecuteRefundExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\ExecuteRefundExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\ExecuteRefundExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\ExecuteRefundExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:21.038Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CheckRefundRuleExecutor.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\CheckRefundRuleExecutor.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Workflows\\Refund\\Executors\\CheckRefundRuleExecutor.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Workflows\\Refund\\Executors\\CheckRefundRuleExecutor.cs",
+              "RelativeToolTip": "src\\CallCenter.Workflows\\Refund\\Executors\\CheckRefundRuleExecutor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T00:40:13.942Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
+              "RelativeDocumentMoniker": "..\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
+              "RelativeToolTip": "..\\CallCenterSolution\\src\\CallCenter.ConsoleClient\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAABgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-29T01:30:44.744Z"
             }
           ]
         }

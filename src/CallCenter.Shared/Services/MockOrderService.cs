@@ -3,6 +3,13 @@ using CallCenter.Shared.Mcp;
 
 namespace CallCenter.Shared.Services;
 
+/// <summary>
+/// Mock implementation of IOrderMcpClient for demo/testing.
+/// Contains three hardcoded orders covering different refund scenarios:
+///   A001 — delivered, within 7 days, refundable (has coupon)
+///   A002 — delivered, over 30 days, not refundable (custom item)
+///   A003 — shipped (not yet delivered), not refundable
+/// </summary>
 public class MockOrderService : IOrderMcpClient
 {
     private static readonly Dictionary<string, OrderInfo> _orders = new()
