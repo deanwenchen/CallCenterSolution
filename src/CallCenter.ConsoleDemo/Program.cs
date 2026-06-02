@@ -17,9 +17,10 @@ using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using OpenAI;
 
-var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY")
+ var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY")
     ?? throw new InvalidOperationException("DASHSCOPE_API_KEY not set. Set it to your DashScope API key.");
-var modelName = Environment.GetEnvironmentVariable("DASHSCOPE_MODEL_NAME") ?? "qwen3.6-plus";
+ 
+var modelName = Environment.GetEnvironmentVariable("DASHSCOPE_MODEL_NAME") ?? "qwen3-vl-flash";
 
 // Create DashScope ChatClient (OpenAI compatible)
 IChatClient chatClient = new OpenAIClient(
@@ -56,7 +57,7 @@ var summarizerClient = StandardPipelineFactory.CreateSummarizerClient(
     new OpenAIClient(
         new ApiKeyCredential(apiKey),
         new OpenAIClientOptions { Endpoint = new Uri("https://dashscope.aliyuncs.com/compatible-mode/v1") }),
-    "qwen-plus");
+    modelName);
 
 var logger = new JsonlLogger();
 var pipelineClient = StandardPipelineFactory.CreatePipeline(chatClient, summarizerClient, sessionId, logger);
@@ -259,11 +260,36 @@ static async Task ResumeWorkflow(Workflow workflow, string userMessage, Checkpoi
         switch (evt)
         {
             case RequestInfoEvent reqEvt:
-                // Per D-01/D-02: User input directly becomes the RequestPort response
-                // The user's current input (userMessage) is sent as the response
-                Console.WriteLine($"[DEBUG] 发送用户输入到工作流: {userMessage}");
-                var response = reqEvt.Request.CreateResponse(new RefundIntent(userMessage, "U100"));
-                await run.SendResponseAsync(response);
+                // Check which RequestPort is waiting and send the correct response type
+                if (reqEvt.Request.TryGetDataAs<RefundSignal>(out _))
+                {
+                    // InfoPort is waiting — user provided order ID
+                    Console.WriteLine($"[DEBUG] 发送订单号到工作流: {userMessage}");
+                    var orderIdResponse = reqEvt.Request.CreateResponse(new RefundIntent(userMessage, "U100"));
+                    await run.SendResponseAsync(orderIdResponse);
+                }
+                else if (reqEvt.Request.TryGetDataAs<ConfirmRefundRequest>(out var confirmReq))
+                {
+                    // ConfirmPort is waiting — parse user's confirmation
+                    Console.WriteLine($"订单 {confirmReq.OrderId}: {confirmReq.ProductName} ¥{confirmReq.Amount:F2}");
+                    Console.Write($"确认退款？(回复'确认'或'取消'): 用户输入 '{userMessage}' → ");
+                    ExternalResponse confirmResponse;
+                    if (userMessage == "确认")
+                    {
+                        Console.WriteLine("已确认");
+                        confirmResponse = reqEvt.Request.CreateResponse(new UserConfirmation(true));
+                    }
+                    else
+                    {
+                        Console.WriteLine("已取消");
+                        confirmResponse = reqEvt.Request.CreateResponse(new UserConfirmation(false));
+                    }
+                    await run.SendResponseAsync(confirmResponse);
+                }
+                else
+                {
+                    Console.WriteLine($"[ERROR] 未知的 RequestPort 类型");
+                }
                 break;
 
             case WorkflowOutputEvent outputEvt:
