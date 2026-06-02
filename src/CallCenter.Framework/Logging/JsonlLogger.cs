@@ -14,6 +14,10 @@ public record JsonlLogEntry(
     string Content,
     int? TokenCount);
 
+/// <summary>
+/// 操作日志记录器。将每次 LLM 请求/响应写入 .logs/{sessionId}.jsonl。
+/// 用于调试和追踪，与 AuditLogger（审计链）不同，此日志不包含哈希验证。
+/// </summary>
 public class JsonlLogger
 {
     private readonly string _logDirectory;

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 namespace CallCenter.Framework.Safety;
 
 /// <summary>
-/// Keyword-based content filter for blocking escalation-trigger words.
-/// Covers complaint/legal terms (投诉, 举报, 起诉), violence (暴力, 杀人), fraud (诈骗), etc.
-/// Case-insensitive matching. Used as part of the SafetyInputFilter pipeline.
+/// 关键词内容过滤器。用于拦截升级触发词。
+/// 覆盖：投诉/法律类（投诉、举报、起诉、维权）、暴力类（暴力、杀人、自杀、死）、诈骗类（诈骗、欺诈、骗子）、违规类（非法、违规）。
+/// 不区分大小写匹配。作为 SafetyInputFilter 管道的一部分使用。
 /// </summary>
 public static class KeywordFilter
 {

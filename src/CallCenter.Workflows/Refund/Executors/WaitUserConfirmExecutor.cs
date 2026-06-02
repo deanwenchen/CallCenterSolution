@@ -3,6 +3,9 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 等待用户确认。第三步。向 ConfirmPort 发送确认请求，工作流暂停等待用户回复。
+/// </summary>
 [SendsMessage(typeof(ConfirmRefundRequest))]
 internal sealed class WaitUserConfirmExecutor : Executor<RefundRuleResult>
 {

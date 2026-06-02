@@ -5,6 +5,9 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 执行退款。第四步。用户确认时调用财务服务，取消时直接返回 null 结果。
+/// </summary>
 [SendsMessage(typeof(RefundExecuted))]
 [SendsMessage(typeof(RefundSignal))]
 internal sealed class ExecuteRefundExecutor : Executor<UserConfirmation, RefundExecuted>

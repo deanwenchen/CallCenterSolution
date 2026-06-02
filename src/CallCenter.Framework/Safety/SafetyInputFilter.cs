@@ -3,8 +3,8 @@ using System;
 namespace CallCenter.Framework.Safety;
 
 /// <summary>
-/// Thrown when user input violates safety policies (keyword blocking, prompt injection).
-/// Carries the violation type for downstream handling and logging.
+/// 安全违规异常。当用户输入触发关键词拦截或提示注入检测时抛出。
+/// 携带违规类型供下游处理和日志记录。
 /// </summary>
 public class SafetyViolationException : Exception
 {
@@ -17,9 +17,9 @@ public class SafetyViolationException : Exception
 }
 
 /// <summary>
-/// Multi-stage input safety filter applied before messages reach the LLM.
-/// Pipeline order: PII redaction → keyword blocking → prompt injection detection.
-/// Any stage can throw SafetyViolationException, which short-circuits the pipeline.
+/// 多阶段输入安全过滤器。在消息到达 LLM 之前应用。
+/// 管道顺序：PII 脱敏 → 关键词拦截 → 提示注入检测。
+/// 任一阶段可抛出 SafetyViolationException，短路整个管道。
 /// </summary>
 public static class SafetyInputFilter
 {
@@ -46,8 +46,8 @@ public static class SafetyInputFilter
 }
 
 /// <summary>
-/// Output safety filter applied to AI responses before they reach the user.
-/// Currently only PII redaction; extend as needed for content moderation.
+/// 输出安全过滤器。在 AI 响应到达用户之前应用。
+/// 目前仅做 PII 脱敏；需要时可扩展内容审核功能。
 /// </summary>
 public static class SafetyOutputFilter
 {

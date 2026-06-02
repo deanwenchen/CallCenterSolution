@@ -4,6 +4,9 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 恢复优惠券。第五步。退款取消时跳过，成功时调用会员服务恢复优惠券。
+/// </summary>
 internal sealed class RestoreCouponExecutor : Executor<RefundExecuted, CouponRestored>
 {
     private readonly IMemberMcpClient _memberService;

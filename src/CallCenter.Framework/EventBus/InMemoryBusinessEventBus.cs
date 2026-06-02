@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 namespace CallCenter.Framework.EventBus;
 
 /// <summary>
-/// In-memory event bus implementation using ConcurrentDictionary for thread-safe handler storage.
-/// Fire-and-forget dispatch — handlers are invoked without awaiting, so slow handlers won't block publishers.
-/// Suitable for demo/dev; production should use a durable message broker.
+/// 内存事件总线实现。线程安全（ConcurrentDictionary 存储处理器）。
+/// 发布时采用 fire-and-forget 策略，慢处理器不会阻塞发布者。
+/// 适用于演示/开发环境；生产环境应使用持久化消息代理。
 /// </summary>
 public class InMemoryBusinessEventBus : IBusinessEventBus
 {

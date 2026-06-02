@@ -7,11 +7,11 @@ using Microsoft.Extensions.AI;
 namespace CallCenter.Framework.Safety;
 
 /// <summary>
-/// A DelegatingChatClient that applies safety filters to both input and output.
-/// Applied as part of the StandardPipeline (outermost layer for input, innermost for output).
-/// Note: StandardPipelineFactory now uses separate SafetyInputDelegatingClient and
-/// SafetyOutputDelegatingClient wrappers instead of this class for finer-grained pipeline control.
-/// This class is retained for backward compatibility.
+/// 安全管道代理客户端。对输入和输出同时应用安全过滤器。
+/// 作为 StandardPipeline 的最外层（输入）和最内层（输出）使用。
+/// 注意：StandardPipelineFactory 现在使用分离的 SafetyInputDelegatingClient 和
+/// SafetyOutputDelegatingClient 替代此类，以实现更细粒度的管道控制。
+/// 此类保留用于向后兼容。
 /// </summary>
 public class SafetyPipelineAgent : DelegatingChatClient
 {

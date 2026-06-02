@@ -3,8 +3,9 @@ using CallCenter.Shared.Models;
 namespace CallCenter.Shared.Mcp;
 
 /// <summary>
-/// MCP client for order operations.
-/// Production implementations should call the actual order management system.
+/// 订单服务 MCP 客户端接口。用于查询订单信息。
+/// 当前使用 MockOrderService 模拟数据（A001 可退、A002 超期、A003 未签收）。
+/// 生产环境应接入真实订单管理系统。
 /// </summary>
 public interface IOrderMcpClient
 {

@@ -1,7 +1,8 @@
 namespace CallCenter.Shared.Models;
 
 /// <summary>
-/// Result of a refund operation. Returned by IFinanceMcpClient.RefundAsync.
+/// 退款操作结果。由 IFinanceMcpClient.RefundAsync 返回。
+/// 包含退款单号、金额、状态和消息。
 /// </summary>
 public record RefundResult(
     string RefundId,

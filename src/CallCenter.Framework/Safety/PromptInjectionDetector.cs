@@ -3,10 +3,12 @@ using System;
 namespace CallCenter.Framework.Safety;
 
 /// <summary>
-/// Detects potential prompt injection attacks by matching known attack patterns.
-/// Covers common techniques: instruction override ("忽略之前", "ignore previous"),
-/// system prompt extraction ("system prompt"), role manipulation ("you are now"), etc.
-/// Case-insensitive matching. Used as part of the SafetyInputFilter pipeline.
+/// 提示注入检测器。匹配已知攻击模式：
+/// - 指令覆盖："忽略之前"、"ignore previous"、"override instructions"
+/// - 系统提示提取："system prompt"、"system指令"
+/// - 角色扮演："you are now"、"你现在是"
+/// - 绕过安全："绕过安全"
+/// 不区分大小写匹配。作为 SafetyInputFilter 管道的一部分使用。
 /// </summary>
 public static class PromptInjectionDetector
 {

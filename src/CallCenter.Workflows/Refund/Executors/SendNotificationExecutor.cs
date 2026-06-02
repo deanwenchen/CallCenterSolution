@@ -5,6 +5,9 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 发送退款通知。第六步。成功时发布事件并输出通知，取消时输出流程结束消息。
+/// </summary>
 [YieldsOutput(typeof(RefundNotification))]
 internal sealed class SendNotificationExecutor : Executor<CouponRestored>
 {

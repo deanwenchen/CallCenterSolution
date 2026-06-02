@@ -4,9 +4,11 @@ using System.Text.Json;
 namespace CallCenter.Framework.Session;
 
 /// <summary>
-/// In-memory session store using a two-level dictionary: scope → key → value.
-/// Thread-safe via ConcurrentDictionary. Used for demo/dev; production should use RedisSessionStore.
-/// Supports scoped sessions (e.g., sessionId as scope) for multi-user isolation.
+/// 内存会话存储。使用两层字典：scope（如 sessionId）→ key → value。
+/// 线程安全（ConcurrentDictionary）。适用于演示/开发环境。
+/// 生产环境应使用 RedisSessionStore 实现持久化存储。
+/// 用于存储：activeWorkflow（当前工作流名）、lastCheckpoint（断点信息）、
+/// lastActivity（最后活动时间）、pendingOrderId（动态追问的订单号）等。
 /// </summary>
 public class InMemorySessionStore
 {

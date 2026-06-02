@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace CallCenter.Framework.Saga;
 
+/// <summary>Saga 补偿异常。重试耗尽且补偿也失败时抛出。</summary>
 public class SagaCompensationException : Exception
 {
     public string FailedStep { get; }
@@ -20,6 +21,9 @@ public class SagaCompensationException : Exception
     }
 }
 
+/// <summary>
+/// Saga 构建器。重试 + 补偿模式。失败时先重试，耗尽后执行补偿回滚。
+/// </summary>
 public class SagaBuilder
 {
     private readonly List<(string Step, Func<CancellationToken, Task> Compensation)> _compensations = new();

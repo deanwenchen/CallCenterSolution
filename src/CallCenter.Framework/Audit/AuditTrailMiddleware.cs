@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 namespace CallCenter.Framework.Audit;
 
 /// <summary>
-/// Static audit capture helper — called from ConsoleDemo event loop,
-/// not a real MAF middleware (MAF has no middleware concept for workflows).
+/// 审计追踪中间件。ConsoleDemo 事件循环中的静态审计捕获辅助方法。
+/// 在每一步开始/结束/出错时记录日志到 AuditLogger。
+/// 注意：这不是真正的 MAF 中间件（MAF 工作流没有中间件概念），
+/// 只是在事件循环中手动调用的辅助方法。
 /// </summary>
 public static class AuditTrailMiddleware
 {

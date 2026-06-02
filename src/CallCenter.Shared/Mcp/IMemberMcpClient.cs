@@ -3,8 +3,10 @@ using CallCenter.Shared.Models;
 namespace CallCenter.Shared.Mcp;
 
 /// <summary>
-/// MCP client for member/coupon operations.
-/// Used to restore coupons after successful refunds.
+/// 会员服务 MCP 客户端接口。用于用户优惠券操作。
+/// 退款成功后，RestoreCouponExecutor 调用此接口恢复用户优惠券。
+/// 当前使用 MockMemberService 模拟数据。
+/// 生产环境应接入真实会员系统。
 /// </summary>
 public interface IMemberMcpClient
 {

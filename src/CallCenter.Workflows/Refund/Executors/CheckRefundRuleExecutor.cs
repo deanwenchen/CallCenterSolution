@@ -3,6 +3,11 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 退款规则校验执行器。第二步。
+/// 规则：1) 超过 7 天退货期 → 拒绝  2) 订单未签收 → 拒绝  3) 定制商品 → 拒绝
+/// 通过后：将退款金额保存到 state（若有优惠券则扣减 20 元），发送给 WaitUserConfirm 或 RefundDenied。
+/// </summary>
 internal sealed class CheckRefundRuleExecutor : Executor<OrderFound, RefundRuleResult>
 {
     public CheckRefundRuleExecutor() : base("CheckRefundRule") { }

@@ -1,8 +1,8 @@
 namespace CallCenter.Shared.Models;
 
 /// <summary>
-/// Represents a coupon associated with a user.
-/// Restored via IMemberMcpClient after a successful refund (compensation step).
+/// 用户优惠券信息。退款成功后由 RestoreCouponExecutor 恢复。
+/// 包含优惠券 ID、用户 ID、折扣金额和过期日期。
 /// </summary>
 public record CouponInfo(
     string CouponId,

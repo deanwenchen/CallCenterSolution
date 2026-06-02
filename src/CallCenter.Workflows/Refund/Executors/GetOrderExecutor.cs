@@ -4,6 +4,11 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.Workflows.Refund.Executors;
 
+/// <summary>
+/// 订单查询执行器。退款流程第一步。
+/// 有订单号且存在时保存订单到 state 并发送 OrderFound；
+/// 无订单号或不存在时发送 NeedOrderId 信号给 InfoPort 追问用户。
+/// </summary>
 [SendsMessage(typeof(OrderFound))]
 [SendsMessage(typeof(RefundSignal))]
 internal sealed class GetOrderExecutor : Executor<RefundIntent>

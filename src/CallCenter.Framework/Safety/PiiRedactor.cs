@@ -3,10 +3,9 @@ using System.Text.RegularExpressions;
 namespace CallCenter.Framework.Safety;
 
 /// <summary>
-/// PII (Personally Identifiable Information) redaction using regex patterns.
-/// Masks Chinese phone numbers, ID cards, and bank card numbers by preserving
-/// first/last digits and replacing the middle with asterisks.
-/// Applied to both user input and AI output to prevent PII leakage.
+/// PII（个人身份信息）脱敏。使用正则匹配并替换为星号。
+/// 支持：中国手机号（138****1234）、身份证号（110101********1234）、银行卡号（6222****1234）。
+/// 应用于用户输入和 AI 输出，防止敏感信息泄露。
 /// </summary>
 public static partial class PiiRedactor
 {

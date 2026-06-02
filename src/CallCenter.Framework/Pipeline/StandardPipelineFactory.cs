@@ -8,6 +8,11 @@ using OpenAI;
 
 namespace CallCenter.Framework.Pipeline;
 
+/// <summary>
+/// 标准聊天管道工厂。创建 6 层委托链：
+/// SafetyInput(最外层) → Logging → Compaction → ToolApproval → LLM(最内层) → SafetyOutput
+/// 外层先执行，内层后执行，形成洋葱模型结构。
+/// </summary>
 public static class StandardPipelineFactory
 {
     /// <summary>
