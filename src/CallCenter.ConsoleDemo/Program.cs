@@ -154,11 +154,11 @@ static async Task RunWorkflow(
     var currentMessage = initialMessage;
     while (true)
     {
-        await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, currentMessage, checkpointManager);
+        await using var run2 = await InProcessExecution.RunStreamingAsync(workflow, currentMessage, checkpointManager);
 
         bool needsOrderId = false;
 
-        await foreach (WorkflowEvent evt in run.WatchStreamAsync())
+        await foreach (WorkflowEvent evt in run2.WatchStreamAsync())
         {
             switch (evt)
             {
@@ -167,15 +167,18 @@ static async Task RunWorkflow(
                     if (reqEvt.Request.TryGetDataAs<RefundSignal>(out var signal) && signal == RefundSignal.NeedOrderId)
                     {
                         Console.Write("请提供订单号: ");
-                        var orderId = await inputChannel.Reader.ReadAsync() ?? "";
+                        var orderId = await inputChannel.Reader.ReadAsync();
                         await sessionStore.SetAsync("pendingOrderId", orderId, sessionId);
                         currentMessage = currentMessage with { OrderId = orderId };
                         needsOrderId = true;
+                        // Send the response to the port so the workflow can continue
+                        var orderIdResponse = reqEvt.Request.CreateResponse(new RefundIntent(orderId, "U100"));
+                        await run2.SendResponseAsync(orderIdResponse);
                     }
                     else
                     {
                         var response = await HandleRequestAsync(reqEvt.Request, recognizeIntent, sessionStore, sessionId, inputChannel);
-                        await run.SendResponseAsync(response);
+                        await run2.SendResponseAsync(response);
                     }
                     await AuditTrailMiddleware.CaptureStepEnd(auditLogger!, sessionId, "RequestInfo", reqEvt);
                     break;
