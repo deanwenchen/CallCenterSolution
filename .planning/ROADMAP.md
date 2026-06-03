@@ -33,12 +33,16 @@ See: [.planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md](.planning/milestones/
 <details>
 <summary>◆ v2.0 Framework 提取 (Phases 9-12) — IN PROGRESS</summary>
 
-- [ ] Phase 9: 基础配置与工厂 — CallCenterOptions + AIAgentFactory + EntryPoint 修改
+- [x] Phase 9: 基础配置与工厂 — CallCenterOptions + AIAgentFactory + EntryPoint 修改
   - **Plans:** 3 plans
-  - [ ] 09-01-PLAN.md — CallCenterOptions 配置类 + Extensions.cs DI 扩展方法
-  - [ ] 09-02-PLAN.md — AIAgentFactory 工厂类（CreateIntentAgent + CreateDialogAgent）
-  - [ ] 09-03-PLAN.md — EntryPoint 构造函数迁移 + Program.cs 同步
-- [ ] Phase 10: CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类
+  - [x] 09-01-PLAN.md — CallCenterOptions 配置类 + Extensions.cs DI 扩展方法
+  - [x] 09-02-PLAN.md — AIAgentFactory 工厂类（CreateIntentAgent + CreateDialogAgent）
+  - [x] 09-03-PLAN.md — EntryPoint 构造函数迁移 + Program.cs 同步
+- [x] Phase 10: CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类 (completed 2026-06-03)
+  - **Plans:** 3 plans
+  - [x] 10-01-PLAN.md — Core.cs 骨架：partial class 定义、双构造函数模式、IDisposable
+  - [x] 10-02-PLAN.md — Intent.cs + Routing.cs：ProcessAsync 入口、意图→工作流映射
+  - [x] 10-03-PLAN.md — Execution.cs + Interaction.cs：DriveLoopAsync 事件循环、9 种事件处理、HandleRequestAsync
 - [ ] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简
 - [ ] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试
 
@@ -48,4 +52,4 @@ OpenSpec: `extract-callcenter-service` (47 tasks)
 
 ---
 
-*Roadmap updated: 2026-06-03 after v2.0 milestone start*
+*Roadmap updated: 2026-06-03 after Phase 10 planning*
