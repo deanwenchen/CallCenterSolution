@@ -30,7 +30,7 @@ public partial class CallCenterService
             case ResumeExistingResult resumeResult:
                 // Wave 3: will call ResumeWorkflowAsync with sessionId
                 // Currently stubbed — ResumeWorkflowAsync not yet implemented
-                return await ResumeWorkflowAsync(sessionId, userMessage, ct);
+                return await ResumeWorkflowAsync(sessionId, userMessage, ct).ConfigureAwait(false);
 
             case TimeoutResult timeout:
                 return timeout.Message;
@@ -42,41 +42,11 @@ public partial class CallCenterService
                 return noIntent.Response;
 
             case StartWorkflowResult start:
-                // Wave 3: will call RunWorkflowAsync with sessionId
-                // Currently stubbed — RunWorkflowAsync not yet implemented
-                return await RunWorkflowAsync(sessionId, start.InitialMessage, ct);
+                return await RunWorkflowAsync(sessionId, start.InitialMessage, ct).ConfigureAwait(false);
 
             default:
                 return "系统处理异常，请重试。";
         }
     }
 
-    /// <summary>
-    /// 运行新工作流。
-    /// Wave 3 实现 — 当前为占位。
-    /// </summary>
-    private async Task<string> RunWorkflowAsync(string sessionId, RefundIntent initialMessage, CancellationToken ct)
-    {
-        // TODO Wave 3: Implement full workflow execution
-        // - Create execution context with audit, checkpoint, saga
-        // - Drive workflow through event loop
-        // - Handle RequestInfoEvent, WorkflowOutputEvent, WorkflowErrorEvent
-        // - Return final result string
-        throw new NotImplementedException("RunWorkflowAsync will be implemented in Wave 3 (Execution.cs)");
-    }
-
-    /// <summary>
-    /// 从断点恢复工作流。
-    /// Wave 3 实现 — 当前为占位。
-    /// </summary>
-    private async Task<string> ResumeWorkflowAsync(string sessionId, string userMessage, CancellationToken ct)
-    {
-        // TODO Wave 3: Implement workflow resume from checkpoint
-        // - Load lastCheckpoint from session store
-        // - Resume workflow execution from checkpoint
-        // - Inject userMessage into waiting RequestPort
-        // - Handle events same as RunWorkflowAsync
-        // - Return final result string
-        throw new NotImplementedException("ResumeWorkflowAsync will be implemented in Wave 3 (Execution.cs)");
-    }
 }
