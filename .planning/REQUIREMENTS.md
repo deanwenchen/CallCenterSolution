@@ -62,17 +62,17 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CS-01 | Phase 9 | Pending |
-| CS-02 | Phase 9 | Pending |
+| CS-01 | Phase 10 | Pending |
+| CS-02 | Phase 10 | Pending |
 | CS-03 | Phase 10 | Pending |
-| CS-04 | Phase 11 | Pending |
-| DI-01 | Phase 9 | Pending |
-| DI-02 | Phase 9 | Pending |
-| DI-03 | Phase 9 | Pending |
-| DI-04 | Phase 9 | Pending |
-| AF-01 | Phase 9 | Pending |
-| AF-02 | Phase 9 | Pending |
-| AF-03 | Phase 9 | Pending |
+| CS-04 | Phase 10 | Pending |
+| DI-01 | Phase 9 | Done |
+| DI-02 | Phase 9 | Done |
+| DI-03 | Phase 9 | Done |
+| DI-04 | Phase 9 | Done |
+| AF-01 | Phase 9 | Done |
+| AF-02 | Phase 9 | Done |
+| AF-03 | Phase 9 | Done |
 | PR-01 | Phase 11 | Pending |
 | PR-02 | Phase 11 | Pending |
 
@@ -84,4 +84,4 @@
 ---
 
 *Requirements defined: 2026-06-03*
-*Last updated: 2026-06-03 after v2.0 milestone start*
+*Last updated: 2026-06-03 after Phase 10 planning*
