@@ -1,4 +1,4 @@
-using System.ClientModel;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -12,54 +12,32 @@ using OpenAI;
 
 namespace CallCenter.AgentHost;
 
-/// <summary>
-/// 意图识别结果。由 LLM 返回的 JSON 反序列化得到。
-/// <example>
-/// {"intent": "refund", "workflow": "RefundWorkflow", "orderId": "A001"}
-/// </example>
-/// </summary>
+/// <summary>意图识别结果。LLM 返回的通用 JSON 格式。</summary>
 public record IntentResult(
     [property: JsonPropertyName("intent")] string Intent,
-    [property: JsonPropertyName("workflow")] string? Workflow,
-    [property: JsonPropertyName("orderId")] string? OrderId);
+    [property: JsonPropertyName("parameters")] Dictionary<string, string?> Parameters);
 
-/// <summary>
-/// EntryPoint.ProcessAsync 的返回类型，表示对用户输入的不同处理结果。
-/// </summary>
+/// <summary>EntryPoint.ProcessAsync 的返回类型。</summary>
 public record ProcessResult
 {
-    /// <summary>恢复已存在的工作流（用户继续之前中断的流程）。</summary>
     public static ProcessResult ResumeExisting() => new ResumeExistingResult();
-    /// <summary>启动新工作流（识别到业务意图，如"我要退款"）。</summary>
     public static ProcessResult StartWorkflow(RefundIntent initialMessage) => new StartWorkflowResult(initialMessage);
-    /// <summary>无业务意图（闲聊或无法识别），返回自然语言回复。</summary>
     public static ProcessResult NoIntent(string response) => new NoIntentResult(response);
-    /// <summary>超时警告（30 分钟无操作）。</summary>
     public static ProcessResult TimeoutWarning(string msg) => new TimeoutResult(true, msg);
-    /// <summary>超时终止（60 分钟无操作，清除工作流状态）。</summary>
     public static ProcessResult TimeoutTerminate(string msg) => new TimeoutResult(false, msg);
-    /// <summary>意图切换（用户在有活跃工作流时输入其他意图）。</summary>
     public static ProcessResult IntentSwitch(string oldWf, string newIntent) => new IntentSwitchResult(oldWf, newIntent);
 }
 
-/// <summary>用户回复"确认"或"取消"时的响应。</summary>
 public record ResumeExistingResult : ProcessResult;
-/// <summary>启动退款工作流的响应，携带初始意图信息。</summary>
 public record StartWorkflowResult(RefundIntent InitialMessage) : ProcessResult;
-/// <summary>无业务意图的响应，携带给用户的自然语言消息。</summary>
 public record NoIntentResult(string Response) : ProcessResult;
-/// <summary>超时响应，区分警告和终止两种状态。</summary>
 public record TimeoutResult(bool IsWarning, string Message) : ProcessResult;
-/// <summary>意图切换响应，记录旧工作流和新意图名称。</summary>
 public record IntentSwitchResult(string OldWorkflow, string NewIntent) : ProcessResult;
 
 /// <summary>
 /// 用户输入处理入口。
 /// 主要作用：承接用户每次输入，完成意图识别、会话超时检查、工作流路由与切换控制。
-/// 职责：1) 通过 LLM 识别用户意图 2) 管理会话超时 3) 路由到对应工作流。
-/// 路由逻辑：
-///   - 无活跃工作流 → 识别意图 → refund 启动 RefundWorkflow，否则回复自然语言
-///   - 有活跃工作流 → 识别意图 → 相同意图则恢复，不同意图则终止旧流程，闲聊则回复不终止
+/// 路由逻辑：直观 if/switch，好读好改。
 /// </summary>
 [Experimental("MAAI001")]
 public class EntryPoint
@@ -71,17 +49,13 @@ public class EntryPoint
     {
         _sessionStore = sessionStore;
 
-        var systemPrompt = """
-            你是一个意图识别助手。分析用户消息，判断意图。返回JSON格式: {"intent": "refund"|"greeting"|"unknown", "workflow": "RefundWorkflow", "orderId": "<如果提到订单号>"}. 只返回JSON，不要其他内容。
-            """;
-
         _intentAgent = new ChatClientAgent(
             chatClient,
             new ChatClientAgentOptions
             {
                 ChatOptions = new()
                 {
-                    Instructions = systemPrompt,
+                    Instructions = IntentRegistry.BuildSystemPrompt(),
                 },
                 AIContextProviders = skillsProvider != null ? [skillsProvider] : null,
             });
@@ -92,7 +66,6 @@ public class EntryPoint
         try
         {
             var response = await _intentAgent.RunAsync(userMessage, cancellationToken: ct);
-
             if (string.IsNullOrWhiteSpace(response?.Text))
                 return null;
 
@@ -105,30 +78,22 @@ public class EntryPoint
         }
     }
 
-    public async Task<string?> GetActiveWorkflowAsync(string sessionId, CancellationToken ct = default)
-    {
-        return await _sessionStore.GetAsync<string>("activeWorkflow", sessionId, ct);
-    }
+    public async Task<string?> GetActiveWorkflowAsync(string sessionId, CancellationToken ct = default) =>
+        await _sessionStore.GetAsync<string>("activeWorkflow", sessionId, ct);
 
-    public async Task SetActiveWorkflowAsync(string sessionId, string workflowName, CancellationToken ct = default)
-    {
+    public async Task SetActiveWorkflowAsync(string sessionId, string workflowName, CancellationToken ct = default) =>
         await _sessionStore.SetAsync("activeWorkflow", workflowName, sessionId, ct);
-    }
 
-    public async Task ClearActiveWorkflowAsync(string sessionId, CancellationToken ct = default)
-    {
+    public async Task ClearActiveWorkflowAsync(string sessionId, CancellationToken ct = default) =>
         await _sessionStore.RemoveAsync("activeWorkflow", sessionId, ct);
-    }
 
-    public async Task<DateTime?> GetLastActivityAsync(string sessionId, CancellationToken ct = default)
-    {
-        return await _sessionStore.GetAsync<DateTime>("lastActivity", sessionId, ct);
-    }
+    public async Task<DateTime?> GetLastActivityAsync(string sessionId, CancellationToken ct = default) =>
+        await _sessionStore.GetAsync<DateTime>("lastActivity", sessionId, ct);
 
     public async Task<ProcessResult?> CheckTimeoutAsync(string sessionId, CancellationToken ct = default)
     {
         var lastActivity = await GetLastActivityAsync(sessionId, ct);
-        if (lastActivity == null) return null; // First input, no timeout check
+        if (lastActivity == null) return null;
 
         var elapsed = DateTime.UtcNow - lastActivity.Value;
 
@@ -149,70 +114,78 @@ public class EntryPoint
     public async Task<ProcessResult> ProcessAsync(
         string sessionId,
         string userMessage,
-        Workflow refundWorkflow,
         CancellationToken ct = default)
     {
-        // a. Set lastActivity timestamp (from Task 1)
         await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
 
-        // b. Check timeout first - if timeout result, return it immediately
         var timeoutResult = await CheckTimeoutAsync(sessionId, ct);
-        if (timeoutResult != null)
-        {
-            return timeoutResult;
-        }
+        if (timeoutResult != null) return timeoutResult;
 
         var activeWorkflow = await GetActiveWorkflowAsync(sessionId, ct);
 
-        // c. Check if activeWorkflow exists
+        // 有活跃工作流时的处理
         if (!string.IsNullOrEmpty(activeWorkflow))
         {
             var intent = await RecognizeIntentAsync(userMessage, ct);
 
-            // greeting/unknown during active workflow returns NoIntent without clearing workflow
-            if (intent == null || intent.Intent is "unknown" or "greeting")
+            // 非业务意图 — 不中断当前流程
+            if (intent == null || !IntentRegistry.IsBusinessIntent(intent.Intent))
             {
-                var response = intent?.Intent switch
-                {
-                    "greeting" => "你好！有什么可以帮助你的？",
-                    _ => "抱歉，我不太明白。你可以说'我要退款'来开始退款流程。",
-                };
+                var response = intent?.Intent == "greeting"
+                    ? "你好！有什么可以帮助你的？"
+                    : "抱歉，我不太明白。";
                 return ProcessResult.NoIntent(response);
             }
 
-            // Same intent - resume existing workflow
-            if (activeWorkflow == "RefundWorkflow" && intent.Intent == "refund")
+            // 意图与当前工作流匹配 — 恢复
+            var currentIntent = GetIntentForWorkflow(activeWorkflow);
+            if (currentIntent != null && intent.Intent == currentIntent)
             {
                 return ProcessResult.ResumeExisting();
             }
 
-            // Intent switch - terminate old workflow, return IntentSwitch result
-            if (activeWorkflow == "RefundWorkflow" && intent.Intent != "refund")
-            {
-                await ClearActiveWorkflowAsync(sessionId, ct);
-                return ProcessResult.IntentSwitch("RefundWorkflow", intent.Intent);
-            }
+            // 意图切换 — 终止旧流程
+            await ClearActiveWorkflowAsync(sessionId, ct);
+            return ProcessResult.IntentSwitch(activeWorkflow, intent.Intent);
         }
 
-        // d. No activeWorkflow - recognize intent and start new workflow or reply naturally
+        // 无活跃工作流 — 识别意图并启动
         var newIntent = await RecognizeIntentAsync(userMessage, ct);
 
-        if (newIntent == null || newIntent.Intent is "unknown" or "greeting")
+        if (newIntent == null || !IntentRegistry.IsBusinessIntent(newIntent.Intent))
         {
-            var response = newIntent?.Intent switch
-            {
-                "greeting" => "你好！有什么可以帮助你的？",
-                _ => "抱歉，我不太明白。你可以说'我要退款'来开始退款流程。",
-            };
+            var response = newIntent?.Intent == "greeting"
+                ? "你好！有什么可以帮助你的？"
+                : "抱歉，我不太明白。";
             return ProcessResult.NoIntent(response);
         }
 
-        if (newIntent.Intent == "refund")
+        // 路由：根据意图名启动对应工作流
+        switch (newIntent.Intent)
         {
-            await SetActiveWorkflowAsync(sessionId, "RefundWorkflow", ct);
-            return ProcessResult.StartWorkflow(new RefundIntent(newIntent.OrderId, "U100"));
+            case "refund":
+            {
+                var orderId = newIntent.Parameters.GetValueOrDefault("OrderId");
+                await SetActiveWorkflowAsync(sessionId, "RefundWorkflow", ct);
+                return ProcessResult.StartWorkflow(new RefundIntent(orderId, "U100"));
+            }
+            // 新增意图：
+            // case "complaint":
+            //     var orderId2 = newIntent.Parameters.GetValueOrDefault("OrderId");
+            //     var issue = newIntent.Parameters.GetValueOrDefault("Issue");
+            //     await SetActiveWorkflowAsync(sessionId, "ComplaintWorkflow", ct);
+            //     return ProcessResult.StartWorkflow(new ComplaintIntent(orderId2, issue, "U100"));
         }
 
-        return ProcessResult.NoIntent("抱歉，我不太明白。你可以说'我要退款'来开始退款流程。");
+        return ProcessResult.NoIntent("抱歉，无法启动该流程。");
     }
+
+    /// <summary>根据工作流名称反查对应的意图名称。</summary>
+    private static string? GetIntentForWorkflow(string workflowName) =>
+        workflowName switch
+        {
+            "RefundWorkflow" => "refund",
+            "ExchangeWorkflow" => "exchange",
+            _ => null,
+        };
 }
