@@ -1,5 +1,22 @@
 # Milestones
 
+## v2.0 Framework 提取 (Shipped: 2026-06-03)
+
+**Phases completed:** 10 phases, 26 plans, 57 tasks
+
+**Key accomplishments:**
+
+- .NET 10.0 solution with 5 CallCenter projects, 4 MAF source references, and centralized package management (8 packages)
+- 状态：已完成
+- One-liner:
+- Task Consolidation:
+- Problem:
+- One-liner:
+- One-liner:
+- One-liner:
+
+---
+
 ## v1.0 Refund Workflow Demo (Shipped: 2026-06-01)
 
 **Phases completed:** 4 phases, 13 plans, 34 tasks

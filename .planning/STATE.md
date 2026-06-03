@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Framework 提取
 current_phase: 10
-status: milestone_complete
-stopped_at: Milestone complete (Phase 10 was final phase)
-last_updated: 2026-06-03T15:18:21.928Z
-last_activity: 2026-06-03 -- Phase 10 execution started
+status: Awaiting next milestone
+stopped_at: v2.0 milestone initialized
+last_updated: "2026-06-03T15:20:33.656Z"
+last_activity: 2026-06-03 — Milestone v2.0 completed and archived
 progress:
   total_phases: 10
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 26
   completed_plans: 26
-  percent: 90
+  percent: 100
 ---
 
 # STATE.md
@@ -57,6 +57,18 @@ OpenSpec: `extract-callcenter-service` (47 tasks, 12 phases)
 Requirements: 13 requirements mapped to 4 phases
 Roadmap: Phases 9-12
 
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-06-03:
+
+| Category | Item | Status |
+|----------|------|--------|
+| verification | Phase 10: 10-VERIFICATION.md — 5 runtime tests (greeting flow, end-to-end refund, timeout, saga compensation, business flow equivalence) | human_needed |
+
+## Milestone: v2.0 Framework 提取 — SHIPPED 2026-06-03
+
+All 10 phases completed. Known deferred: 5 runtime verification items (Phase 10 skeleton not yet integrated into Program.cs — Phase 11 scope).
+
 ## Last Session
 
 **Timestamp:** 2026-06-03
@@ -65,12 +77,11 @@ Roadmap: Phases 9-12
 
 ## Current Position
 
-Phase: 10 (callcenter-service-skeleton) — EXECUTING
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-06-03
+Phase: Milestone v2.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-03 — Milestone v2.0 completed and archived
 
 ## Operator Next Steps
 
-- `/gsd:plan-phase 9` — plan Phase 9: 基础配置与工厂
-- `/gsd:execute-phase 9` — execute Phase 9 tasks
+- Start the next milestone with /gsd-new-milestone
