@@ -72,6 +72,11 @@ public partial class CallCenterService : IDisposable
         _sessionStore = _provider.GetRequiredService<InMemorySessionStore>();
         _auditLogger = _provider.GetRequiredService<AuditLogger>();
         _eventBus = _provider.GetRequiredService<IBusinessEventBus>();
+        _eventBus.Subscribe<RefundCompletedEvent>(async e =>
+        {
+            Console.WriteLine($"\n[EVENT] 退款完成: 订单{e.OrderId}, 金额 {e.RefundAmount:C}");
+            await Task.CompletedTask;
+        });
         _logger = _provider.GetRequiredService<JsonlLogger>();
         _refundWorkflow = _provider.GetRequiredService<Workflow>();
         _skillsProvider = _provider.GetRequiredService<AgentSkillsProvider>();
@@ -110,6 +115,11 @@ public partial class CallCenterService : IDisposable
         _sessionStore = provider.GetRequiredService<InMemorySessionStore>();
         _auditLogger = provider.GetRequiredService<AuditLogger>();
         _eventBus = provider.GetRequiredService<IBusinessEventBus>();
+        _eventBus.Subscribe<RefundCompletedEvent>(async e =>
+        {
+            Console.WriteLine($"\n[EVENT] 退款完成: 订单{e.OrderId}, 金额 {e.RefundAmount:C}");
+            await Task.CompletedTask;
+        });
         _logger = provider.GetRequiredService<JsonlLogger>();
         _refundWorkflow = provider.GetRequiredService<Workflow>();
         _skillsProvider = provider.GetRequiredService<AgentSkillsProvider>();
