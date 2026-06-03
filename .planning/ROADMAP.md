@@ -51,11 +51,13 @@ See: [.planning/milestones/v2.0-REQUIREMENTS.md](.planning/milestones/v2.0-REQUI
 
 ### 📋 v2.1 Execution & Cleanup (Planned)
 
-- [ ] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简
+- [x] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简 (completed 2026-06-03)
+  - **Plans:** 1 plan
+  - [x] 11-01-PLAN.md — Core.cs EventBus 订阅 + Program.cs 精简为 ~25-30 行主循环
 - [ ] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试
 
 OpenSpec: `extract-callcenter-service` (47 tasks — phases 9-12)
 
 ---
 
-*Roadmap updated: 2026-06-03 after Phase 10 planning*
+*Roadmap updated: 2026-06-03 after Phase 11 planning*
