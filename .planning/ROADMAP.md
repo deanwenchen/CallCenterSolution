@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 Refund Workflow Demo** — Phases 1-4 (shipped 2026-06-01)
 - ✅ **v1.1 Technical Debt Closure** — Phases 5-8 (shipped 2026-06-01)
+- ◆ **v2.0 Framework 提取** — Phases 9-12 (in progress)
 
 ## Phases
 
@@ -29,6 +30,18 @@ See: [.planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md](.planning/milestones/
 
 </details>
 
+<details>
+<summary>◆ v2.0 Framework 提取 (Phases 9-12) — IN PROGRESS</summary>
+
+- [ ] Phase 9: 基础配置与工厂 — CallCenterOptions + AIAgentFactory + EntryPoint 修改
+- [ ] Phase 10: CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类
+- [ ] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简
+- [ ] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试
+
+OpenSpec: `extract-callcenter-service` (47 tasks)
+
+</details>
+
 ---
 
-*Roadmap updated: 2026-06-02 after v1.1 milestone*
+*Roadmap updated: 2026-06-03 after v2.0 milestone start*

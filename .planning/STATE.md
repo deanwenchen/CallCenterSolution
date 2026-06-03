@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.0
-milestone_name: TBD
+milestone_name: Framework 提取
 status: planning
-last_updated: "2026-06-02T00:00:00.000Z"
-last_activity: 2026-06-02
+last_updated: "2026-06-03T00:00:00.000Z"
+last_activity: 2026-06-03
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -15,16 +15,16 @@ progress:
 
 # STATE.md
 
-Current phase: Planning next milestone
+Current phase: Planning v2.0 - requirements and roadmap created
 Active plans: —
-Current task: v1.1 complete — planning v2.0
+Current task: v2.0 milestone initialized — ready for /gsd:plan-phase 9
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-02)
+See: .planning/PROJECT.md (updated 2026-06-03)
 
 **Core value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
-**Current focus:** Planning v2.0 milestone
+**Current focus:** v2.0 Framework 提取 — Phase 9: 基础配置与工厂
 
 ## Phase Progress
 
@@ -38,26 +38,37 @@ See: .planning/PROJECT.md (updated 2026-06-02)
 | 6     | Complete   | 2/2         | 100%     |
 | 7     | Complete   | 2/2         | 100%     |
 | 8     | Complete   | 1/1         | 100%     |
+| 9     | Not Started | 6/6        | 0%       |
+| 10    | Not Started | 2/2        | 0%       |
+| 11    | Not Started | 3/3        | 0%       |
+| 12    | Not Started | 2/2        | 0%       |
 
-Tasks: 35/35 complete
+Tasks: 35/35 complete (v1.0 + v1.1)
 
 ## Milestone: v1.1 Technical Debt Closure — SHIPPED 2026-06-01
 
 All 8 phases completed. See .planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md
 
+## Milestone: v2.0 Framework 提取 — IN PLANNING
+
+OpenSpec: `extract-callcenter-service` (47 tasks, 12 phases)
+Requirements: 13 requirements mapped to 4 phases
+Roadmap: Phases 9-12
+
 ## Last Session
 
-**Timestamp:** 2026-06-02
-**Stopped At:** v1.1 milestone archived
+**Timestamp:** 2026-06-03
+**Stopped At:** v2.0 milestone initialized
 **Resume File:** None
 
 ## Current Position
 
-Phase: Milestone complete — planning next
+Phase: 9 (planning)
 Plan: —
-Status: Ready for /gsd:new-milestone
-Last activity: 2026-06-02 — Milestone v1.1 archived
+Status: Ready for /gsd:plan-phase 9
+Last activity: 2026-06-03 — v2.0 milestone initialized
 
 ## Operator Next Steps
 
-- /gsd:new-milestone — start v2.0 milestone planning
+- `/gsd:plan-phase 9` — plan Phase 9: 基础配置与工厂
+- `/gsd:execute-phase 9` — execute Phase 9 tasks

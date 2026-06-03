@@ -6,6 +6,8 @@
 
 v1.1 完成后，系统已具备：意图切换、超时管理、6 层安全 Pipeline、审计日志、Saga 补偿、以及新业务模块 7 步扩展指南。
 
+v2.0 框架提取后，系统已具备：CallCenterService 统一服务入口、DI 容器支持、AIAgentFactory 动态创建 Agent、Program.cs 精简到 ~20 行。控制台和未来 Web API 共用同一框架。
+
 ## Core Value
 
 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作 — 整个链路无需人工干预。
@@ -25,6 +27,20 @@ v1.0 → v1.1 additions:
 - Audit Logger with SHA256 chain, VerifyChainAsync (FW-08)
 - Saga Builder with retry + compensation framework (FW-09)
 - Business Extensibility Guide (7 steps) + Exchange skeleton (BE-01)
+
+## Current State: v2.0 Framework 提取 (In Progress)
+
+**Goal:** 将 Program.cs（439 行）的框架复杂度抽离到可复用的 CallCenterService 中
+**OpenSpec:** extract-callcenter-service
+**Tasks:** 47 个任务，12 个实施阶段
+
+v2.0 范围:
+- CallCenterService partial 类（Core/Intent/Routing/Execution/Interaction/Extensions）
+- AIAgentFactory 按场景动态创建 AIAgent
+- 所有基础设施 DI 支持
+- CallCenterOptions 环境变量统一处理
+- Program.cs 精简到 ~20 行
+- **不改变**任何业务流程逻辑和 workflows/ 代码
 
 ## Requirements
 
@@ -47,12 +63,28 @@ v1.0 → v1.1 additions:
 - ✓ **IR-05**: 用户回复不在预期范围 → 重新意图识别 — Phase 5
 - ✓ **BE-01**: 新增业务模块 7 步流程 — Phase 8
 
-### Out of Scope (v1.x)
+### Active
+
+<!-- v2.0 框架提取需求 -->
+
+- [ ] **CS-01**: CallCenterService.ProcessAsync(sessionId, userMessage) → string，内部完成意图识别→工作流执行→返回结果
+- [ ] **CS-02**: CallCenterService partial class 拆分（Core/Intent/Routing/Execution/Interaction）
+- [ ] **CS-03**: 工作流事件处理完整性（所有 9 种事件类型）
+- [ ] **CS-04**: 业务流程不变（退款 6 步流程、事件处理、Saga 补偿、断点恢复）
+- [ ] **DI-01**: AddCallCenter() DI 扩展方法，自动注册所有依赖
+- [ ] **DI-02**: IChatClient 分层注册（keyed base + pipeline 默认）
+- [ ] **DI-03**: CallCenterOptions 环境变量统一处理（ApplyDefaults）
+- [ ] **DI-04**: 服务覆盖方法（AddCallCenterOrderService 等）
+- [ ] **AF-01**: AIAgentFactory 创建意图识别 Agent
+- [ ] **AF-02**: AIAgentFactory 创建工作流对话 Agent
+- [ ] **AF-03**: EntryPoint 改用 AIAgentFactory
+
+### Out of Scope (v2.0)
 
 - 真实 MCP Server 调用 — Mock 服务替代
 - Session 持久化存储（Redis）— InMemorySessionStore 替代
-- Knowledge Layer / Observability Layer / Human Agent Layer — 旁路系统后续实现
-- Web/Gateway 接入层 — 控制台调试入口替代
+- Web API 接入层 — 框架支持但具体实现后续
+- 新增业务工作流 — 仅做框架重构，不加新业务
 - ToolApproval 具体审批规则 → v2
 - SafetyOutput 敏感内容拦截 → v2
 - KeywordFilter 配置化 → v2
@@ -66,6 +98,7 @@ v1.0 → v1.1 additions:
 - 意图识别使用 DashScope（通义千问）OpenAI 兼容接口
 - v1.1 代码量增长：新增 ~600 LOC C#（Pipeline、Audit、Saga、Exchange skeleton）
 - Exchange 骨架已就绪：Workflow + 7 Executors + Messages + Skill，编译通过
+- v2.0 框架提取：OpenSpec change `extract-callcenter-service`
 
 ## Constraints
 
@@ -73,6 +106,7 @@ v1.0 → v1.1 additions:
 - **[Data]**: Demo 阶段全部 Mock，不依赖真实后端
 - **[Interface]**: 纯控制台交互，不需要 API 输出
 - **[Source]**: 源码调用必须参照 D:\GitCode\agent-framework\dotnet 样本模式
+- **[Refactoring]**: v2.0 不改变业务流程逻辑，不改变 workflows/ 代码
 
 ## Key Decisions
 
@@ -86,6 +120,9 @@ v1.0 → v1.1 additions:
 | Compaction 使用 MAF CompactionProvider | Phase 6 实现：PipelineCompactionStrategy (8000 token, 8 turns, qwen-plus) | ✓ Good |
 | AuditLogger 写入 .audit/ 带 SHA256 链 | Phase 7 实现：不可篡改审计日志，VerifyChainAsync 验证 | ✓ Good |
 | SagaBuilder 自建框架 | Phase 7 实现：OnFailure → WithRetry → ExecuteAsync 链式 API | ✓ Good |
+| AIAgent 不直接 DI，使用工厂模式 | 不同场景需要不同 System Prompt 和 Tools 配置 | — Pending |
+| CallCenterService partial class 拆分 | 按职责拆分，每文件职责清晰，新增业务只需改对应文件 | — Pending |
+| ProcessAsync 返回 string 阻塞到终态 | 控制台和 Web API 都只需要最终结果 | — Pending |
 
 ## Evolution
 
@@ -106,4 +143,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-06-02 after v1.1 Technical Debt Closure milestone*
+*Last updated: 2026-06-03 after v2.0 milestone start*

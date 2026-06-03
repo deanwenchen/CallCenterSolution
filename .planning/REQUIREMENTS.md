@@ -1,0 +1,87 @@
+# Requirements: CallCenter Framework 提取
+
+**Defined:** 2026-06-03
+**Core Value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
+
+## v2.0 Requirements
+
+框架提取需求。将 Program.cs（439 行）的复杂度抽离到可复用的 CallCenterService 中。
+
+### 统一服务入口 (CallCenterService)
+
+- [ ] **CS-01**: CallCenterService.ProcessAsync(sessionId, userMessage) 返回 string，内部完成意图识别→工作流执行→返回结果
+- [ ] **CS-02**: CallCenterService partial class 拆分为 Core.cs/Intent.cs/Routing.cs/Execution.cs/Interaction.cs/Extensions.cs
+- [ ] **CS-03**: 工作流事件处理完整性 — HandleEventAsync 列出所有 9 种可访问的 WorkflowEvent 类型
+- [ ] **CS-04**: 业务流程不变 — 退款 6 步流程、事件处理、Saga 补偿、断点恢复与重构前完全一致
+
+### DI 支持
+
+- [ ] **DI-01**: IServiceCollection.AddCallCenter(options?) 扩展方法，自动注册所有依赖服务
+- [ ] **DI-02**: IChatClient 分层注册 — AddKeyedSingleton("base") 注册原始客户端，默认注册 pipeline 包装客户端
+- [ ] **DI-03**: CallCenterOptions.ApplyDefaults() 是唯一读取 Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY") 的地方
+- [ ] **DI-04**: 服务覆盖方法 — AddCallCenterOrderService<T>()、AddCallCenterFinanceService<T>()、AddCallCenterMemberService<T>()
+
+### AIAgentFactory
+
+- [ ] **AF-01**: AIAgentFactory.CreateIntentAgent(skillsProvider?) 创建意图识别 Agent，使用 IntentRegistry.BuildSystemPrompt()
+- [ ] **AF-02**: AIAgentFactory.CreateDialogAgent(skillsProvider?) 创建工作流对话 Agent
+- [ ] **AF-03**: EntryPoint 构造函数改用 AIAgentFactory（替代原来的 IChatClient）
+
+### 入口精简
+
+- [ ] **PR-01**: Program.cs 精简到 ~20 行 — 创建 CallCenterService → while 循环读输入 → ProcessAsync → 打印结果
+- [ ] **PR-02**: 清理旧代码 — 移除 Framework/ServiceCollectionExtensions.cs 中的旧 AddCallCenter 方法
+
+## v2 Requirements
+
+ deferred to future release. Tracked but not in current roadmap.
+
+### Web API 接入
+
+- **WA-01**: Web API 控制器使用 CallCenterService 处理请求
+- **WA-02**: SSE 流式返回中间状态
+- **WA-03**: 用户交互改为 HTTP 请求/响应模式
+
+### 新增业务工作流
+
+- **WF-10**: Exchange Workflow 完整业务逻辑
+- **WF-11**: Complaint Workflow
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| 真实 MCP Server 调用 | Mock 服务替代，v2+ |
+| Session 持久化存储（Redis） | InMemorySessionStore 替代，v2+ |
+| ToolApproval 具体审批规则 | 框架支持，规则后续 |
+| SafetyOutput 敏感内容拦截 | 框架支持，规则后续 |
+| KeywordFilter 配置化 | 框架支持，配置后续 |
+| Web/Gateway 接入层 | 框架支持，具体实现后续 |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| CS-01 | Phase 9 | Pending |
+| CS-02 | Phase 9 | Pending |
+| CS-03 | Phase 10 | Pending |
+| CS-04 | Phase 11 | Pending |
+| DI-01 | Phase 9 | Pending |
+| DI-02 | Phase 9 | Pending |
+| DI-03 | Phase 9 | Pending |
+| DI-04 | Phase 9 | Pending |
+| AF-01 | Phase 9 | Pending |
+| AF-02 | Phase 9 | Pending |
+| AF-03 | Phase 9 | Pending |
+| PR-01 | Phase 11 | Pending |
+| PR-02 | Phase 11 | Pending |
+
+**Coverage:**
+- v2.0 requirements: 13 total
+- Mapped to phases: 13
+- Unmapped: 0 ✓
+
+---
+
+*Requirements defined: 2026-06-03*
+*Last updated: 2026-06-03 after v2.0 milestone start*
