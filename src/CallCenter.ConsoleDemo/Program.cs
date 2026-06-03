@@ -58,7 +58,7 @@ var refundWorkflow = RefundWorkflow.Build(orderService, financeService, memberSe
 
 // 注册 Agent 技能。
 // 主要作用：让 AIAgent 可以通过技能描述自动发现“退款 / 换货”能力。
-var skillsProvider = new AgentSkillsProvider(new RefundSkill(), new ExchangeSkill());
+var skillsProvider = new AgentSkillsProvider(SkillRegistry.All);
 
 // 构建标准 6 层聊天管道。
 // 主要作用：把安全过滤、日志、压缩、工具审批统一包在一次 LLM 调用链里。
