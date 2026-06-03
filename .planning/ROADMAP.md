@@ -34,6 +34,10 @@ See: [.planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md](.planning/milestones/
 <summary>◆ v2.0 Framework 提取 (Phases 9-12) — IN PROGRESS</summary>
 
 - [ ] Phase 9: 基础配置与工厂 — CallCenterOptions + AIAgentFactory + EntryPoint 修改
+  - **Plans:** 3 plans
+  - [ ] 09-01-PLAN.md — CallCenterOptions 配置类 + Extensions.cs DI 扩展方法
+  - [ ] 09-02-PLAN.md — AIAgentFactory 工厂类（CreateIntentAgent + CreateDialogAgent）
+  - [ ] 09-03-PLAN.md — EntryPoint 构造函数迁移 + Program.cs 同步
 - [ ] Phase 10: CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类
 - [ ] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简
 - [ ] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试
