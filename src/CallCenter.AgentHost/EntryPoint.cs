@@ -8,7 +8,6 @@ using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
-using OpenAI;
 
 namespace CallCenter.AgentHost;
 
@@ -20,16 +19,16 @@ public record IntentResult(
 /// <summary>EntryPoint.ProcessAsync 的返回类型。</summary>
 public record ProcessResult
 {
-    public static ProcessResult ResumeExisting() => new ResumeExistingResult();
-    public static ProcessResult StartWorkflow(RefundIntent initialMessage) => new StartWorkflowResult(initialMessage);
+    public static ProcessResult ResumeExisting(Workflow workflow) => new ResumeExistingResult(workflow);
+    public static ProcessResult StartWorkflow(RefundIntent initialMessage, Workflow workflow) => new StartWorkflowResult(initialMessage, workflow);
     public static ProcessResult NoIntent(string response) => new NoIntentResult(response);
     public static ProcessResult TimeoutWarning(string msg) => new TimeoutResult(true, msg);
     public static ProcessResult TimeoutTerminate(string msg) => new TimeoutResult(false, msg);
     public static ProcessResult IntentSwitch(string oldWf, string newIntent) => new IntentSwitchResult(oldWf, newIntent);
 }
 
-public record ResumeExistingResult : ProcessResult;
-public record StartWorkflowResult(RefundIntent InitialMessage) : ProcessResult;
+public record ResumeExistingResult(Workflow Workflow) : ProcessResult;
+public record StartWorkflowResult(RefundIntent InitialMessage, Workflow Workflow) : ProcessResult;
 public record NoIntentResult(string Response) : ProcessResult;
 public record TimeoutResult(bool IsWarning, string Message) : ProcessResult;
 public record IntentSwitchResult(string OldWorkflow, string NewIntent) : ProcessResult;
@@ -45,20 +44,10 @@ public class EntryPoint
     private readonly AIAgent _intentAgent;
     private readonly InMemorySessionStore _sessionStore;
 
-    public EntryPoint(IChatClient chatClient, InMemorySessionStore sessionStore, AgentSkillsProvider? skillsProvider = null)
+    public EntryPoint(AIAgentFactory factory, InMemorySessionStore sessionStore, AgentSkillsProvider? skillsProvider = null)
     {
         _sessionStore = sessionStore;
-
-        _intentAgent = new ChatClientAgent(
-            chatClient,
-            new ChatClientAgentOptions
-            {
-                ChatOptions = new()
-                {
-                    Instructions = IntentRegistry.BuildSystemPrompt(),
-                },
-                AIContextProviders = skillsProvider != null ? [skillsProvider] : null,
-            });
+        _intentAgent = factory.CreateIntentAgent(skillsProvider);
     }
 
     public async Task<IntentResult?> RecognizeIntentAsync(string userMessage, CancellationToken ct = default)
@@ -114,6 +103,7 @@ public class EntryPoint
     public async Task<ProcessResult> ProcessAsync(
         string sessionId,
         string userMessage,
+        Workflow refundWorkflow,
         CancellationToken ct = default)
     {
         await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
@@ -141,7 +131,7 @@ public class EntryPoint
             var currentIntent = GetIntentForWorkflow(activeWorkflow);
             if (currentIntent != null && intent.Intent == currentIntent)
             {
-                return ProcessResult.ResumeExisting();
+                return ProcessResult.ResumeExisting(refundWorkflow);
             }
 
             // 意图切换 — 终止旧流程
@@ -167,7 +157,7 @@ public class EntryPoint
             {
                 var orderId = newIntent.Parameters.GetValueOrDefault("OrderId");
                 await SetActiveWorkflowAsync(sessionId, "RefundWorkflow", ct);
-                return ProcessResult.StartWorkflow(new RefundIntent(orderId, "U100"));
+                return ProcessResult.StartWorkflow(new RefundIntent(orderId, "U100"), refundWorkflow);
             }
             // 新增意图：
             // case "complaint":

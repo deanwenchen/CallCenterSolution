@@ -88,7 +88,8 @@ var refundWorkflowWithAudit = RefundWorkflow.Build(orderService, financeService,
 
 // 创建用户输入入口。
 // 主要作用：统一承接用户消息，做意图识别、超时检查和流程路由。
-var entryPoint = new EntryPoint(pipelineClient, sessionStore, skillsProvider);
+var agentFactory = new AIAgentFactory(pipelineClient);
+var entryPoint = new EntryPoint(agentFactory, sessionStore, skillsProvider);
 
 // 创建单一 stdin 读取通道。
 // 主要作用：把控制台输入和事件循环解耦，避免 Console.ReadLine() 被多个地方抢占。
