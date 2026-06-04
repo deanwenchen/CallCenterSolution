@@ -77,7 +77,7 @@
 4. 前端可用 EventSource 或 fetch + ReadableStream 消费
 
 **Plans:** 1 plan
-- [ ] 14-01-PLAN.md — SSE 流式端点 + 会话管理
+- [x] 14-01-PLAN.md — SSE 流式端点 + 会话管理
 
 ### Phase 15: Safety Pipeline 实现
 
