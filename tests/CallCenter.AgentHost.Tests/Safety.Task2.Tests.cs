@@ -48,8 +48,8 @@ public class SafetyTask2Tests
     {
         // Arrange & Act — static API should still work
         // Assert
-        Assert.True(KeywordFilter.IsBlocked("我要投诉"));
-        Assert.False(KeywordFilter.IsBlocked("正常订单查询"));
+        Assert.True(KeywordFilter.IsBlockedStatic("我要投诉"));
+        Assert.False(KeywordFilter.IsBlockedStatic("正常订单查询"));
     }
 
     [Fact]

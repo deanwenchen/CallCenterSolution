@@ -2,12 +2,14 @@ using CallCenter.Framework;
 using CallCenter.Framework.Audit;
 using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Pipeline;
+using CallCenter.Framework.Safety;
 using CallCenter.Framework.Session;
 using CallCenter.Shared.Mcp;
 using CallCenter.Shared.Services;
 using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAI;
 using System.ClientModel;
@@ -22,6 +24,36 @@ namespace CallCenter.AgentHost;
 public static class Extensions
 {
     /// <summary>
+    /// 注册 CallCenter 框架所有基础设施，并从配置读取安全选项。
+    /// 适用于 WebApi 场景，从 appsettings.json 读取 "Safety" 配置段。
+    /// </summary>
+    public static IServiceCollection AddCallCenter(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        CallCenterOptions? options = null)
+    {
+        // 手动绑定安全选项（避免依赖 Configuration.Binder）
+        var safetySection = configuration.GetSection("Safety");
+        var safetyOptions = new SafetyOptions
+        {
+            EnableKeywordFilter = bool.TryParse(safetySection["EnableKeywordFilter"], out var ekf) ? ekf : true,
+            EnableInjectionDetection = bool.TryParse(safetySection["EnableInjectionDetection"], out var eid) ? eid : true,
+            BlockedKeywords = safetySection.GetSection("BlockedKeywords").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
+            BlockedMessageTemplate = safetySection["BlockedMessageTemplate"] ?? "您的输入包含敏感内容（{keyword}），我们已暂时中止处理。如有需要，请联系人工客服。",
+        };
+        // 如果配置中没有 BlockedKeywords，回退到默认值
+        if (safetyOptions.BlockedKeywords.Length == 0)
+        {
+            safetyOptions.BlockedKeywords = new SafetyOptions().BlockedKeywords;
+        }
+
+        services.AddSingleton(safetyOptions);
+        services.AddSingleton<KeywordFilter>(sp => new KeywordFilter(sp.GetRequiredService<SafetyOptions>()));
+
+        return AddCallCenterCore(services, options, useConfiguredKeywordFilter: true);
+    }
+
+    /// <summary>
     /// 注册 CallCenter 框架所有基础设施。
     /// 包括：LLM 客户端（keyed + pipeline）、会话存储、审计日志、事件总线、
     /// Mock 服务、工作流实例。
@@ -29,6 +61,14 @@ public static class Extensions
     public static IServiceCollection AddCallCenter(
         this IServiceCollection services,
         CallCenterOptions? options = null)
+    {
+        return AddCallCenterCore(services, options, useConfiguredKeywordFilter: false);
+    }
+
+    private static IServiceCollection AddCallCenterCore(
+        IServiceCollection services,
+        CallCenterOptions? options,
+        bool useConfiguredKeywordFilter)
     {
         options ??= new CallCenterOptions();
         options.ApplyDefaults();
@@ -51,8 +91,12 @@ public static class Extensions
         var summarizerClient = StandardPipelineFactory.CreateSummarizerClient(openAIClient, options.ModelName);
 
         // 6 层管道客户端（安全 → 日志 → 压缩 → 工具审批 → LLM → 安全输出）
-        var pipelineClient = StandardPipelineFactory.CreatePipeline(baseClient, summarizerClient, "pipeline", logger: null);
-        services.AddSingleton<IChatClient>(pipelineClient);
+        // 使用工厂委托延迟解析 KeywordFilter，确保 DI 已就绪
+        services.AddSingleton<IChatClient>(sp =>
+        {
+            var keywordFilter = useConfiguredKeywordFilter ? sp.GetService<KeywordFilter>() : null;
+            return StandardPipelineFactory.CreatePipeline(baseClient, summarizerClient, "pipeline", logger: null, keywordFilter: keywordFilter);
+        });
 
         // 会话存储
         services.AddSingleton<InMemorySessionStore>();

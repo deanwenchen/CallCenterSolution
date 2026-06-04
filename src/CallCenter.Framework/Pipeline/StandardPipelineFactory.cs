@@ -24,7 +24,8 @@ public static class StandardPipelineFactory
         IChatClient baseClient,
         IChatClient summarizerClient,
         string sessionId,
-        JsonlLogger? logger = null)
+        JsonlLogger? logger = null,
+        Safety.KeywordFilter? keywordFilter = null)
     {
         logger ??= new JsonlLogger();
 
@@ -44,7 +45,7 @@ public static class StandardPipelineFactory
         client = new LoggingDelegatingClient(client, logger, sessionId);
 
         // Layer 6 (outermost): SafetyInput — redact PII, block keywords, detect injection
-        client = new SafetyInputDelegatingClient(client);
+        client = new SafetyInputDelegatingClient(client, keywordFilter);
 
         return client;
     }
@@ -125,7 +126,12 @@ internal sealed class LoggingDelegatingClient : DelegatingChatClient
 /// <summary>安全输入包装器。对用户消息应用安全过滤（PII 脱敏 + 关键词 + 注入检测）。</summary>
 internal sealed class SafetyInputDelegatingClient : DelegatingChatClient
 {
-    public SafetyInputDelegatingClient(IChatClient inner) : base(inner) { }
+    private readonly Safety.KeywordFilter? _keywordFilter;
+
+    public SafetyInputDelegatingClient(IChatClient inner, Safety.KeywordFilter? keywordFilter = null) : base(inner)
+    {
+        _keywordFilter = keywordFilter;
+    }
 
     public override async Task<ChatResponse> GetResponseAsync(
         IEnumerable<ChatMessage> messages,
@@ -137,7 +143,7 @@ internal sealed class SafetyInputDelegatingClient : DelegatingChatClient
         {
             if (msg.Role == ChatRole.User && msg.Text is not null)
             {
-                var safeText = SafetyInputFilter.ProcessInput(msg.Text, "pipeline");
+                var safeText = SafetyInputFilter.ProcessInput(msg.Text, "pipeline", _keywordFilter);
                 safeMessages.Add(new ChatMessage(ChatRole.User, safeText));
             }
             else

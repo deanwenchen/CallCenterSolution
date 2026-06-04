@@ -26,14 +26,35 @@ public static class SafetyInputFilter
 {
     public static string ProcessInput(string input, string sessionId)
     {
+        return ProcessInput(input, sessionId, keywordFilter: null);
+    }
+
+    /// <summary>
+    /// 处理用户输入，应用安全过滤。
+    /// 当 keywordFilter 为 null 时，回退到静态默认关键词（向后兼容）。
+    /// </summary>
+    public static string ProcessInput(string input, string sessionId, KeywordFilter? keywordFilter)
+    {
         // Step 1: PII redaction — mask sensitive data before any further processing
         var redacted = PiiRedactor.Redact(input);
 
         // Step 2: Keyword blocking — reject messages containing escalation-trigger words
-        if (KeywordFilter.IsBlocked(redacted))
+        if (keywordFilter != null)
         {
-            var keyword = KeywordFilter.GetBlockedKeyword(redacted);
-            throw new SafetyViolationException("keyword_blocked", $"Input blocked by keyword filter: {keyword}");
+            if (keywordFilter.IsBlocked(redacted))
+            {
+                var keyword = keywordFilter.GetBlockedKeyword(redacted);
+                throw new SafetyViolationException("keyword_blocked", $"Input blocked by keyword filter: {keyword}");
+            }
+        }
+        else
+        {
+            // Fallback to static default keywords
+            if (KeywordFilter.IsBlockedStatic(redacted))
+            {
+                var keyword = KeywordFilter.GetBlockedKeywordStatic(redacted);
+                throw new SafetyViolationException("keyword_blocked", $"Input blocked by keyword filter: {keyword}");
+            }
         }
 
         // Step 3: Prompt injection detection — catch attempts to override system instructions

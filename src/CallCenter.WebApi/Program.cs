@@ -9,8 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Load appsettings.json
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 
-// DI registration: CallCenter framework (reads DASHSCOPE_API_KEY from environment via ApplyDefaults)
-builder.Services.AddCallCenter();
+// DI registration: CallCenter framework (reads DASHSCOPE_API_KEY from environment via ApplyDefaults, Safety options from IConfiguration)
+builder.Services.AddCallCenter(builder.Configuration);
 
 // DI registration: AIAgentFactory (required by CallCenterService DI constructor)
 builder.Services.AddSingleton<AIAgentFactory>();
