@@ -9,4 +9,5 @@
   <Project Path="src/CallCenter.AgentHost/CallCenter.AgentHost.csproj" />
   <Project Path="src/CallCenter.ConsoleDemo/CallCenter.ConsoleDemo.csproj" />
   <Project Path="src/CallCenter.WebApi/CallCenter.WebApi.csproj" />
+  <Project Path="tests/CallCenter.AgentHost.Tests/CallCenter.AgentHost.Tests.csproj" />
 </Solution>
