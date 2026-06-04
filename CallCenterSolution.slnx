@@ -8,4 +8,5 @@
   <Project Path="src/CallCenter.Workflows/CallCenter.Workflows.csproj" />
   <Project Path="src/CallCenter.AgentHost/CallCenter.AgentHost.csproj" />
   <Project Path="src/CallCenter.ConsoleDemo/CallCenter.ConsoleDemo.csproj" />
+  <Project Path="src/CallCenter.WebApi/CallCenter.WebApi.csproj" />
 </Solution>
