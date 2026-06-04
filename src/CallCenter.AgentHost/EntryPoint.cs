@@ -1,13 +1,10 @@
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using CallCenter.Framework.Parsing;
 using CallCenter.Framework.Session;
 using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
-using Microsoft.Extensions.AI;
 
 namespace CallCenter.AgentHost;
 

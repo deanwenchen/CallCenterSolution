@@ -1,22 +1,14 @@
 #pragma warning disable MAAI001
-using System.ClientModel;
 using System.Threading.Channels;
-using System.Text.Json;
 using CallCenter.Framework;
 using CallCenter.Framework.Audit;
 using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Logging;
 using CallCenter.Framework.Parsing;
-using CallCenter.Framework.Pipeline;
-using CallCenter.Framework.Session;
-using CallCenter.Shared.Mcp;
-using CallCenter.Shared.Services;
-using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
-using OpenAI;
 
 namespace CallCenter.AgentHost;
 

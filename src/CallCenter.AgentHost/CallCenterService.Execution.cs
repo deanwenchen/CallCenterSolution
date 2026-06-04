@@ -1,10 +1,6 @@
 #pragma warning disable MAAI001
-using System.Threading.Channels;
-using CallCenter.Framework;
 using CallCenter.Framework.Audit;
-using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Saga;
-using CallCenter.Framework.Session;
 using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI.Workflows;
 
