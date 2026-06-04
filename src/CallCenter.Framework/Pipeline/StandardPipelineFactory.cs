@@ -25,15 +25,18 @@ public static class StandardPipelineFactory
         IChatClient summarizerClient,
         string sessionId,
         JsonlLogger? logger = null,
-        Safety.KeywordFilter? keywordFilter = null)
+        Safety.KeywordFilter? keywordFilter = null,
+        SafetyOptions? safetyOptions = null)
     {
         logger ??= new JsonlLogger();
+        safetyOptions ??= new SafetyOptions();
 
         // Layer 1 (innermost): baseClient — raw LLM
         IChatClient client = baseClient;
 
-        // Layer 2: SafetyOutput — redact PII from LLM responses
-        client = new SafetyOutputDelegatingClient(client);
+        // Layer 2: SafetyOutput — redact PII from LLM responses + content filtering
+        var contentFilter = new OutputContentFilter(safetyOptions);
+        client = new SafetyOutputDelegatingClient(client, safetyOptions, contentFilter);
 
         // Layer 3: ToolApproval — check tool calls before execution
         client = new ToolApprovalDelegatingClient(client, new DefaultToolApprovalAgent(), sessionId);
@@ -69,10 +72,17 @@ public static class StandardPipelineFactory
     }
 }
 
-/// <summary>安全输出包装器。对 AI 响应应用 PII 脱敏，防止敏感信息泄露给用户。</summary>
+/// <summary>安全输出包装器。对 AI 响应应用 PII 脱敏和可选的输出端内容审核，防止敏感信息泄露给用户。</summary>
 internal sealed class SafetyOutputDelegatingClient : DelegatingChatClient
 {
-    public SafetyOutputDelegatingClient(IChatClient inner) : base(inner) { }
+    private readonly SafetyOptions _options;
+    private readonly OutputContentFilter? _contentFilter;
+
+    public SafetyOutputDelegatingClient(IChatClient inner, SafetyOptions options, OutputContentFilter? contentFilter = null) : base(inner)
+    {
+        _options = options;
+        _contentFilter = contentFilter;
+    }
 
     public override async Task<ChatResponse> GetResponseAsync(
         IEnumerable<ChatMessage> messages,
@@ -82,12 +92,23 @@ internal sealed class SafetyOutputDelegatingClient : DelegatingChatClient
         var response = await base.GetResponseAsync(messages, options, cancellationToken);
         if (response.Text is not null)
         {
-            var safeOutput = SafetyOutputFilter.ProcessOutput(response.Text);
-            return new ChatResponse([new ChatMessage(ChatRole.Assistant, safeOutput)])
+            try
             {
-                FinishReason = response.FinishReason,
-                Usage = response.Usage,
-            };
+                var safeOutput = SafetyOutputFilter.ProcessOutput(response.Text, _options, _contentFilter);
+                return new ChatResponse([new ChatMessage(ChatRole.Assistant, safeOutput)])
+                {
+                    FinishReason = response.FinishReason,
+                    Usage = response.Usage,
+                };
+            }
+            catch (SafetyViolationException ex)
+            {
+                return new ChatResponse([new ChatMessage(ChatRole.Assistant, ex.Message)])
+                {
+                    FinishReason = response.FinishReason,
+                    Usage = response.Usage,
+                };
+            }
         }
         return response;
     }

@@ -69,12 +69,41 @@ public static class SafetyInputFilter
 
 /// <summary>
 /// 输出安全过滤器。在 AI 响应到达用户之前应用。
-/// 目前仅做 PII 脱敏；需要时可扩展内容审核功能。
+/// 默认仅做 PII 脱敏；当配置 OutputContentFilter 后，额外执行输出端敏感内容拦截。
 /// </summary>
 public static class SafetyOutputFilter
 {
+    /// <summary>仅做 PII 脱敏（向后兼容）。</summary>
     public static string ProcessOutput(string output)
     {
         return PiiRedactor.Redact(output);
+    }
+
+    /// <summary>
+    /// 处理 AI 输出，应用 PII 脱敏和可选的输出端内容审核。
+    /// 当 contentFilter 不为 null 且 options.BlockedOutputCategories 非空时，
+    /// 对脱敏后的内容执行关键词匹配拦截，命中则抛出 SafetyViolationException。
+    /// </summary>
+    public static string ProcessOutput(string output, SafetyOptions? options, OutputContentFilter? contentFilter)
+    {
+        var redacted = PiiRedactor.Redact(output);
+
+        if (contentFilter != null && options != null && options.BlockedOutputCategories is { Length: > 0 })
+        {
+            if (contentFilter.IsBlocked(redacted))
+            {
+                var category = contentFilter.GetMatchedCategory(redacted);
+                var message = category switch
+                {
+                    "violence" => options.ViolenceMessageTemplate,
+                    "pornography" => options.PornographyMessageTemplate,
+                    "politics" => options.PoliticsMessageTemplate,
+                    _ => options.BlockedMessageTemplate,
+                };
+                throw new SafetyViolationException("output_content_blocked", message);
+            }
+        }
+
+        return redacted;
     }
 }
