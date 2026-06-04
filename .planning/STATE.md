@@ -1,51 +1,40 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: Execution & Cleanup
+milestone: v3.0
+milestone_name: Web API + Safety 增强
 current_phase: null
-status: Milestone complete
-stopped_at: v2.1 milestone archived
-last_updated: "2026-06-04T01:00:00.000Z"
-last_activity: 2026-06-04 — Milestone v2.1 completed and archived
+status: Planning
+stopped_at: null
+last_updated: "2026-06-04T00:00:00.000Z"
+last_activity: 2026-06-04 — Milestone v3.0 started, defining requirements
 progress:
-  total_phases: 12
-  completed_phases: 12
-  total_plans: 29
-  completed_plans: 29
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
 
-Current phase: — (all milestones complete)
-Active plans: —
-Current task: v2.1 milestone archived — ready for /gsd:new-milestone
+Current phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-04 — Milestone v3.0 started
 
 ## Project Reference
 
-See: .planning/PROJECT.md
+See: .planning/PROJECT.md (updated 2026-06-04)
 
 **Core value:** 用户说出业务意图后，系统能自动识别、启动对应流程、在需要时追问缺失参数、最终完成业务操作
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v3.0
 
 ## Phase Progress
 
 | Phase | Status | Plans | Progress |
 |-------|--------|-------|----------|
-| 1 | Complete | 6/6 | 100% |
-| 2 | Complete | 3/3 | 100% |
-| 3 | Complete | 2/2 | 100% |
-| 4 | Complete | 2/2 | 100% |
-| 5 | Complete | 1/1 | 100% |
-| 6 | Complete | 2/2 | 100% |
-| 7 | Complete | 2/2 | 100% |
-| 8 | Complete | 2/2 | 100% |
-| 9 | Complete | 3/3 | 100% |
-| 10 | Complete | 3/3 | 100% |
-| 11 | Complete | 1/1 | 100% |
-| 12 | Complete | 2/2 | 100% |
 
-Total: 29/29 plans complete across 4 milestones
+Total: 0/0 plans complete
 
 ## Deferred Items
 
@@ -56,16 +45,15 @@ Total: 29/29 plans complete across 4 milestones
 ## Last Session
 
 **Timestamp:** 2026-06-04
-**Stopped At:** v2.1 milestone archived
-**Resume File:** None
+**Stopped At:** Milestone v3.0 started
 
 ## Current Position
 
-Phase: All milestones complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-04 — Milestone v2.1 archived
+Status: Defining requirements
+Last activity: 2026-06-04 — Milestone v3.0 started
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd:new-milestone
+- `/gsd:plan-phase 1` — Start planning first phase after roadmap is created

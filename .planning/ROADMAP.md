@@ -6,6 +6,7 @@
 - ✅ **v1.1 Technical Debt Closure** — Phases 5-8 (shipped 2026-06-01)
 - ✅ **v2.0 Framework 提取** — Phases 9-10 (shipped 2026-06-03)
 - ✅ **v2.1 Execution & Cleanup** — Phases 11-12 (shipped 2026-06-04)
+- ◆ **v3.0 Web API + Safety 增强** — Phases 13-16 (defining)
 
 ## Phases
 
@@ -27,41 +28,85 @@
 - [x] Phase 7: Audit Logger + Saga Compensation (2/2 plans) — completed 2026-06-01
 - [x] Phase 8: Business Extensibility Guide (2/2 plans) — completed 2026-06-01
 
-See: [.planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md](.planning/milestones/v1.1-TECHNICAL-DEBT-CLOSURE.md)
-
 </details>
 
 <details>
 <summary>✅ v2.0 Framework 提取 (Phases 9-10) — SHIPPED 2026-06-03</summary>
 
-- [x] Phase 9: 基础配置与工厂 — CallCenterOptions + AIAgentFactory + EntryPoint 修改
-  - **Plans:** 3 plans
-  - [x] 09-01-PLAN.md — CallCenterOptions 配置类 + Extensions.cs DI 扩展方法
-  - [x] 09-02-PLAN.md — AIAgentFactory 工厂类（CreateIntentAgent + CreateDialogAgent）
-  - [x] 09-03-PLAN.md — EntryPoint 构造函数迁移 + Program.cs 同步
-- [x] Phase 10: CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类 (completed 2026-06-03)
-  - **Plans:** 3 plans
-  - [x] 10-01-PLAN.md — Core.cs 骨架：partial class 定义、双构造函数模式、IDisposable
-  - [x] 10-02-PLAN.md — Intent.cs + Routing.cs：ProcessAsync 入口、意图→工作流映射
-  - [x] 10-03-PLAN.md — Execution.cs + Interaction.cs：DriveLoopAsync 事件循环、9 种事件处理、HandleRequestAsync
-
-See: [.planning/milestones/v2.0-REQUIREMENTS.md](.planning/milestones/v2.0-REQUIREMENTS.md)
+- [x] Phase 9: 基础配置与工厂 (3/3 plans) — completed 2026-06-03
+- [x] Phase 10: CallCenterService 骨架 (3/3 plans) — completed 2026-06-03
 
 </details>
 
 <details>
 <summary>✅ v2.1 Execution & Cleanup (Phases 11-12) — SHIPPED 2026-06-04</summary>
 
-- [x] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简 (completed 2026-06-03)
-  - **Plans:** 1 plan
-  - [x] 11-01-PLAN.md — Core.cs EventBus 订阅 + Program.cs 精简为 ~25-30 行主循环
-- [x] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试 (2 plans) (completed 2026-06-04)
-  - [x] 12-01-PLAN.md — 删除旧 AddCallCenter + 清理未使用 using 指令
-  - [x] 12-02-PLAN.md — 编译验证 + 4 个 E2E 场景冒烟测试
+- [x] Phase 11: 执行层与入口 (1/1 plans) — completed 2026-06-03
+- [x] Phase 12: 清理与验证 (2/2 plans) — completed 2026-06-04
 
-See: [.planning/milestones/v2.1-ROADMAP.md](.planning/milestones/v2.1-ROADMAP.md)
+</details>
 
-OpenSpec: `extract-callcenter-service` (47 tasks — phases 9-12)
+<details>
+<summary>◆ v3.0 Web API + Safety 增强 (Phases 13-16) — ACTIVE</summary>
+
+### Phase 13: Web API 基础 — 新项目搭建 + /chat 端点
+
+**Goal:** 新增 CallCenter.WebApi 项目，实现基础 HTTP 聊天入口。
+
+**Requirements:** WA-01, WA-02, WA-05
+
+**Success Criteria:**
+1. `dotnet run` 启动 Web API 项目，访问 Swagger UI
+2. POST /chat {message: "我要退款，订单A001"} 返回阻塞式响应（先不流式）
+3. CORS 配置允许前端跨域请求
+4. ConsoleDemo 和 WebApi 可并行运行
+
+**Plans:** 1 plan
+- [ ] 13-01-PLAN.md — CallCenter.WebApi 项目 + /chat 端点 + DI 注册
+
+### Phase 14: SSE 流式 + 会话管理
+
+**Goal:** 将 /chat 改为 SSE 流式输出，支持会话生命周期管理。
+
+**Requirements:** WA-03, WA-04
+
+**Success Criteria:**
+1. POST /chat/stream 返回 SSE 事件流，用户可实时看到工作流中间输出
+2. 自动 sessionId 生成，后续请求复用同一会话
+3. 过期会话（60 分钟无活动）自动清理
+4. 前端可用 EventSource 或 fetch + ReadableStream 消费
+
+**Plans:** 1 plan
+- [ ] 14-01-PLAN.md — SSE 流式端点 + 会话管理
+
+### Phase 15: Safety Pipeline 实现
+
+**Goal:** 补齐 6 层 Pipeline 中 SafetyInput 层的实际拦截能力。
+
+**Requirements:** SI-01, SI-02, SI-03, SI-04
+
+**Success Criteria:**
+1. 输入含邮箱/手机号 → PII 脱敏后传给 LLM
+2. 输入含黑名单关键词 → 返回友好拦截消息，不调 LLM
+3. 输入含 prompt injection 模式 → 返回安全警告
+4. 关键词列表在 appsettings.json 可配置，不改代码
+
+**Plans:** 1 plan
+- [ ] 15-01-PLAN.md — PII 脱敏 + 关键词黑名单 + Prompt injection 检测 + 配置化
+
+### Phase 16: SafetyOutput + Exchange 骨架确认
+
+**Goal:** 实现 LLM 输出端敏感内容拦截，确认 Exchange 骨架就绪。
+
+**Requirements:** SO-01, EX-01
+
+**Success Criteria:**
+1. LLM 输出含敏感内容 → 替换为安全消息返回
+2. ExchangeWorkflow 编译通过，骨架文件齐全
+3. 全解决方案 0 错误 0 警告编译
+
+**Plans:** 1 plan
+- [ ] 16-01-PLAN.md — SafetyOutput 敏感内容拦截 + Exchange 骨架确认
 
 </details>
 
@@ -81,7 +126,11 @@ OpenSpec: `extract-callcenter-service` (47 tasks — phases 9-12)
 | 10. CallCenterService 骨架 | v2.0 | 3/3 | Complete | 2026-06-03 |
 | 11. 执行层与入口 | v2.1 | 1/1 | Complete | 2026-06-03 |
 | 12. 清理与验证 | v2.1 | 2/2 | Complete | 2026-06-04 |
+| 13. Web API 基础 | v3.0 | 0/1 | Not Started | — |
+| 14. SSE 流式 + 会话管理 | v3.0 | 0/1 | Not Started | — |
+| 15. Safety Pipeline 实现 | v3.0 | 0/1 | Not Started | — |
+| 16. SafetyOutput + Exchange | v3.0 | 0/1 | Not Started | — |
 
 ---
 
-*Roadmap updated: 2026-06-04 after v2.1 milestone completion*
+*Roadmap updated: 2026-06-04 after v3.0 roadmap creation*
