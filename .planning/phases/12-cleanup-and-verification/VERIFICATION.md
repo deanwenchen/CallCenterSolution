@@ -26,24 +26,38 @@
 
 ## Task 2: E2E Smoke Test (4 Scenarios)
 
-*Results to be filled after execution.*
+**Status:** Requires human verification — interactive console demo with LLM API calls cannot be reliably automated.
+
+### Pre-execution Fix (Rule 1 - Bug)
+
+**Issue:** `JsonlLogger` not registered in DI container. `Extensions.cs` `AddCallCenter()` was missing the `JsonlLogger` registration that existed in the old `ServiceCollectionExtensions.cs`.
+**Fix:** Added `services.AddSingleton<CallCenter.Framework.Logging.JsonlLogger>()` to `Extensions.cs`.
+**Result:** Build passes, application starts successfully (verified by successful startup with greeting output).
+
+### Automated Testing Limitation
+
+The console demo has two concurrent stdin readers:
+1. Main loop: `Console.ReadLine()` (synchronous)
+2. Background task: `Console.In.ReadLineAsync()` (async, feeds `_inputChannel`)
+
+Piped input races between these two readers, making automated E2E testing unreliable. Manual interactive testing is required.
 
 ### T1: Business Intent (Refund)
 - **Input:** "我要退款，订单A001"
 - **Expected:** 显示订单信息 → 确认退款 → 显示退款结果 → 显示 [EVENT] 退款完成
-- **Actual:** _pending_
+- **Actual:** _requires human verification_
 
 ### T2: Rule Reject
 - **Input:** "我要退款，订单A002"
 - **Expected:** 返回规则拒绝（定制商品不可退款）
-- **Actual:** _pending_
+- **Actual:** _requires human verification_
 
 ### T3: Non-business Intent
 - **Input:** "你好"
 - **Expected:** 返回问候语，不启动工作流
-- **Actual:** _pending_
+- **Actual:** _requires human verification_
 
 ### T4: Missing Parameter Follow-up
 - **Input:** "我要退款"
 - **Expected:** 追问订单号 → 用户提供 → 继续流程
-- **Actual:** _pending_
+- **Actual:** _requires human verification_

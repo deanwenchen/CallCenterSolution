@@ -64,6 +64,9 @@ public static class Extensions
         // 事件总线
         services.AddSingleton<IBusinessEventBus, InMemoryBusinessEventBus>();
 
+        // JSONL 日志记录器
+        services.AddSingleton<CallCenter.Framework.Logging.JsonlLogger>();
+
         // Mock 服务（默认注册，可被后续 override 方法替换）
         if (options.UseMockServices)
         {
