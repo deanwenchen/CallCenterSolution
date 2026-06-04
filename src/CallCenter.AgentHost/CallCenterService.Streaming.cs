@@ -129,4 +129,10 @@ public partial class CallCenterService
         });
         return $"data: {{\"type\":\"{typeName}\",\"data\":{json}}}\n\n";
     }
+
+    /// <summary>
+    /// 清除指定会话的所有数据（惰性清理用）。
+    /// </summary>
+    public Task ClearSessionScopeAsync(string sessionId, CancellationToken ct = default) =>
+        _sessionStore.ClearScopeAsync(sessionId, ct);
 }

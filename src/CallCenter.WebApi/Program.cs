@@ -60,4 +60,43 @@ app.MapPost("/chat", async (ChatRequest request, CallCenterService svc) =>
 })
 .WithName("Chat");
 
+// POST /chat/stream endpoint — SSE event stream for real-time workflow output
+app.MapPost("/chat/stream", async (ChatRequest request, CallCenterService svc, HttpContext http) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Message))
+    {
+        return Results.BadRequest(new { error = "message is required" });
+    }
+
+    var sessionId = string.IsNullOrWhiteSpace(request.SessionId)
+        ? Guid.NewGuid().ToString()
+        : request.SessionId;
+
+    // Lazy session cleanup (per D-14-07): check if session expired (>60 min inactive)
+    var lastActivity = await svc.GetLastActivityAsync(sessionId, http.RequestAborted);
+    if (lastActivity != null && DateTime.UtcNow - lastActivity.Value >= TimeSpan.FromMinutes(60))
+    {
+        await svc.ClearSessionScopeAsync(sessionId, http.RequestAborted);
+        http.Response.ContentType = "text/event-stream";
+        http.Response.Headers.CacheControl = "no-cache";
+        await http.Response.WriteAsync(
+            $"data: {{\"type\":\"SessionExpired\",\"data\":{{\"reason\":\"60 minutes of inactivity\"}}}}\n\n",
+            http.RequestAborted);
+        return Results.Empty;
+    }
+
+    // Stream workflow events as SSE
+    http.Response.ContentType = "text/event-stream";
+    http.Response.Headers.CacheControl = "no-cache";
+
+    await foreach (var sseEvent in svc.ProcessStreamingAsync(sessionId, request.Message, http.RequestAborted))
+    {
+        await http.Response.WriteAsync(sseEvent, http.RequestAborted);
+        await http.Response.Body.FlushAsync(http.RequestAborted);
+    }
+
+    return Results.Empty;
+})
+.WithName("ChatStream");
+
 app.Run();
