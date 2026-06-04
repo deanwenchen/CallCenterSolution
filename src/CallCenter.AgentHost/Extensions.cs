@@ -40,6 +40,14 @@ public static class Extensions
             EnableInjectionDetection = bool.TryParse(safetySection["EnableInjectionDetection"], out var eid) ? eid : true,
             BlockedKeywords = safetySection.GetSection("BlockedKeywords").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
             BlockedMessageTemplate = safetySection["BlockedMessageTemplate"] ?? "您的输入包含敏感内容（{keyword}），我们已暂时中止处理。如有需要，请联系人工客服。",
+            // Output-end content filtering
+            BlockedOutputCategories = safetySection.GetSection("BlockedOutputCategories").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
+            ViolenceKeywords = safetySection.GetSection("ViolenceKeywords").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
+            PornographyKeywords = safetySection.GetSection("PornographyKeywords").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
+            PoliticsKeywords = safetySection.GetSection("PoliticsKeywords").GetChildren().Select(c => c.Value).Where(v => v != null).ToArray()!,
+            ViolenceMessageTemplate = safetySection["ViolenceMessageTemplate"] ?? "抱歉，系统无法提供相关内容。如需帮助，请联系人工客服。",
+            PornographyMessageTemplate = safetySection["PornographyMessageTemplate"] ?? "抱歉，系统无法提供相关内容。如需帮助，请联系人工客服。",
+            PoliticsMessageTemplate = safetySection["PoliticsMessageTemplate"] ?? "抱歉，该问题超出我的服务范围。如有其他问题，我很乐意帮助您。",
         };
         // 如果配置中没有 BlockedKeywords，回退到默认值
         if (safetyOptions.BlockedKeywords.Length == 0)
@@ -91,11 +99,12 @@ public static class Extensions
         var summarizerClient = StandardPipelineFactory.CreateSummarizerClient(openAIClient, options.ModelName);
 
         // 6 层管道客户端（安全 → 日志 → 压缩 → 工具审批 → LLM → 安全输出）
-        // 使用工厂委托延迟解析 KeywordFilter，确保 DI 已就绪
+        // 使用工厂委托延迟解析 KeywordFilter 和 SafetyOptions，确保 DI 已就绪
         services.AddSingleton<IChatClient>(sp =>
         {
             var keywordFilter = useConfiguredKeywordFilter ? sp.GetService<KeywordFilter>() : null;
-            return StandardPipelineFactory.CreatePipeline(baseClient, summarizerClient, "pipeline", logger: null, keywordFilter: keywordFilter);
+            var safetyOptions = sp.GetService<SafetyOptions>();
+            return StandardPipelineFactory.CreatePipeline(baseClient, summarizerClient, "pipeline", logger: null, keywordFilter: keywordFilter, safetyOptions: safetyOptions);
         });
 
         // 会话存储
