@@ -106,7 +106,7 @@
 3. 全解决方案 0 错误 0 警告编译
 
 **Plans:** 1 plan
-- [ ] 16-01-PLAN.md — SafetyOutput 敏感内容拦截 + Exchange 骨架确认
+- [ ] 16-01-PLAN.md — OutputContentFilter 按类关键词拦截 + SafetyOutputDelegatingClient 话术返回 + Exchange 骨架编译确认
 
 </details>
 
@@ -129,7 +129,7 @@
 | 13. Web API 基础 | v3.0 | 1/1 | Complete    | 2026-06-04 |
 | 14. SSE 流式 + 会话管理 | v3.0 | 1/1 | Complete | 2026-06-04 |
 | 15. Safety Pipeline 实现 | v3.0 | 1/1 | Complete    | 2026-06-04 |
-| 16. SafetyOutput + Exchange | v3.0 | 0/1 | Not Started | — |
+| 16. SafetyOutput + Exchange | v3.0 | 0/1 | Planned | — |
 
 ---
 
