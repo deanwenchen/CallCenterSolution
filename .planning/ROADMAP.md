@@ -61,8 +61,8 @@
 3. CORS 配置允许前端跨域请求
 4. ConsoleDemo 和 WebApi 可并行运行
 
-**Plans:** 1 plan
-- [ ] 13-01-PLAN.md — CallCenter.WebApi 项目 + /chat 端点 + DI 注册
+**Plans:** 1/1 plans complete
+- [x] 13-01-PLAN.md — CallCenter.WebApi 项目 + /chat 端点 + DI 注册
 
 ### Phase 14: SSE 流式 + 会话管理
 
@@ -126,7 +126,7 @@
 | 10. CallCenterService 骨架 | v2.0 | 3/3 | Complete | 2026-06-03 |
 | 11. 执行层与入口 | v2.1 | 1/1 | Complete | 2026-06-03 |
 | 12. 清理与验证 | v2.1 | 2/2 | Complete | 2026-06-04 |
-| 13. Web API 基础 | v3.0 | 0/1 | Not Started | — |
+| 13. Web API 基础 | v3.0 | 1/1 | Complete   | 2026-06-04 |
 | 14. SSE 流式 + 会话管理 | v3.0 | 0/1 | Not Started | — |
 | 15. Safety Pipeline 实现 | v3.0 | 0/1 | Not Started | — |
 | 16. SafetyOutput + Exchange | v3.0 | 0/1 | Not Started | — |
