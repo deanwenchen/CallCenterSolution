@@ -15,10 +15,10 @@
 
 ### Safety Pipeline 实现
 
-- [ ] **SI-01**: PII 脱敏 — 识别并脱敏邮箱/手机号/身份证号码（替换为 ***）
-- [ ] **SI-02**: 关键词黑名单 — 拦截包含禁用词的输入，返回友好拒绝消息
-- [ ] **SI-03**: Prompt injection 检测 — 识别系统提示注入攻击（如 "ignore previous instructions"），拦截可疑输入
-- [ ] **SI-04**: KeywordFilter 配置化 — 从 appsettings.json 读取关键词列表和拦截规则，不硬编码
+- [x] **SI-01**: PII 脱敏 — 识别并脱敏邮箱/手机号/身份证号码（替换为 ***）
+- [x] **SI-02**: 关键词黑名单 — 拦截包含禁用词的输入，返回友好拒绝消息
+- [x] **SI-03**: Prompt injection 检测 — 识别系统提示注入攻击（如 "ignore previous instructions"），拦截可疑输入
+- [x] **SI-04**: KeywordFilter 配置化 — 从 appsettings.json 读取关键词列表和拦截规则，不硬编码
 - [ ] **SO-01**: SafetyOutput 敏感内容拦截 — 检测 LLM 输出中的暴力/色情/政治等敏感内容，拦截不当输出
 
 ### Exchange Workflow 骨架
@@ -44,10 +44,10 @@
 | WA-03 | Phase 14 | Pending |
 | WA-04 | Phase 14 | Pending |
 | WA-05 | Phase 13 | Complete |
-| SI-01 | Phase 15 | Pending |
-| SI-02 | Phase 15 | Pending |
-| SI-03 | Phase 15 | Pending |
-| SI-04 | Phase 15 | Pending |
+| SI-01 | Phase 15 | Complete |
+| SI-02 | Phase 15 | Complete |
+| SI-03 | Phase 15 | Complete |
+| SI-04 | Phase 15 | Complete |
 | SO-01 | Phase 16 | Pending |
 | EX-01 | Phase 16 | Pending |
 
