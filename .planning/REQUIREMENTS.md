@@ -19,11 +19,11 @@
 - [x] **SI-02**: 关键词黑名单 — 拦截包含禁用词的输入，返回友好拒绝消息
 - [x] **SI-03**: Prompt injection 检测 — 识别系统提示注入攻击（如 "ignore previous instructions"），拦截可疑输入
 - [x] **SI-04**: KeywordFilter 配置化 — 从 appsettings.json 读取关键词列表和拦截规则，不硬编码
-- [ ] **SO-01**: SafetyOutput 敏感内容拦截 — 检测 LLM 输出中的暴力/色情/政治等敏感内容，拦截不当输出
+- [x] **SO-01**: SafetyOutput 敏感内容拦截 — 检测 LLM 输出中的暴力/色情/政治等敏感内容，拦截不当输出
 
 ### Exchange Workflow 骨架
 
-- [ ] **EX-01**: ExchangeWorkflow 骨架保留（已有 Workflow + 7 Executors + Messages + Skill，编译通过）
+- [x] **EX-01**: ExchangeWorkflow 骨架保留（已有 Workflow + 7 Executors + Messages + Skill，编译通过）
 
 ## Out of Scope
 
@@ -48,8 +48,8 @@
 | SI-02 | Phase 15 | Complete |
 | SI-03 | Phase 15 | Complete |
 | SI-04 | Phase 15 | Complete |
-| SO-01 | Phase 16 | Pending |
-| EX-01 | Phase 16 | Pending |
+| SO-01 | Phase 16 | Complete |
+| EX-01 | Phase 16 | Complete |
 
 **Coverage:**
 - v3.0 requirements: 11 total
