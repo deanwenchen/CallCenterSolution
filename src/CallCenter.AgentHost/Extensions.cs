@@ -4,13 +4,11 @@ using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Pipeline;
 using CallCenter.Framework.Session;
 using CallCenter.Shared.Mcp;
-using CallCenter.Shared.Services;
 using CallCenter.Workflows.Refund;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using OpenAI;
-using System;
 using System.ClientModel;
 
 namespace CallCenter.AgentHost;

@@ -1,7 +1,4 @@
 #pragma warning disable MAAI001
-using CallCenter.Framework.Session;
-using CallCenter.Workflows.Refund;
-using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.AgentHost;
 
