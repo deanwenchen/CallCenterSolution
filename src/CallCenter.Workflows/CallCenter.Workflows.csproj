@@ -7,6 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CallCenter.Shared\CallCenter.Shared.csproj" />
     <ProjectReference Include="..\CallCenter.Framework\CallCenter.Framework.csproj" />
-    <ProjectReference Include="..\..\..\..\GitCode\agent-framework\dotnet\src\Microsoft.Agents.AI.Workflows\Microsoft.Agents.AI.Workflows.csproj" />
+    <ProjectReference Include="..\..\..\..\..\..\..\GitCode\agent-framework\dotnet\src\Microsoft.Agents.AI.Workflows\Microsoft.Agents.AI.Workflows.csproj" />
   </ItemGroup>
 </Project>

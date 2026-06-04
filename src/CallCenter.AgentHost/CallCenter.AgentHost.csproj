@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CallCenter.Workflows\CallCenter.Workflows.csproj" />
     <ProjectReference Include="..\CallCenter.Framework\CallCenter.Framework.csproj" />
-    <ProjectReference Include="..\..\..\..\GitCode\agent-framework\dotnet\src\Microsoft.Agents.AI\Microsoft.Agents.AI.csproj" />
+    <ProjectReference Include="..\..\..\..\..\..\..\GitCode\agent-framework\dotnet\src\Microsoft.Agents.AI\Microsoft.Agents.AI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OpenAI" />
