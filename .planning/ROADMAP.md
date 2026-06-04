@@ -91,7 +91,7 @@
 3. 输入含 prompt injection 模式 → 返回安全警告
 4. 关键词列表在 appsettings.json 可配置，不改代码
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 - [x] 15-01-PLAN.md — PII 脱敏 + 关键词黑名单 + Prompt injection 检测 + 配置化
 
 ### Phase 16: SafetyOutput + Exchange 骨架确认
@@ -128,7 +128,7 @@
 | 12. 清理与验证 | v2.1 | 2/2 | Complete | 2026-06-04 |
 | 13. Web API 基础 | v3.0 | 1/1 | Complete    | 2026-06-04 |
 | 14. SSE 流式 + 会话管理 | v3.0 | 1/1 | Complete | 2026-06-04 |
-| 15. Safety Pipeline 实现 | v3.0 | 0/1 | Not Started | — |
+| 15. Safety Pipeline 实现 | v3.0 | 1/1 | Complete   | 2026-06-04 |
 | 16. SafetyOutput + Exchange | v3.0 | 0/1 | Not Started | — |
 
 ---
