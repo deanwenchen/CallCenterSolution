@@ -54,9 +54,9 @@ See: [.planning/milestones/v2.0-REQUIREMENTS.md](.planning/milestones/v2.0-REQUI
 - [x] Phase 11: 执行层与入口 — Execution/Intent partial 类 + Program.cs 精简 (completed 2026-06-03)
   - **Plans:** 1 plan
   - [x] 11-01-PLAN.md — Core.cs EventBus 订阅 + Program.cs 精简为 ~25-30 行主循环
-- [ ] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试 (2 plans)
-  - [ ] 12-01-PLAN.md — 删除旧 AddCallCenter + 清理未使用 using 指令
-  - [ ] 12-02-PLAN.md — 编译验证 + 4 个 E2E 场景冒烟测试
+- [x] Phase 12: 清理与验证 — 清理旧代码 + 端到端测试 (2 plans) (completed 2026-06-04)
+  - [x] 12-01-PLAN.md — 删除旧 AddCallCenter + 清理未使用 using 指令
+  - [x] 12-02-PLAN.md — 编译验证 + 4 个 E2E 场景冒烟测试
 
 OpenSpec: `extract-callcenter-service` (47 tasks — phases 9-12)
 
