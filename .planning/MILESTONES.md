@@ -1,19 +1,30 @@
 # Milestones
 
-## v2.0 Framework 提取 (Shipped: 2026-06-03)
+## v2.1 Execution & Cleanup (Shipped: 2026-06-04)
 
-**Phases completed:** 10 phases, 26 plans, 57 tasks
+**Phases completed:** 2 phases (11-12), 3 plans
 
 **Key accomplishments:**
 
-- .NET 10.0 solution with 5 CallCenter projects, 4 MAF source references, and centralized package management (8 packages)
-- 状态：已完成
-- One-liner:
-- Task Consolidation:
-- Problem:
-- One-liner:
-- One-liner:
-- One-liner:
+- Program.cs 精简为 18 行主循环，使用 `new CallCenterService()` + `svc.ProcessAsync()` 替代 434 行旧代码
+- CallCenterService 完整接入 EventBus：两个构造函数各注册 `Subscribe<RefundCompletedEvent>` 回调
+- 删除废弃 `ServiceCollectionExtensions.cs`（旧版 AddCallCenter 无调用者）
+- 清理 29 个未使用的 using 指令，修复 JsonlLogger DI 注册缺失的 runtime bug
+- 全解决方案 0 错误编译，4 个 E2E 场景验证定义完成
+
+---
+
+## v2.0 Framework 提取 (Shipped: 2026-06-03)
+
+**Phases completed:** 4 phases (9-10), 6 plans
+
+**Key accomplishments:**
+
+- CallCenterService partial class 拆分为 5 个文件（Core/Intent/Routing/Execution/Interaction）
+- 双构造函数模式：自建 DI 容器 + 外部 DI 注入
+- ProcessAsync 统一入口：意图识别 → 工作流路由 → 执行/恢复 → 返回结果
+- 9 种 WorkflowEvent 类型的 HandleEventAsync 处理 + DriveLoopAsync 共享事件循环
+- Saga 补偿机制：ExecuteRefund 失败时自动补偿（恢复优惠券）
 
 ---
 
