@@ -21,8 +21,9 @@ builder.Services.AddSingleton<AgentSkillsProvider>(sp => new AgentSkillsProvider
 // DI registration: CallCenterService (external DI constructor)
 builder.Services.AddScoped<CallCenterService>();
 
-// CORS service registration (strategy "AllowAll", configured in Task 3)
-builder.Services.AddCors();
+// CORS service registration — allow all origins (development mode, WA-05)
+builder.Services.AddCors(options => options.AddPolicy("AllowAll",
+    policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 // Swagger service registration (configured in Task 3)
 builder.Services.AddEndpointsApiExplorer();
@@ -30,7 +31,16 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Middleware pipeline (configured in Task 3)
+// Middleware pipeline
+app.UseCors("AllowAll");
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
 
 // POST /chat endpoint — blocking JSON response
 app.MapPost("/chat", async (ChatRequest request, CallCenterService svc) =>
