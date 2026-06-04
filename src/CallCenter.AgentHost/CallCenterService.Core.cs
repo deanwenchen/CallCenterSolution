@@ -5,6 +5,7 @@ using CallCenter.Framework.Audit;
 using CallCenter.Framework.EventBus;
 using CallCenter.Framework.Logging;
 using CallCenter.Framework.Parsing;
+using CallCenter.Framework.Session;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
