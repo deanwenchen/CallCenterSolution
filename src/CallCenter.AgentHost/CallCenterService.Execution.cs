@@ -120,6 +120,8 @@ public partial class CallCenterService
                 {
                     Console.Write("请提供订单号: ");
                     var orderId = await _inputChannel.Reader.ReadAsync(ct).ConfigureAwait(false) ?? "";
+                    if (orderId.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase))
+                        throw new UserQuitException();
                     await _sessionStore.SetAsync("pendingOrderId", orderId, sessionId, ct).ConfigureAwait(false);
                     ctx.CurrentMessage = ctx.CurrentMessage with { OrderId = orderId };
                     ctx.NeedsOrderId = true;

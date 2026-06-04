@@ -91,7 +91,7 @@ public class AuditLogger
         if (lines.Length == 0)
             return new AuditVerificationResult(AuditVerificationStatus.Invalid, null, "Audit file is empty");
 
-        string? expectedPreviousHash = null;
+        string expectedPreviousHash = "";
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i];

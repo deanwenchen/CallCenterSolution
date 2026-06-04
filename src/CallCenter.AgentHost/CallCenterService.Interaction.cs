@@ -4,6 +4,12 @@ using Microsoft.Agents.AI.Workflows;
 
 namespace CallCenter.AgentHost;
 
+/// <summary>用户主动退出时抛出，区别于 OperationCanceledException（CancellationToken 触发）。</summary>
+public sealed class UserQuitException : Exception
+{
+    public UserQuitException() : base("User quit") { }
+}
+
 /// <summary>
 /// CallCenterService 用户交互层。
 /// 主要作用：处理工作流发出的 ExternalRequest（RefundSignal 需要订单号、ConfirmRefundRequest 需要确认/取消），
@@ -51,6 +57,10 @@ public partial class CallCenterService
                 Console.WriteLine("[系统] 已取消退款");
                 return request.CreateResponse(new UserConfirmation(false));
             }
+
+            // Check for quit command
+            if (reply?.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase) == true)
+                throw new UserQuitException();
 
             // Unrecognized reply — re-recognize intent (IR-05)
             var intent = await _recognizeIntent(reply ?? "", ct).ConfigureAwait(false);

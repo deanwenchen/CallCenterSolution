@@ -13,6 +13,13 @@ while (true)
     Console.Write("用户: ");
     var userMessage = Console.ReadLine();
     if (string.IsNullOrWhiteSpace(userMessage) || userMessage.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase)) break;
-    var result = await svc.ProcessAsync(sessionId, userMessage);
-    Console.WriteLine($"系统: {result}");
+    try
+    {
+        var result = await svc.ProcessAsync(sessionId, userMessage);
+        Console.WriteLine($"系统: {result}");
+    }
+    catch (UserQuitException)
+    {
+        break;
+    }
 }

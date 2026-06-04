@@ -34,6 +34,7 @@ public partial class CallCenterService : IDisposable
     private readonly Workflow _refundWorkflow;
     private readonly AgentSkillsProvider _skillsProvider;
     private readonly Channel<string> _inputChannel;
+    private readonly CancellationTokenSource _inputCts = new();
     private readonly Func<string, CancellationToken, Task<IntentResult?>> _recognizeIntent;
     private bool _disposed;
 
@@ -81,12 +82,16 @@ public partial class CallCenterService : IDisposable
         // Start stdin reader background task (decouple console input from event loop)
         _ = Task.Run(async () =>
         {
-            while (true)
+            try
             {
-                var line = await Console.In.ReadLineAsync().ConfigureAwait(false);
-                if (line == null) break;
-                await _inputChannel.Writer.WriteAsync(line).ConfigureAwait(false);
+                while (!_inputCts.Token.IsCancellationRequested)
+                {
+                    var line = await Console.In.ReadLineAsync().ConfigureAwait(false);
+                    if (line == null) break;
+                    await _inputChannel.Writer.WriteAsync(line, _inputCts.Token).ConfigureAwait(false);
+                }
             }
+            catch (OperationCanceledException) { }
         });
 
         // Build the intent recognition delegate
@@ -154,6 +159,9 @@ public partial class CallCenterService : IDisposable
     public void Dispose()
     {
         if (_disposed) return;
+
+        _inputCts.Cancel();
+        _inputChannel.Writer.TryComplete();
 
         // Only dispose the self-built provider (not the external one)
         if (_provider is IDisposable disposable)
