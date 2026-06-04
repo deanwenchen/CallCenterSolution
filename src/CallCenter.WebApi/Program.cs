@@ -1,5 +1,6 @@
 using CallCenter.AgentHost;
 using CallCenter.Framework;
+using CallCenter.WebApi;
 using Microsoft.Agents.AI;
 using Microsoft.Agents.AI.Workflows;
 
@@ -30,5 +31,23 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Middleware pipeline (configured in Task 3)
+
+// POST /chat endpoint — blocking JSON response
+app.MapPost("/chat", async (ChatRequest request, CallCenterService svc) =>
+{
+    if (string.IsNullOrWhiteSpace(request.Message))
+    {
+        return Results.BadRequest(new { error = "message is required" });
+    }
+
+    var sessionId = string.IsNullOrWhiteSpace(request.SessionId)
+        ? Guid.NewGuid().ToString()
+        : request.SessionId;
+
+    var result = await svc.ProcessAsync(sessionId, request.Message);
+
+    return Results.Ok(new { response = result, sessionId = sessionId });
+})
+.WithName("Chat");
 
 app.Run();
