@@ -7,11 +7,11 @@
 
 ### Web API 接入
 
-- [ ] **WA-01**: 新增 CallCenter.WebApi 项目（ASP.NET Core Minimal API，.NET 10.0）
-- [ ] **WA-02**: POST /chat 端点，接收 {message, sessionId?} 返回 SSE 流式响应
+- [x] **WA-01**: 新增 CallCenter.WebApi 项目（ASP.NET Core Minimal API，.NET 10.0）
+- [x] **WA-02**: POST /chat 端点，接收 {message, sessionId?} 返回 SSE 流式响应
 - [ ] **WA-03**: SSE 端点复用 CallCenterService.ProcessAsync，将工作流中间输出通过 SSE 事件推送
 - [ ] **WA-04**: 会话管理（自动生成 sessionId、恢复已有会话、超时清理）
-- [ ] **WA-05**: CORS 配置，默认允许所有来源（开发阶段）
+- [x] **WA-05**: CORS 配置，默认允许所有来源（开发阶段）
 
 ### Safety Pipeline 实现
 
@@ -39,11 +39,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WA-01 | Phase 13 | Pending |
-| WA-02 | Phase 13 | Pending |
+| WA-01 | Phase 13 | Complete |
+| WA-02 | Phase 13 | Complete |
 | WA-03 | Phase 14 | Pending |
 | WA-04 | Phase 14 | Pending |
-| WA-05 | Phase 13 | Pending |
+| WA-05 | Phase 13 | Complete |
 | SI-01 | Phase 15 | Pending |
 | SI-02 | Phase 15 | Pending |
 | SI-03 | Phase 15 | Pending |
