@@ -92,7 +92,7 @@
 4. 关键词列表在 appsettings.json 可配置，不改代码
 
 **Plans:** 1 plan
-- [ ] 15-01-PLAN.md — PII 脱敏 + 关键词黑名单 + Prompt injection 检测 + 配置化
+- [x] 15-01-PLAN.md — PII 脱敏 + 关键词黑名单 + Prompt injection 检测 + 配置化
 
 ### Phase 16: SafetyOutput + Exchange 骨架确认
 
