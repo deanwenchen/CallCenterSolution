@@ -6,7 +6,8 @@
 - ✅ **v1.1 Technical Debt Closure** — Phases 5-8 (shipped 2026-06-01)
 - ✅ **v2.0 Framework 提取** — Phases 9-10 (shipped 2026-06-03)
 - ✅ **v2.1 Execution & Cleanup** — Phases 11-12 (shipped 2026-06-04)
-- ◆ **v3.0 Web API + Safety 增强** — Phases 13-16 (defining)
+- ✅ **v3.0 Web API + Safety 增强** — Phases 13-16 (shipped 2026-06-05)
+- ◆ **v4.0 Session 持久化 + 生产就绪** — Phase 17 (defining)
 
 ## Phases
 
@@ -110,6 +111,25 @@
 
 </details>
 
+### Phase 17: Session 持久化存储
+
+**Goal:** 创建 ISessionStore 接口，实现 RedisSessionStore，支持配置切换内存/Redis 存储。
+
+**Requirements:** SS-01 ~ SS-07
+
+**Success Criteria:**
+1. ISessionStore 接口定义 5 个方法，SetAsync 支持可选 TTL
+2. InMemorySessionStore 实现接口，行为不变
+3. RedisSessionStore 使用 StackExchange.Redis，支持 JSON 序列化、TTL 过期
+4. `AddSessionStore()` 扩展方法通过配置切换实现
+5. 全解决方案编译通过，内存模式功能不变
+6. Redis 模式可连接并读写
+
+**Plans:** 1 plan
+- [ ] 17-01-PLAN.md — ISessionStore 接口 + RedisSessionStore 实现 + DI 扩展
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -126,11 +146,12 @@
 | 10. CallCenterService 骨架 | v2.0 | 3/3 | Complete | 2026-06-03 |
 | 11. 执行层与入口 | v2.1 | 1/1 | Complete | 2026-06-03 |
 | 12. 清理与验证 | v2.1 | 2/2 | Complete | 2026-06-04 |
-| 13. Web API 基础 | v3.0 | 1/1 | Complete    | 2026-06-04 |
+| 13. Web API 基础 | v3.0 | 1/1 | Complete | 2026-06-04 |
 | 14. SSE 流式 + 会话管理 | v3.0 | 1/1 | Complete | 2026-06-04 |
-| 15. Safety Pipeline 实现 | v3.0 | 1/1 | Complete    | 2026-06-04 |
-| 16. SafetyOutput + Exchange | v3.0 | 1/1 | Complete    | 2026-06-04 |
+| 15. Safety Pipeline 实现 | v3.0 | 1/1 | Complete | 2026-06-04 |
+| 16. SafetyOutput + Exchange | v3.0 | 1/1 | Complete | 2026-06-04 |
+| 17. Session 持久化存储 | v4.0 | 0/1 | Not started | — |
 
 ---
 
-*Roadmap updated: 2026-06-04 after v3.0 roadmap creation*
+*Roadmap updated: 2026-06-05 after v4.0 milestone start*

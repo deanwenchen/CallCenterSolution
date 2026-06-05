@@ -1,18 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.0
-milestone_name: Web API + Safety 增强
-current_phase: 16
-status: completed
-stopped_at: Phase 16 context gathered
-last_updated: "2026-06-05T01:44:52.923Z"
+milestone: v4.0
+milestone_name: Session 持久化 + 生产就绪
+status: planning
+last_updated: "2026-06-05T07:45:07.577Z"
 last_activity: 2026-06-05
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md
@@ -53,10 +51,10 @@ Total: 2/2 plans complete (current milestone)
 
 ## Current Position
 
-Phase: Milestone v3.0 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-05 — Milestone v3.0 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-05 — Milestone v4.0 started
 
 ## Operator Next Steps
 

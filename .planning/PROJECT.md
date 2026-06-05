@@ -38,18 +38,22 @@ v2.1 完成后，系统已具备：意图切换、超时管理、6 层安全 Pip
 
 ### Active
 
-<!-- v3.0 Web API + Safety 增强 -->
+<!-- v4.0 Session 持久化 + 生产就绪 -->
 
-- [ ] **WA-01**: 新增 CallCenter.WebApi 项目，ASP.NET Core Minimal API
-- [ ] **WA-02**: POST /chat 端点，接收消息返回 SSE 流式响应
-- [ ] **WA-03**: SSE 端点复用 CallCenterService.ProcessAsync
-- [ ] **WA-04**: 会话管理（sessionId 生成/恢复、超时清理）
-- [ ] **WA-05**: CORS 配置，允许前端跨域访问
-- [ ] **SI-01**: Pipeline SafetyInput 层 — PII 脱敏（邮箱/手机号/身份证）
-- [ ] **SI-02**: Pipeline SafetyInput 层 — 关键词黑名单检测
-- [ ] **SI-03**: Pipeline SafetyInput 层 — Prompt injection 检测
-- [ ] **SI-04**: KeywordFilter 配置化（从硬编码到 JSON 配置）
-- [ ] **SO-01**: Pipeline SafetyOutput 层 — 敏感内容拦截（暴力/色情/政治等）
+- [ ] **SS-01**: 创建 ISessionStore 接口，统一内存和 Redis 实现
+- [ ] **SS-02**: InMemorySessionStore 实现 ISessionStore（保持原行为）
+- [ ] **SS-03**: RedisSessionStore 完整实现（StackExchange.Redis + TTL + 序列化）
+- [ ] **SS-04**: DI 扩展方法 AddSessionStore()，通过配置切换实现
+- [ ] **SS-05**: 所有消费者改用 ISessionStore 接口依赖
+- [ ] **SS-06**: appsettings.json 新增 SessionStore 配置段
+- [ ] **SS-07**: 验证：内存模式现有功能不变，Redis 模式可连接并读写
+
+### Out of Scope (v4.0)
+
+- JWT 认证 / API Key — v4.x 后期
+- Exchange Workflow 完整业务逻辑 — v4.x
+- ToolApproval 具体审批规则 — v4.x
+- 真实 MCP Server 调用 — Mock 服务替代
 
 ### Out of Scope (v3.0)
 
