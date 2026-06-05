@@ -1,5 +1,16 @@
 # Milestones
 
+## v3.0 Web API + Safety 增强 (Shipped: 2026-06-05)
+
+**Phases completed:** 4 phases, 4 plans, 8 tasks
+
+**Key accomplishments:**
+
+- SSE 流式端点 POST /chat/stream 实现，9 种 WorkflowEvent 实时推送 + sessionId 生命周期管理
+- One-liner:
+
+---
+
 ## v2.1 Execution & Cleanup (Shipped: 2026-06-04)
 
 **Phases completed:** 2 phases (11-12), 3 plans
