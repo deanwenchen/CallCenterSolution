@@ -7,7 +7,7 @@
 - ✅ **v2.0 Framework 提取** — Phases 9-10 (shipped 2026-06-03)
 - ✅ **v2.1 Execution & Cleanup** — Phases 11-12 (shipped 2026-06-04)
 - ✅ **v3.0 Web API + Safety 增强** — Phases 13-16 (shipped 2026-06-05)
-- ◆ **v4.0 Session 持久化 + 生产就绪** — Phase 17 (defining)
+- ✅ **v4.0 Session 持久化 + 生产就绪** — Phase 17 (shipped 2026-06-05)
 
 ## Phases
 
@@ -125,8 +125,8 @@
 5. 全解决方案编译通过，内存模式功能不变
 6. Redis 模式可连接并读写
 
-**Plans:** 1 plan
-- [ ] 17-01-PLAN.md — ISessionStore 接口 + RedisSessionStore 实现 + DI 扩展
+**Plans:** 1/1 plans complete
+- [x] 17-01-PLAN.md — ISessionStore 接口 + RedisSessionStore 实现 + DI 扩展
 
 </details>
 
@@ -150,7 +150,7 @@
 | 14. SSE 流式 + 会话管理 | v3.0 | 1/1 | Complete | 2026-06-04 |
 | 15. Safety Pipeline 实现 | v3.0 | 1/1 | Complete | 2026-06-04 |
 | 16. SafetyOutput + Exchange | v3.0 | 1/1 | Complete | 2026-06-04 |
-| 17. Session 持久化存储 | v4.0 | 0/1 | Not started | — |
+| 17. Session 持久化存储 | v4.0 | 1/1 | Complete | 2026-06-05 |
 
 ---
 

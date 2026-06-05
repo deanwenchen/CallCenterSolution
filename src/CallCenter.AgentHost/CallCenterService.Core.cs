@@ -110,7 +110,7 @@ public partial class CallCenterService : IDisposable
         // Resolve all dependencies from external provider
         _chatClient = provider.GetRequiredService<IChatClient>();
         _agentFactory = provider.GetRequiredService<AIAgentFactory>();
-        _sessionStore = provider.GetRequiredService<InMemorySessionStore>();
+        _sessionStore = provider.GetRequiredService<ISessionStore>();
         _auditLogger = provider.GetRequiredService<AuditLogger>();
         _eventBus = provider.GetRequiredService<IBusinessEventBus>();
         _eventBus.Subscribe<RefundCompletedEvent>(async e =>

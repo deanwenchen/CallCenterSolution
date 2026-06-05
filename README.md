@@ -4,6 +4,8 @@
 
 > **设计理念**：今天加退款，明天加换货，互不影响，结构清晰。
 
+**当前版本**: v3.0 — 2026-06-05
+
 ---
 
 ## 一、核心特性
@@ -15,10 +17,11 @@
 | **RequestPort 人工介入** | 流程需要用户确认时自动暂停，等用户回复后恢复执行 |
 | **意图切换** | 用户在流程中途切换意图时，自动终止旧流程、启动新流程 |
 | **超时管理** | 30 分钟警告、60 分钟终止，防止会话永远挂起 |
-| **6 层安全 Pipeline** | 用户输入经过 PII 脱敏 → 关键词拦截 → 注入检测 → LLM → 输出脱敏 |
+| **6 层安全 Pipeline** | 输入安全 → 日志 → 压缩 → 工具审批 → LLM → 输出安全 |
 | **审计日志** | 每步操作写入 SHA256 哈希链，支持完整性校验 |
 | **Saga 补偿** | 支持失败重试 + 补偿回滚（如退款失败后恢复优惠券） |
 | **事件总线** | 业务事件解耦发布与订阅，方便对接通知、分析等外部系统 |
+| **Web API + SSE** | RESTful `/chat` 端点 + SSE `/chat/stream` 实时推送 9 种工作流事件 |
 
 ---
 
@@ -60,12 +63,12 @@
 用户输入: "我要退款，订单A001"
   │
   ▼
-[1] EntryPoint.ProcessAsync()
+[1] CallCenterService.ProcessAsync()
   │  ├── 更新 lastActivity
   │  ├── 检查超时（30min 警告 / 60min 终止）
   │  ├── 检查是否有活跃工作流 → 没有
   │  └── 调用 LLM 意图识别
-  │        └─ 返回: {"intent": "refund", "workflow": "RefundWorkflow", "orderId": "A001"}
+  │        └─ 返回: {"intent": "refund", "workflow": "RefundWorkflow", "OrderId": "A001"}
   │
   ▼
 [2] 识别到 refund 意图 → 启动 RefundWorkflow
@@ -119,7 +122,8 @@
 
 | 步骤 | 文件 | 说明 |
 |------|------|------|
-| [1] | `AgentHost/EntryPoint.cs` | 意图识别 + 路由决策 |
+| [1] | `AgentHost/CallCenterService.Intent.cs` | 意图识别 + 统一入口 |
+| [1] | `AgentHost/CallCenterService.Routing.cs` | 路由决策 + 超时检测 |
 | [2] | `Workflows/Refund/RefundWorkflow.cs` | 工作流图定义 |
 | [3] | `Workflows/Refund/Executors/GetOrderExecutor.cs` | 订单查询 |
 | [4] | `Workflows/Refund/Executors/CheckRefundRuleExecutor.cs` | 规则校验 |
@@ -127,6 +131,9 @@
 | [7] | `Workflows/Refund/Executors/ExecuteRefundExecutor.cs` | 执行退款 |
 | [8] | `Workflows/Refund/Executors/RestoreCouponExecutor.cs` | 恢复优惠券 |
 | [9] | `Workflows/Refund/Executors/SendNotificationExecutor.cs` | 通知用户 |
+| 事件循环 | `AgentHost/CallCenterService.Execution.cs` | DriveLoopAsync + HandleEventAsync |
+| 交互处理 | `AgentHost/CallCenterService.Interaction.cs` | HandleRequestAsync |
+| SSE 流式 | `AgentHost/CallCenterService.Streaming.cs` | ProcessStreamingAsync + SSE 序列化 |
 | 端口 | `Workflows/Refund/RefundMessages.cs` | 消息类型定义 |
 | Mock 数据 | `Shared/Services/MockOrderService.cs` | 三个测试订单（A001/A002/A003） |
 
@@ -139,15 +146,19 @@
 │                    CallCenter AI 架构                               │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
-│  ┌──────────────┐                                                  │
-│  │ ConsoleDemo  │  ← 当前演示入口（终端对话）                      │
-│  └──────┬───────┘                                                  │
-│         │                                                          │
-│         ▼                                                          │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐        │
-│  │  EntryPoint  │───→│ SkillsProvider│───→│ RefundSkill  │        │
-│  │  (意图路由)  │    │ (技能注册)   │    │ ExchangeSkill│        │
-│  └──────┬───────┘    └──────────────┘    └──────────────┘        │
+│  │ ConsoleDemo  │    │  WebApi      │    │ AgentHost    │        │
+│  │ (终端演示)   │    │ (REST + SSE) │    │ (DI 编排)    │        │
+│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘        │
+│         │                   │                   │                  │
+│         └───────────────────┴───────────────────┘                  │
+│                             │                                      │
+│                             ▼                                      │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │              CallCenterService (partial class)            │   │
+│  │  Core.cs · Intent.cs · Routing.cs · Execution.cs ·       │   │
+│  │  Interaction.cs · Streaming.cs                            │   │
+│  └───────────────────────────────────────────────────────────┘   │
 │         │                                                          │
 │         ▼                                                          │
 │  ┌───────────────────────────────────────────────────────────┐   │
@@ -180,40 +191,58 @@
 ```
 src/
 ├── CallCenter.AgentHost/            # Agent 托管与编排
-│   ├── EntryPoint.cs                # 统一入口：意图识别 + 工作流路由
+│   ├── CallCenterService.Core.cs     # 基础骨架、DI 字段
+│   ├── CallCenterService.Intent.cs   # ProcessAsync 统一入口
+│   ├── CallCenterService.Routing.cs  # 意图路由 + 超时检测
+│   ├── CallCenterService.Execution.cs # 工作流驱动 + 事件循环
+│   ├── CallCenterService.Interaction.cs # 用户交互处理
+│   ├── CallCenterService.Streaming.cs   # SSE 流式输出
+│   ├── Extensions.cs                 # DI 注册扩展
+│   ├── AIAgentFactory.cs             # Intent/Dialog Agent 工厂
 │   └── Skills/
-│       ├── RefundSkill.cs           # 退款技能（已实现）
-│       └── ExchangeSkill.cs         # 换货技能（骨架）
+│       ├── RefundSkill.cs            # 退款技能
+│       └── ExchangeSkill.cs          # 换货技能
 │
 ├── CallCenter.Framework/            # 框架核心（横切关注点）
-│   ├── Audit/                       # 审计日志（SHA256 哈希链）
-│   ├── Compaction/                  # 对话压缩（8000 token / 8 轮阈值）
-│   ├── EventBus/                    # 业务事件总线（发布/订阅）
-│   ├── Logging/                     # JSONL 操作日志
-│   ├── Parsing/                     # LLM 结构化输出解析器
-│   ├── Pipeline/                    # 6 层聊天管道工厂
-│   ├── Safety/                      # 安全过滤（PII / 关键词 / 注入检测）
-│   ├── Saga/                        # 失败重试 + 补偿框架
-│   ├── Session/                     # 会话存储（内存 / Redis 占位）
-│   └── ToolApproval/                # 工具调用审批（空壳）
+│   ├── Audit/                        # 审计日志（SHA256 哈希链）
+│   ├── Compaction/                   # 对话压缩（8000 token / 8 轮）
+│   ├── EventBus/                     # 业务事件总线
+│   ├── Logging/                      # JSONL 操作日志
+│   ├── Parsing/                      # LLM 结构化输出解析
+│   ├── Pipeline/                     # 6 层聊天管道工厂
+│   ├── Safety/                       # 安全过滤（PII/关键词/注入/输出拦截）
+│   ├── Saga/                         # 失败重试 + 补偿框架
+│   ├── Session/                      # 会话存储（内存 / Redis 占位）
+│   └── ToolApproval/                 # 工具调用审批
 │
-├── CallCenter.Workflows/            # 业务流程（业务规则在这里）
-│   ├── Refund/                      # 退款流程（已完成）
-│   │   ├── RefundWorkflow.cs        # 工作流图定义
-│   │   ├── RefundMessages.cs        # 消息类型
-│   │   └── Executors/               # 7 个执行器
-│   └── Exchange/                    # 换货流程（骨架，v2 实现）
-│       ├── ExchangeWorkflow.cs
-│       ├── ExchangeMessages.cs
-│       └── Executors/               # 7 个执行器（骨架）
+├── CallCenter.Workflows/            # 业务流程
+│   ├── Refund/                       # 退款流程（已完成）
+│   │   ├── RefundWorkflow.cs         # 工作流图定义
+│   │   ├── RefundMessages.cs         # 消息类型
+│   │   └── Executors/                # 7 个执行器
+│   └── Exchange/                     # 换货流程（骨架）
+│       ├── ExchangeWorkflow.cs       # 工作流定义
+│       ├── ExchangeMessages.cs       # 消息类型
+│       └── Executors/                # 7 个执行器（骨架）
+│
+├── CallCenter.WebApi/               # Web API（v3.0 新增）
+│   ├── Program.cs                    # /chat + /chat/stream 端点
+│   ├── ChatRequest.cs                # 请求模型
+│   └── appsettings.json              # 安全配置 + DI
 │
 ├── CallCenter.Shared/               # 共享模型与接口
-│   ├── Models/                      # OrderInfo / RefundResult / CouponInfo
-│   ├── Mcp/                         # MCP Client 接口
-│   └── Services/                    # Mock 实现（订单/财务/会员）
+│   ├── Models/                       # OrderInfo / RefundResult / CouponInfo
+│   ├── Mcp/                          # MCP Client 接口
+│   └── Services/                     # Mock 实现（订单/财务/会员）
 │
 └── CallCenter.ConsoleDemo/          # 演示入口
     └── Program.cs                   # 主循环 + 工作流执行驱动
+
+tests/
+└── CallCenter.AgentHost.Tests/       # 集成测试
+    ├── Phase10.Uat.Tests.cs          # Phase 10 UAT（4/4 通过）
+    ├── Safety.Tests.cs               # 安全组件测试
+    └── CallCenterService.Streaming.Tests.cs # SSE 序列化测试
 ```
 
 ---
@@ -225,8 +254,9 @@ src/
 | 框架 | .NET 10.0 |
 | Agent SDK | Microsoft Agent Framework (MAF) .NET SDK（源码引用） |
 | LLM | DashScope（通义千问）OpenAI 兼容接口 |
-| 构建 | 5 个项目，0 errors, 0 warnings |
-| 语言 | C# |
+| 构建 | 6 个项目 + 1 个测试项目，0 errors |
+| 语言 | C#（70 个源文件） |
+| 测试 | xUnit（37 个测试通过） |
 
 ---
 
@@ -237,7 +267,7 @@ src/
 1. .NET 10.0 SDK
 2. DashScope API Key（[获取地址](https://dashscope.console.aliyun.com/)）
 
-### 启动
+### 终端演示
 
 ```bash
 # 设置环境变量
@@ -248,6 +278,26 @@ export DASHSCOPE_MODEL_NAME="qwen-plus"
 
 # 运行演示
 dotnet run --project src/CallCenter.ConsoleDemo
+```
+
+### Web API
+
+```bash
+# 启动 Web API
+dotnet run --project src/CallCenter.WebApi
+
+# Swagger UI
+open https://localhost:<port>/swagger
+
+# 测试 /chat 端点
+curl -X POST https://localhost:<port>/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "我要退款，订单A001"}'
+
+# 测试 /chat/stream SSE 端点
+curl -N -X POST https://localhost:<port>/chat/stream \
+  -H "Content-Type: application/json" \
+  -d '{"message": "我要退款，订单A001"}'
 ```
 
 ### 测试场景
@@ -273,36 +323,54 @@ dotnet run --project src/CallCenter.ConsoleDemo
 
 ---
 
-## 八、已实现功能清单
+## 八、版本历史
 
-### v1.0 退款工作流
+### v3.0 Web API + Safety 增强（2026-06-05）
 
-- ✅ 6 步工作流执行（查单 → 规则校验 → 用户确认 → 执行退款 → 恢复优惠券 → 通知）
-- ✅ LLM 意图识别（DashScope Qwen + 结构化 JSON 解析）
-- ✅ Session 管理（活跃工作流跟踪、超时检测）
-- ✅ 断点恢复（CheckpointManager 超步骤持久化）
-- ✅ Mock 服务（订单/财务/会员 3 个测试场景）
-- ✅ EventBus（RefundCompletedEvent 发布/订阅）
+**4 个阶段，4 个计划，8 个任务**
 
-### v1.1 能力增强
+- **Phase 13**: Web API Chat 端点 — `POST /chat` RESTful 接口 + DI 注册 + 安全配置
+- **Phase 14**: SSE 流式 + 会话管理 — `POST /chat/stream` 实时推送 9 种 WorkflowEvent，sessionId 自动生成/复用，60 分钟惰性清理
+- **Phase 15**: Safety Pipeline 实现 — 6 层管道完整接入（安全输入 → 日志 → 压缩 → 工具审批 → LLM → 安全输出）
+- **Phase 16**: SafetyOutput 输出端拦截 — 暴力/色情/政治 3 类关键词过滤，友好话术替换；Exchange 骨架编译验证通过
 
-- ✅ 意图切换（中途换意图 → 终止旧流程 → 启动新流程）
-- ✅ 超时管理（30 分钟警告 / 60 分钟终止）
-- ✅ 6 层安全 Pipeline（PII 脱敏 + 关键词拦截 + 注入检测）
-- ✅ 对话压缩（CompactionProvider，8000 token / 8 轮阈值）
-- ✅ 审计日志（SHA256 哈希链，VerifyChainAsync 验证）
-- ✅ Saga 补偿（失败重试 + 补偿回滚框架）
-- ✅ 新业务扩展指南（换货骨架已就绪）
+**测试**: 37 个单元测试通过，Phase 10 UAT 4/4 通过
+
+### v2.1 Execution & Cleanup（2026-06-04）
+
+- Program.cs 精简为 18 行主循环
+- CallCenterService 完整 DI 接入
+- 全解决方案 0 错误编译
+
+### v2.0 Framework 提取（2026-06-03）
+
+- CallCenter.Framework 独立项目，包含安全/审计/Saga/会话等横切关注点
+- CallCenter.AgentHost 独立项目，负责 Agent 编排
+
+### v1.1 Technical Debt Closure（2026-06-01）
+
+- 意图切换 + 超时管理 + 6 层安全 Pipeline + 对话压缩 + 审计日志 + Saga 补偿
+
+### v1.0 Refund Workflow Demo（2026-06-01）
+
+- 完整退款工作流（查单 → 规则 → 确认 → 退款 → 优惠券 → 通知）
 
 ---
 
 ## 九、路线图
 
-| 版本 | 计划内容 |
-|------|----------|
-| v2.0 | Redis Session 持久化 + SafetyOutput 敏感内容拦截 |
-| v2.x | 真实 MCP Server 接入 + Web/Gateway 接入层 |
-| v3.x | 换货/物流/发票等业务模块完整实现 |
+| 版本 | 状态 | 计划内容 |
+|------|------|----------|
+| v1.0 | ✅ 已发布 | 退款工作流 Demo |
+| v1.1 | ✅ 已发布 | 技术债务清理 + 能力增强 |
+| v2.0 | ✅ 已发布 | Framework 提取 |
+| v2.1 | ✅ 已发布 | 执行整合 + 清理验证 |
+| v3.0 | ✅ 已发布 | Web API + Safety 增强 |
+| v4.0 | 📋 规划中 | Exchange 换货实现 + 更多工作流 |
+
+**已知债务：**
+- Phase 13 UAT: 4 项人工测试（Swagger 可访问性 / POST /chat 响应 / 400 错误 / CORS）
+- Phase 14 UAT: SSE 端到端 curl 验证
 
 ---
 
