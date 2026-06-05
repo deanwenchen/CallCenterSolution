@@ -122,7 +122,7 @@ public partial class CallCenterService
                     var orderId = await _inputChannel.Reader.ReadAsync(ct).ConfigureAwait(false) ?? "";
                     if (orderId.Trim().Equals("quit", StringComparison.OrdinalIgnoreCase))
                         throw new UserQuitException();
-                    await _sessionStore.SetAsync("pendingOrderId", orderId, sessionId, ct).ConfigureAwait(false);
+                    await _sessionStore.SetAsync("pendingOrderId", orderId, scope: sessionId, ct: ct).ConfigureAwait(false);
                     ctx.CurrentMessage = ctx.CurrentMessage with { OrderId = orderId };
                     ctx.NeedsOrderId = true;
                     await run.SendResponseAsync(reqEvt.Request.CreateResponse(new RefundIntent(orderId, "U100"))).ConfigureAwait(false);
@@ -144,7 +144,7 @@ public partial class CallCenterService
 
                 if (ctx.LastCheckpoint != null)
                 {
-                    await _sessionStore.SetAsync("lastCheckpoint", ctx.LastCheckpoint, sessionId, ct).ConfigureAwait(false);
+                    await _sessionStore.SetAsync("lastCheckpoint", ctx.LastCheckpoint, scope: sessionId, ct: ct).ConfigureAwait(false);
                 }
                 await _sessionStore.RemoveAsync("activeWorkflow", sessionId, ct).ConfigureAwait(false);
 
@@ -162,7 +162,7 @@ public partial class CallCenterService
                 if (ssc.CompletionInfo?.Checkpoint != null)
                 {
                     ctx.LastCheckpoint = ssc.CompletionInfo.Checkpoint;
-                    await _sessionStore.SetAsync("lastCheckpoint", ctx.LastCheckpoint, sessionId, ct).ConfigureAwait(false);
+                    await _sessionStore.SetAsync("lastCheckpoint", ctx.LastCheckpoint, scope: sessionId, ct: ct).ConfigureAwait(false);
                 }
                 await AuditTrailMiddleware.CaptureStepEnd(_auditLogger, sessionId, "SuperStep", ssc, ct).ConfigureAwait(false);
                 return EventResult.Continue;

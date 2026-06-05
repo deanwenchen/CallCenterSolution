@@ -107,8 +107,9 @@ public static class Extensions
             return StandardPipelineFactory.CreatePipeline(baseClient, summarizerClient, "pipeline", logger: null, keywordFilter: keywordFilter, safetyOptions: safetyOptions);
         });
 
-        // 会话存储
+        // 会话存储（同时注册具体实现和接口，向后兼容）
         services.AddSingleton<InMemorySessionStore>();
+        services.AddSingleton<ISessionStore>(sp => sp.GetRequiredService<InMemorySessionStore>());
 
         // 审计日志
         services.AddSingleton(new AuditLogger(".audit"));
@@ -174,6 +175,39 @@ public static class Extensions
         where T : class, IMemberMcpClient
     {
         services.AddSingleton<IMemberMcpClient, T>();
+        return services;
+    }
+
+    /// <summary>
+    /// 根据配置注册 ISessionStore 实现（内存或 Redis）。
+    /// 读取 appsettings.json 中 "SessionStore" 配置段：
+    ///   - Provider: "memory"（默认）或 "redis"
+    ///   - ProviderName: Redis provider 名称（默认 "default"）
+    ///   - DbIndex: Redis 数据库索引（默认 0）
+    ///   - DefaultTtlMinutes: 默认 TTL 分钟数（默认 30）
+    /// </summary>
+    public static IServiceCollection AddSessionStore(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var section = configuration.GetSection("SessionStore");
+        var provider = section["Provider"] ?? "memory";
+
+        if (string.Equals(provider, "redis", StringComparison.OrdinalIgnoreCase))
+        {
+            var redisProviderName = section["ProviderName"] ?? "default";
+            var dbIndex = int.TryParse(section["DbIndex"], out var db) ? db : 0;
+            var ttlMinutes = int.TryParse(section["DefaultTtlMinutes"], out var ttl) ? ttl : 30;
+            var defaultTtl = TimeSpan.FromMinutes(ttlMinutes);
+
+            services.AddSingleton<ISessionStore>(sp =>
+                new RedisSessionStore(redisProviderName, dbIndex, defaultTtl));
+        }
+        else
+        {
+            services.AddSingleton<ISessionStore, InMemorySessionStore>();
+        }
+
         return services;
     }
 }

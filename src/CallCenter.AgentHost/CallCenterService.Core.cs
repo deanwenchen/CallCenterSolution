@@ -26,7 +26,7 @@ public partial class CallCenterService : IDisposable
     private readonly CallCenterOptions _options;
     private readonly IChatClient _chatClient;
     private readonly AIAgentFactory _agentFactory;
-    private readonly InMemorySessionStore _sessionStore;
+    private readonly ISessionStore _sessionStore;
     private readonly CheckpointManager _checkpointManager;
     private readonly AuditLogger _auditLogger;
     private readonly IBusinessEventBus _eventBus;
@@ -63,7 +63,7 @@ public partial class CallCenterService : IDisposable
         // Resolve from the self-built provider
         _chatClient = _provider.GetRequiredService<IChatClient>();
         _agentFactory = _provider.GetRequiredService<AIAgentFactory>();
-        _sessionStore = _provider.GetRequiredService<InMemorySessionStore>();
+        _sessionStore = _provider.GetRequiredService<ISessionStore>();
         _auditLogger = _provider.GetRequiredService<AuditLogger>();
         _eventBus = _provider.GetRequiredService<IBusinessEventBus>();
         _eventBus.Subscribe<RefundCompletedEvent>(async e =>

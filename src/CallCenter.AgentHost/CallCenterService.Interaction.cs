@@ -34,7 +34,7 @@ public partial class CallCenterService
                 case RefundSignal.NeedOrderId:
                     Console.Write("请提供订单号: ");
                     var orderId = await _inputChannel.Reader.ReadAsync(ct).ConfigureAwait(false) ?? "";
-                    await _sessionStore.SetAsync("pendingOrderId", orderId, sessionId, ct).ConfigureAwait(false);
+                    await _sessionStore.SetAsync("pendingOrderId", orderId, scope: sessionId, ct: ct).ConfigureAwait(false);
                     return request.CreateResponse(new RefundIntent(orderId, "U100"));
             }
         }

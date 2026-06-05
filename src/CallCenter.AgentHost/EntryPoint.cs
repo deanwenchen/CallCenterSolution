@@ -68,7 +68,7 @@ public class EntryPoint
         await _sessionStore.GetAsync<string>("activeWorkflow", sessionId, ct);
 
     public async Task SetActiveWorkflowAsync(string sessionId, string workflowName, CancellationToken ct = default) =>
-        await _sessionStore.SetAsync("activeWorkflow", workflowName, sessionId, ct);
+        await _sessionStore.SetAsync("activeWorkflow", workflowName, scope: sessionId, ct: ct);
 
     public async Task ClearActiveWorkflowAsync(string sessionId, CancellationToken ct = default) =>
         await _sessionStore.RemoveAsync("activeWorkflow", sessionId, ct);
@@ -103,7 +103,7 @@ public class EntryPoint
         Workflow refundWorkflow,
         CancellationToken ct = default)
     {
-        await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
+        await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, scope: sessionId, ct: ct);
 
         var timeoutResult = await CheckTimeoutAsync(sessionId, ct);
         if (timeoutResult != null) return timeoutResult;

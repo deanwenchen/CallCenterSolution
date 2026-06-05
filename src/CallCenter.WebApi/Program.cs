@@ -12,6 +12,9 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 // DI registration: CallCenter framework (reads DASHSCOPE_API_KEY from environment via ApplyDefaults, Safety options from IConfiguration)
 builder.Services.AddCallCenter(builder.Configuration);
 
+// DI registration: Session store (reads SessionStore config section to switch between memory/Redis)
+builder.Services.AddSessionStore(builder.Configuration);
+
 // DI registration: AIAgentFactory (required by CallCenterService DI constructor)
 builder.Services.AddSingleton<AIAgentFactory>();
 

@@ -20,7 +20,7 @@ public partial class CallCenterService
 
     /// <summary>设置当前会话的活跃工作流名称。</summary>
     public async Task SetActiveWorkflowAsync(string sessionId, string workflowName, CancellationToken ct = default) =>
-        await _sessionStore.SetAsync("activeWorkflow", workflowName, sessionId, ct);
+        await _sessionStore.SetAsync("activeWorkflow", workflowName, scope: sessionId, ct: ct);
 
     /// <summary>清除当前会话的活跃工作流。</summary>
     public async Task ClearActiveWorkflowAsync(string sessionId, CancellationToken ct = default) =>
@@ -88,7 +88,7 @@ public partial class CallCenterService
     public async Task<ProcessResult> ResolveWorkflow(string sessionId, string userMessage, CancellationToken ct)
     {
         // 1. Update lastActivity timestamp
-        await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, sessionId, ct);
+        await _sessionStore.SetAsync("lastActivity", DateTime.UtcNow, scope: sessionId, ct: ct);
 
         // 2. Check timeout
         var timeoutResult = await CheckTimeoutAsync(sessionId, ct);

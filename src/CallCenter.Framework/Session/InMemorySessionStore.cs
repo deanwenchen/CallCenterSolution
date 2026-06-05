@@ -12,7 +12,7 @@ namespace CallCenter.Framework.Session;
 /// 用于存储：activeWorkflow（当前工作流名）、lastCheckpoint（断点信息）、
 /// lastActivity（最后活动时间）、pendingOrderId（动态追问的订单号）等。
 /// </summary>
-public class InMemorySessionStore
+public class InMemorySessionStore : ISessionStore
 {
     // Outer dictionary: scope (e.g., sessionId) → inner dictionary of key-value pairs
     private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, object>> _store = new();
@@ -29,12 +29,26 @@ public class InMemorySessionStore
     }
 
     /// <summary>Stores a typed value in the session store.</summary>
-    public Task SetAsync<T>(string key, T value, string? scope = null, CancellationToken ct = default)
+    public Task SetAsync<T>(string key, T value, string? scope = null, TimeSpan? ttl = null, CancellationToken ct = default)
     {
         var scopeKey = scope ?? "default";
         var dict = _store.GetOrAdd(scopeKey, _ => new ConcurrentDictionary<string, object>());
         dict[key] = value!;
         return Task.CompletedTask;
+    }
+
+    /// <summary>Attempts to retrieve a typed value, distinguishing "key missing" from "type mismatch".</summary>
+    public Task<(bool Success, T? Value)> TryGetAsync<T>(string key, string? scope = null, CancellationToken ct = default)
+    {
+        var scopeKey = scope ?? "default";
+        if (_store.TryGetValue(scopeKey, out var dict) && dict.TryGetValue(key, out var stored))
+        {
+            if (stored is T typed)
+            {
+                return Task.FromResult<(bool, T?)>( (true, typed) );
+            }
+        }
+        return Task.FromResult<(bool, T?)>( (false, default) );
     }
 
     /// <summary>Removes a key from the session store.</summary>
