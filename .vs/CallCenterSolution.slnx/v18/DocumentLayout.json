@@ -3,8 +3,36 @@
   "WorkspaceRootPath": "D:\\Claude\\CallCenterSolution1\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{AA690880-156A-6419-7E68-E231BD6D9BDA}|src\\CallCenter.Framework\\CallCenter.Framework.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.framework\\builder\\businessmodulebuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA690880-156A-6419-7E68-E231BD6D9BDA}|src\\CallCenter.Framework\\CallCenter.Framework.csproj|solutionrelative:src\\callcenter.framework\\builder\\businessmodulebuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\callcenterservice.execution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\callcenterservice.execution.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A172AB43-B7AB-9F9B-189C-6B3FDA8CABF2}|src\\CallCenter.ConsoleDemo\\CallCenter.ConsoleDemo.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.consoledemo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A172AB43-B7AB-9F9B-189C-6B3FDA8CABF2}|src\\CallCenter.ConsoleDemo\\CallCenter.ConsoleDemo.csproj|solutionrelative:src\\callcenter.consoledemo\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\callcenterservice.core.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\callcenterservice.core.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\intentregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\intentregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\entrypoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\entrypoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\aiagentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\aiagentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|d:\\claude\\callcentersolution1\\src\\callcenter.agenthost\\extensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{27A8C2F4-FD3E-3450-49CC-74A1DAFF75CA}|src\\CallCenter.AgentHost\\CallCenter.AgentHost.csproj|solutionrelative:src\\callcenter.agenthost\\extensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,19 +47,110 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "IntentRegistry.cs",
-              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\IntentRegistry.cs",
-              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\IntentRegistry.cs",
-              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\IntentRegistry.cs",
-              "RelativeToolTip": "src\\CallCenter.AgentHost\\IntentRegistry.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAAwAgAAAANAAAAAAAAAA==",
+              "Title": "BusinessModuleBuilder.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Framework\\Builder\\BusinessModuleBuilder.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.Framework\\Builder\\BusinessModuleBuilder.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.Framework\\Builder\\BusinessModuleBuilder.cs",
+              "RelativeToolTip": "src\\CallCenter.Framework\\Builder\\BusinessModuleBuilder.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-03T05:54:21.925Z",
+              "WhenOpened": "2026-06-04T01:39:00.645Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CallCenterService.Execution.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\CallCenterService.Execution.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\CallCenterService.Execution.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\CallCenterService.Execution.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\CallCenterService.Execution.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T15:13:15.602Z",
               "EditorCaption": ""
             },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CallCenterService.Core.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\CallCenterService.Core.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\CallCenterService.Core.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\CallCenterService.Core.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\CallCenterService.Core.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T15:13:14.412Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.ConsoleDemo\\Program.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.ConsoleDemo\\Program.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.ConsoleDemo\\Program.cs",
+              "RelativeToolTip": "src\\CallCenter.ConsoleDemo\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T14:53:13.922Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Extensions.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\Extensions.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\Extensions.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\Extensions.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\Extensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T14:52:41.942Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "EntryPoint.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\EntryPoint.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\EntryPoint.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\EntryPoint.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\EntryPoint.cs",
+              "ViewState": "AgIAAJoAAAAAAAAAAAAMwC4AAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T14:52:40.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AIAgentFactory.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\AIAgentFactory.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\AIAgentFactory.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\AIAgentFactory.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\AIAgentFactory.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAEwB4AAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T14:52:22.832Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IntentRegistry.cs",
+              "DocumentMoniker": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\IntentRegistry.cs",
+              "RelativeDocumentMoniker": "src\\CallCenter.AgentHost\\IntentRegistry.cs",
+              "ToolTip": "D:\\Claude\\CallCenterSolution1\\src\\CallCenter.AgentHost\\IntentRegistry.cs",
+              "RelativeToolTip": "src\\CallCenter.AgentHost\\IntentRegistry.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAuwCIAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T05:54:21.925Z",
+              "EditorCaption": ""
             }
           ]
         }

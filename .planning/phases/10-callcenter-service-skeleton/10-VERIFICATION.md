@@ -1,9 +1,16 @@
 ---
 phase: 10-callcenter-service-skeleton
-verified: 2026-06-03T12:00:00Z
+verified: 2026-06-04T00:00:00Z
 status: human_needed
 score: 15/15 must-haves verified
 overrides_applied: 0
+overrides: []
+re_verification:
+  previous_status: human_needed
+  previous_score: 15/15
+  gaps_closed: []
+  gaps_remaining: []
+  regressions: []
 gaps: []
 deferred: []
 human_verification:
@@ -24,69 +31,67 @@ human_verification:
     why_human: "Business flow equivalence requires side-by-side comparison of actual execution output between old Program.cs and new CallCenterService"
 ---
 
-# Phase 10: CallCenterService 骨架 Verification Report
+# Phase 10: CallCenterService 骨架 Verification Report (Re-verification)
 
-**Phase Goal:** CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类
-**Verified:** 2026-06-03T12:00:00Z
+**Phase Goal:** Create CallCenterService skeleton — Core.cs (dual constructors, fields, IDisposable), Intent.cs (ProcessAsync entry), Routing.cs (intent-to-workflow mapping), Execution.cs (event loop), Interaction.cs (user interaction)
+**Verified:** 2026-06-04T00:00:00Z
 **Status:** human_needed
-**Re-verification:** No — initial verification
+**Re-verification:** Yes — after previous human_needed status (no gaps, all truths verified)
 
 ## Goal Achievement
 
-Phase 10's goal is to create the CallCenterService skeleton split into 5 partial class files (Core.cs, Intent.cs, Routing.cs, Execution.cs, Interaction.cs) with complete implementation of:
-- Dual constructor pattern (self-build DI + external DI injection)
-- IDisposable lifecycle management
-- ProcessAsync unified entry point with ProcessResult dispatch
-- Intent-to-workflow mapping and core routing logic
-- 9-event-type handling with shared DriveLoopAsync event loop
-- User interaction handling (RefundSignal + ConfirmRefundRequest)
-- Saga compensation for ExecuteRefund failures
-- Audit logging across all event types
+This is a re-verification. The previous verification found 15/15 truths verified with 5 human verification items and no gaps. This re-verification confirms:
 
-All 5 files exist, compile cleanly (0 errors, 0 warnings), and contain substantive implementations. The partial class files are wired together through shared fields declared in Core.cs. No wiring into Program.cs yet — that is Phase 11's scope per ROADMAP.md.
+- No regressions in any of the 5 partial class files
+- Build still passes with 0 errors and 0 warnings
+- No new anti-patterns introduced
+- All 5 human verification items remain pending (they require runtime testing)
+
+The phase goal is achieved at the code level. Human verification is needed for runtime behavior validation.
 
 ## Observable Truths
 
-| #   | Truth                                                                                           | Status     | Evidence                                                                                              |
-| --- | ----------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
-| 1   | CallCenterService partial class exists with correct namespace                                   | ✓ VERIFIED | `public partial class CallCenterService : IDisposable` in Core.cs line 28, namespace CallCenter.AgentHost |
-| 2   | 无参构造函数能自建 DI 容器并 resolve 所有依赖                                                    | ✓ VERIFIED | Core.cs lines 50-96: ServiceCollection → AddCallCenter → AddSingleton<AIAgentFactory> → BuildServiceProvider → resolve all fields |
-| 3   | DI 注入构造函数接受外部 IServiceProvider，不自建容器                                             | ✓ VERIFIED | Core.cs lines 101-123: `_provider = null`, resolves all fields from external provider                  |
-| 4   | 类实现 IDisposable 释放自建 ServiceProvider                                                      | ✓ VERIFIED | Core.cs lines 151-162: `if (_provider is IDisposable disposable)` pattern, sets `_disposed = true`     |
-| 5   | ProcessAsync 接收 sessionId + userMessage 返回 string                                            | ✓ VERIFIED | Intent.cs line 22: `public async Task<string> ProcessAsync(string sessionId, string userMessage, CancellationToken ct = default)` |
-| 6   | ProcessAsync 内部完成意图识别→工作流路由→执行/恢复→返回结果                                      | ✓ VERIFIED | Intent.cs lines 24-49: calls ResolveWorkflow → switch on 5 ProcessResult types → dispatches to RunWorkflowAsync/ResumeWorkflowAsync |
-| 7   | 非业务意图返回问候语，不启动工作流                                                               | ✓ VERIFIED | Routing.cs lines 109-116, 133-138: `ProcessResult.NoIntent("你好！有什么可以帮助你的？")` for greeting |
-| 8   | 会话超时时返回终止消息                                                                           | ✓ VERIFIED | Routing.cs lines 45-64: 60-min → TimeoutTerminate, 30-min → TimeoutWarning                             |
-| 9   | RunWorkflowAsync 驱动工作流运行，处理 RequestInfo/WorkflowOutput/SuperStepCompleted/WorkflowError/ExecutorFailed 事件 | ✓ VERIFIED | Execution.cs lines 37-59: InProcessExecution.RunStreamingAsync → DriveLoopAsync → HandleEventAsync    |
-| 10  | ResumeWorkflowAsync 从断点恢复工作流，处理同样的事件类型                                         | ✓ VERIFIED | Execution.cs lines 66-86: reads checkpoint from session store → ResumeStreamingAsync → DriveLoopAsync |
-| 11  | DriveLoopAsync 是共享的事件循环，RunWorkflowAsync 和 ResumeWorkflowAsync 都调用它                | ✓ VERIFIED | Execution.cs lines 92-103: called by RunWorkflowAsync (line 45) and ResumeWorkflowAsync (line 78)      |
-| 12  | HandleEventAsync 处理所有 9 种 WorkflowEvent 类型                                                | ✓ VERIFIED | Execution.cs switch with 9 case clauses (lines 119-255): RequestInfoEvent, WorkflowOutputEvent, SuperStepCompletedEvent, WorkflowErrorEvent, ExecutorFailedEvent, WorkflowStartedEvent, ExecutorInvokedEvent, ExecutorCompletedEvent, WorkflowWarningEvent |
-| 13  | HandleRequestAsync 处理 RefundSignal 和 ConfirmRefundRequest 两种请求                           | ✓ VERIFIED | Interaction.cs lines 25-84: Branch 1 (RefundSignal.NeedOrderId), Branch 2 (ConfirmRefundRequest), Branch 3 (NotSupportedException) |
-| 14  | Saga 补偿在 ExecuteRefund 失败时触发                                                             | ✓ VERIFIED | Execution.cs lines 185-211: `if (executorId == "ExecuteRefund")` → SagaBuilder compensation logic      |
+| #   | Truth                                                                                           | Status     | Evidence       |
+| --- | ----------------------------------------------------------------------------------------------- | ---------- | -------------- |
+| 1   | CallCenterService partial class exists with correct namespace                                   | ✓ VERIFIED | `public partial class CallCenterService : IDisposable` in Core.cs line 21, namespace `CallCenter.AgentHost` |
+| 2   | 无参构造函数能自建 DI 容器并 resolve 所有依赖                                                    | ✓ VERIFIED | Core.cs lines 44-99: ServiceCollection → AddCallCenter → AddSingleton<AIAgentFactory> → AddSingleton<AgentSkillsProvider> → BuildServiceProvider → resolve all fields |
+| 3   | DI 注入构造函数接受外部 IServiceProvider，不自建容器                                             | ✓ VERIFIED | Core.cs lines 104-131: `_provider = null`, resolves all fields from external provider |
+| 4   | 类实现 IDisposable 释放自建 ServiceProvider                                                      | ✓ VERIFIED | Core.cs lines 159-173: `_inputCts.Cancel()`, `_inputChannel.Writer.TryComplete()`, `if (_provider is IDisposable disposable)` pattern, `_disposed = true` |
+| 5   | ProcessAsync 接收 sessionId + userMessage 返回 string                                            | ✓ VERIFIED | Intent.cs line 19: `public async Task<string> ProcessAsync(string sessionId, string userMessage, CancellationToken ct = default)` |
+| 6   | ProcessAsync 内部完成意图识别→工作流路由→执行/恢复→返回结果                                      | ✓ VERIFIED | Intent.cs lines 22-46: calls ResolveWorkflow → switch on 5 ProcessResult types → dispatches to RunWorkflowAsync/ResumeWorkflowAsync (both implemented in Execution.cs) |
+| 7   | 非业务意图返回问候语，不启动工作流                                                               | ✓ VERIFIED | Routing.cs lines 108-111, 130-134: `ProcessResult.NoIntent("你好！有什么可以帮助你的？")` for greeting intent |
+| 8   | 会话超时时返回终止消息                                                                           | ✓ VERIFIED | Routing.cs lines 41-60: 60-min → TimeoutTerminate, 30-min → TimeoutWarning |
+| 9   | RunWorkflowAsync 驱动工作流运行，处理 RequestInfo/WorkflowOutput/SuperStepCompleted/WorkflowError/ExecutorFailed 事件 | ✓ VERIFIED | Execution.cs lines 33-55: InProcessExecution.RunStreamingAsync → DriveLoopAsync → HandleEventAsync (9 event types) |
+| 10  | ResumeWorkflowAsync 从断点恢复工作流，处理同样的事件类型                                         | ✓ VERIFIED | Execution.cs lines 62-82: reads checkpoint from session store → ResumeStreamingAsync → DriveLoopAsync |
+| 11  | DriveLoopAsync 是共享的事件循环，RunWorkflowAsync 和 ResumeWorkflowAsync 都调用它                | ✓ VERIFIED | Execution.cs lines 88-99: called by RunWorkflowAsync (line 41) and ResumeWorkflowAsync (line 74) |
+| 12  | HandleEventAsync 处理所有 9 种 WorkflowEvent 类型                                                | ✓ VERIFIED | Execution.cs switch with 9 case clauses (lines 115-253): RequestInfoEvent, WorkflowOutputEvent, SuperStepCompletedEvent, WorkflowErrorEvent, ExecutorFailedEvent, WorkflowStartedEvent, ExecutorInvokedEvent, ExecutorCompletedEvent, WorkflowWarningEvent |
+| 13  | HandleRequestAsync 处理 RefundSignal 和 ConfirmRefundRequest 两种请求                           | ✓ VERIFIED | Interaction.cs lines 27-90: Branch 1 (RefundSignal.NeedOrderId), Branch 2 (ConfirmRefundRequest), Branch 3 (NotSupportedException) |
+| 14  | Saga 补偿在 ExecuteRefund 失败时触发                                                             | ✓ VERIFIED | Execution.cs lines 183-210: `if (executorId == "ExecuteRefund")` → SagaBuilder compensation with OnFailure + WithRetry |
 | 15  | 业务流程与重构前完全一致（per CS-04）                                                            | ✓ VERIFIED (code-level) | Event handling logic, audit logging, Saga compensation, checkpoint save/restore all match Program.cs source. Runtime equivalence needs human testing. |
 
 **Score:** 15/15 truths verified
 
 ## Required Artifacts
 
-| Artifact | Expected | Status | Details |
-| -------- | -------- | ------ | ------- |
-| `src/CallCenter.AgentHost/CallCenterService.Core.cs` | Base partial class: field declarations, dual constructors, IDisposable | ✓ VERIFIED | 163 lines (min 60), contains `public partial class CallCenterService : IDisposable`, both constructor signatures, `_provider = null`, `services.AddCallCenter(`, `AddSingleton<AIAgentFactory>()`, `Dispose()` with `_provider is IDisposable` check |
-| `src/CallCenter.AgentHost/CallCenterService.Intent.cs` | ProcessAsync entry point, ProcessResult dispatch | ✓ VERIFIED | 52 lines (min 50), contains `public async Task<string> ProcessAsync`, switch on all 5 ProcessResult types, calls ResumeWorkflowAsync/RunWorkflowAsync with sessionId parameter |
-| `src/CallCenter.AgentHost/CallCenterService.Routing.cs` | Intent-workflow mapping, timeout detection, ResolveWorkflow | ✓ VERIFIED | 181 lines, contains ResolveWorkflow, CheckTimeoutAsync, GetIntentForWorkflow, GetWorkflowForIntent, RecognizeIntentAsync private helper |
-| `src/CallCenter.AgentHost/CallCenterService.Execution.cs` | Workflow execution: RunWorkflowAsync, ResumeWorkflowAsync, DriveLoopAsync, HandleEventAsync (9 events) | ✓ VERIFIED | 257 lines (min 120), contains all 4 methods + EventResult enum + ExecutionContext class, 9 case clauses for event types, SagaBuilder for ExecuteRefund compensation |
-| `src/CallCenter.AgentHost/CallCenterService.Interaction.cs` | HandleRequestAsync for user interaction | ✓ VERIFIED | 85 lines (min 50), contains HandleRequestAsync(ExternalRequest, string sessionId), RefundSignal.NeedOrderId branch, ConfirmRefundRequest branch, NotSupportedException for unknown types |
+| Artifact | Expected    | Status | Details |
+| -------- | ----------- | ------ | ------- |
+| `src/CallCenter.AgentHost/CallCenterService.Core.cs` | Base partial class: field declarations, dual constructors, IDisposable | ✓ VERIFIED | 175 lines (min 60), contains `public partial class CallCenterService : IDisposable`, both constructor signatures, `_provider = null`, `services.AddCallCenter(`, `AddSingleton<AIAgentFactory>()`, `Dispose()` with `_provider is IDisposable` check |
+| `src/CallCenter.AgentHost/CallCenterService.Intent.cs` | ProcessAsync entry point, ProcessResult dispatch | ✓ VERIFIED | 50 lines (min 50), contains `public async Task<string> ProcessAsync`, switch on all 5 ProcessResult types, calls ResumeWorkflowAsync/RunWorkflowAsync with sessionId parameter |
+| `src/CallCenter.AgentHost/CallCenterService.Routing.cs` | Intent-workflow mapping, timeout detection, ResolveWorkflow | ✓ VERIFIED | 178 lines, contains ResolveWorkflow, CheckTimeoutAsync, GetIntentForWorkflow, GetActiveWorkflowAsync, SetActiveWorkflowAsync, ClearActiveWorkflowAsync |
+| `src/CallCenter.AgentHost/CallCenterService.Execution.cs` | Workflow execution: RunWorkflowAsync, ResumeWorkflowAsync, DriveLoopAsync, HandleEventAsync (9 events) | ✓ VERIFIED | 256 lines (min 120), contains all 4 methods + EventResult enum + ExecutionContext class, 9 case clauses for event types, SagaBuilder for ExecuteRefund compensation |
+| `src/CallCenter.AgentHost/CallCenterService.Interaction.cs` | HandleRequestAsync for user interaction | ✓ VERIFIED | 92 lines (min 50), contains HandleRequestAsync(ExternalRequest, string sessionId), RefundSignal.NeedOrderId branch, ConfirmRefundRequest branch, NotSupportedException for unknown types |
 
 ## Key Link Verification
 
-| From | To | Via | Status | Details |
+| From | To  | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
-| CallCenterService.Core.cs | Extensions.cs (AddCallCenter) | `services.AddCallCenter(_options)` | ✓ WIRED | Core.cs line 58 calls AddCallCenter; Extensions.cs line 30 defines it |
-| CallCenterService.Core.cs | AIAgentFactory.cs | `services.AddSingleton<AIAgentFactory>()` | ✓ WIRED | Core.cs line 61 registers; AIAgentFactory.cs line 12 defines class, line 31 has CreateIntentAgent |
-| CallCenterService.Intent.cs (ProcessAsync) | CallCenterService.Routing.cs (ResolveWorkflow) | Method call `await ResolveWorkflow(sessionId, userMessage, ct)` | ✓ WIRED | Intent.cs line 25 calls ResolveWorkflow; Routing.cs line 92 defines it |
-| CallCenterService.Execution.cs (DriveLoopAsync) | CallCenterService.Interaction.cs (HandleRequestAsync) | `HandleRequestAsync(reqEvt.Request, sessionId, ct)` in RequestInfoEvent | ✓ WIRED | Execution.cs line 134 calls HandleRequestAsync; Interaction.cs line 25 defines it |
-| CallCenterService.Execution.cs (HandleEventAsync) | SagaBuilder | `new SagaBuilder().OnFailure(...)` in WorkflowErrorEvent | ✓ WIRED | Execution.cs line 191 creates SagaBuilder for ExecuteRefund compensation |
-| CallCenterService.Execution.cs (HandleEventAsync) | AuditTrailMiddleware | CaptureStepStart/CaptureStepEnd/CaptureError calls | ✓ WIRED | 8 audit calls across event handlers (lines 121, 138, 145, 169, 182, 204, 210, 224) |
+| CallCenterService.Core.cs | Extensions.cs (AddCallCenter) | `services.AddCallCenter(_options)` | ✓ WIRED | Core.cs line 52 calls AddCallCenter; Extensions.cs line 29 defines it |
+| CallCenterService.Core.cs | AIAgentFactory.cs | `services.AddSingleton<AIAgentFactory>()` | ✓ WIRED | Core.cs line 55 registers; AIAgentFactory.cs defines class with CreateIntentAgent |
+| CallCenterService.Intent.cs (ProcessAsync) | CallCenterService.Routing.cs (ResolveWorkflow) | Method call `await ResolveWorkflow(sessionId, userMessage, ct)` | ✓ WIRED | Intent.cs line 22 calls ResolveWorkflow; Routing.cs line 88 defines it |
+| CallCenterService.Intent.cs (ProcessAsync) | CallCenterService.Execution.cs (RunWorkflowAsync/ResumeWorkflowAsync) | Method calls on ResumeExistingResult and StartWorkflowResult branches | ✓ WIRED | Intent.cs lines 30, 42 call both methods; Execution.cs lines 33, 62 define them |
+| CallCenterService.Execution.cs (DriveLoopAsync) | CallCenterService.Interaction.cs (HandleRequestAsync) | `HandleRequestAsync(reqEvt.Request, sessionId, ct)` in RequestInfoEvent | ✓ WIRED | Execution.cs line 132 calls HandleRequestAsync; Interaction.cs line 27 defines it |
+| CallCenterService.Execution.cs (HandleEventAsync) | SagaBuilder | `new SagaBuilder().OnFailure(...)` in WorkflowErrorEvent | ✓ WIRED | Execution.cs line 189 creates SagaBuilder for ExecuteRefund compensation |
+| CallCenterService.Execution.cs (HandleEventAsync) | AuditTrailMiddleware | CaptureStepStart/CaptureStepEnd/CaptureError calls | ✓ WIRED | 8+ audit calls across event handlers |
 
 ## Data-Flow Trace (Level 4)
 
@@ -110,6 +115,10 @@ All 5 files exist, compile cleanly (0 errors, 0 warnings), and contain substanti
 | No TBD/FIXME/XXX markers | `grep -c "TBD\|FIXME\|XXX" CallCenterService.*.cs` | 0 | ✓ PASS |
 | No NotImplementedException stubs | `grep -c "NotImplementedException" CallCenterService.*.cs` | 0 | ✓ PASS |
 
+## Probe Execution
+
+No phase-specific probes declared in PLAN or SUMMARY files. No conventional `scripts/*/tests/probe-*.sh` files found for this phase. Step 7c: SKIPPED (no runnable probes for skeleton phase).
+
 ## Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
@@ -119,13 +128,15 @@ All 5 files exist, compile cleanly (0 errors, 0 warnings), and contain substanti
 | CS-03 | 10-03-PLAN.md | HandleEventAsync lists all 9 WorkflowEvent types | ✓ SATISFIED | Execution.cs: switch with 9 case clauses covering all specified event types |
 | CS-04 | 10-03-PLAN.md | Business flow unchanged — refund 6-step, event handling, Saga compensation, checkpoint resume match pre-refactor | ? NEEDS HUMAN | Code-level verification shows all logic migrated (event handling, audit, Saga). Runtime equivalence requires testing |
 
+Note: CS-* requirements are defined in `.planning/milestones/v2.0-REQUIREMENTS.md` (archived, status SHIPPED), not in `.planning/REQUIREMENTS.md` (which covers v3.0). All 4 requirements mapped to Phase 10 are accounted for.
+
 ## Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| None | - | - | - | - |
+| CallCenterService.Intent.cs | 28-29 | Outdated comment: "Wave 3: will call ResumeWorkflowAsync" / "Currently stubbed — ResumeWorkflowAsync not yet implemented" | Info | Comment is misleading — ResumeWorkflowAsync IS implemented in Execution.cs. The actual code on line 30 calls the real method, not a stub. No functional impact. |
 
-No TBD/FIXME/XXX markers, no NotImplementedException stubs, no empty return patterns, no hardcoded empty data. The single "not yet implemented" comment in Intent.cs line 32 is a documentation comment explaining Wave 2/Wave 3 separation, not a code stub.
+No TBD/FIXME/XXX markers. No NotImplementedException stubs. No empty return patterns. No hardcoded empty data.
 
 ## Human Verification Required
 
@@ -161,13 +172,13 @@ No TBD/FIXME/XXX markers, no NotImplementedException stubs, no empty return patt
 
 ## Gaps Summary
 
-No gaps found. All 15 must-have truths are verified at the code level. All 5 artifacts exist, are substantive (exceeding minimum line counts), and are properly wired. All key links are verified. Build passes with 0 errors and 0 warnings. No anti-patterns detected.
+No gaps found. All 15 must-have truths are verified at the code level. All 5 artifacts exist, are substantive (exceeding minimum line counts), and are properly wired. All key links are verified. Build passes with 0 errors and 0 warnings. One minor documentation issue: outdated comment in Intent.cs lines 28-29 claiming ResumeWorkflowAsync is "stubbed" when it is actually implemented in Execution.cs.
 
-The phase goal "CallCenterService 骨架 — Core/Routing/Interaction/Extensions partial 类" is achieved. The 5 partial class files form a complete skeleton with full implementations of DI, routing, event handling, user interaction, and Saga compensation. Integration into Program.cs is deferred to Phase 11 per ROADMAP.md.
+The phase goal "Create CallCenterService skeleton — Core.cs (dual constructors, fields, IDisposable), Intent.cs (ProcessAsync entry), Routing.cs (intent-to-workflow mapping), Execution.cs (event loop), Interaction.cs (user interaction)" is achieved. All 5 partial class files form a complete skeleton with full implementations of DI, routing, event handling, user interaction, and Saga compensation.
 
 Human verification is required for 5 items related to runtime behavior equivalence and end-to-end workflow correctness.
 
 ---
 
-_Verified: 2026-06-03T12:00:00Z_
+_Verified: 2026-06-04T00:00:00Z_
 _Verifier: Claude (gsd-verifier)_
