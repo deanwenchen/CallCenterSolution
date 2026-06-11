@@ -32,6 +32,21 @@ public static class Extensions
         IConfiguration configuration,
         CallCenterOptions? options = null)
     {
+        // 从 appsettings.json 的 "LLM" 段读取配置
+        var llmSection = configuration.GetSection("LLM");
+        options ??= new CallCenterOptions();
+        if (llmSection.Exists())
+        {
+            var providerStr = llmSection["Provider"];
+            if (!string.IsNullOrEmpty(providerStr) && Enum.TryParse<LLMProvider>(providerStr, ignoreCase: true, out var provider))
+                options.Provider = provider;
+            options.ApiKey ??= llmSection["ApiKey"];
+            var modelName = llmSection["ModelName"];
+            if (!string.IsNullOrEmpty(modelName)) options.ModelName = modelName;
+            var endpoint = llmSection["Endpoint"];
+            if (!string.IsNullOrEmpty(endpoint)) options.Endpoint = endpoint;
+        }
+
         // 手动绑定安全选项（避免依赖 Configuration.Binder）
         var safetySection = configuration.GetSection("Safety");
         var safetyOptions = new SafetyOptions
@@ -83,13 +98,13 @@ public static class Extensions
 
         if (string.IsNullOrEmpty(options.ApiKey))
         {
-            throw new InvalidOperationException("DASHSCOPE_API_KEY not set. Set it to your DashScope API key.");
+            throw new InvalidOperationException("LLM API key not set. Set DASHSCOPE_API_KEY or LLM_API_KEY environment variable, or configure ApiKey in CallCenterOptions.");
         }
 
-        // 创建 OpenAI 客户端（DashScope 兼容端点）
+        // 创建 OpenAI 客户端（兼容 OpenAI 协议的厂商：DashScope/OpenAI/DeepSeek/硅基流动/Ollama）
         var openAIClient = new OpenAIClient(
             new ApiKeyCredential(options.ApiKey),
-            new OpenAIClientOptions { Endpoint = new Uri(options.Endpoint) });
+            new OpenAIClientOptions { Endpoint = new Uri(options.Endpoint!) });
 
         // 原始 LLM 客户端（keyed 注册，供需要直接访问的场景使用）
         var baseClient = openAIClient.GetChatClient(options.ModelName).AsIChatClient();

@@ -1,4 +1,5 @@
 #pragma warning disable MAAI001
+using CallCenter.Workflows.Refund;
 
 namespace CallCenter.AgentHost;
 
@@ -27,7 +28,7 @@ public partial class CallCenterService
             case ResumeExistingResult resumeResult:
                 // Wave 3: will call ResumeWorkflowAsync with sessionId
                 // Currently stubbed — ResumeWorkflowAsync not yet implemented
-                return await ResumeWorkflowAsync(sessionId, userMessage, ct).ConfigureAwait(false);
+                return await ResumeWorkflowAsync(sessionId, userMessage, resumeResult.Workflow, ct).ConfigureAwait(false);
 
             case TimeoutResult timeout:
                 return timeout.Message;
@@ -39,7 +40,7 @@ public partial class CallCenterService
                 return noIntent.Response;
 
             case StartWorkflowResult start:
-                return await RunWorkflowAsync(sessionId, start.InitialMessage, ct).ConfigureAwait(false);
+                return await RunWorkflowAsync(sessionId, (RefundIntent)start.InitialMessage, start.Workflow, ct).ConfigureAwait(false);
 
             default:
                 return "系统处理异常，请重试。";

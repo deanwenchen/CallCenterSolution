@@ -30,13 +30,13 @@ public partial class CallCenterService
     /// 以及 WorkflowStarted/ExecutorInvoked/ExecutorCompleted/WorkflowWarning 审计事件。
     /// 当需要订单号时（RefundSignal.NeedOrderId），自动重跑流程。
     /// </summary>
-    public async Task<string> RunWorkflowAsync(string sessionId, RefundIntent initialMessage, CancellationToken ct)
+    public async Task<string> RunWorkflowAsync(string sessionId, RefundIntent initialMessage, Workflow workflow, CancellationToken ct)
     {
         var ctx = new ExecutionContext { CurrentMessage = initialMessage };
 
         while (true)
         {
-            await using var run = await InProcessExecution.RunStreamingAsync(_refundWorkflow, ctx.CurrentMessage!, _checkpointManager, sessionId: sessionId, cancellationToken: ct).ConfigureAwait(false);
+            await using var run = await InProcessExecution.RunStreamingAsync(workflow, ctx.CurrentMessage!, _checkpointManager, sessionId: sessionId, cancellationToken: ct).ConfigureAwait(false);
 
             var result = await DriveLoopAsync(sessionId, run, isResumeMode: false, ctx, ct).ConfigureAwait(false);
             if (result == EventResult.Return)
@@ -59,7 +59,7 @@ public partial class CallCenterService
     /// 从 session store 读取 lastCheckpoint，使用 ResumeStreamingAsync 恢复执行。
     /// RequestInfoEvent 处理更简单（不需要 orderId retry loop）。
     /// </summary>
-    public async Task<string> ResumeWorkflowAsync(string sessionId, string userMessage, CancellationToken ct)
+    public async Task<string> ResumeWorkflowAsync(string sessionId, string userMessage, Workflow workflow, CancellationToken ct)
     {
         var checkpoint = await _sessionStore.GetAsync<CheckpointInfo>("lastCheckpoint", sessionId, ct).ConfigureAwait(false);
         if (checkpoint == null)
@@ -67,7 +67,7 @@ public partial class CallCenterService
             return "未找到断点记录，请重新启动流程";
         }
 
-        await using var run = await InProcessExecution.ResumeStreamingAsync(_refundWorkflow, checkpoint, _checkpointManager, ct).ConfigureAwait(false);
+        await using var run = await InProcessExecution.ResumeStreamingAsync(workflow, checkpoint, _checkpointManager, ct).ConfigureAwait(false);
 
         var ctx = new ExecutionContext { LastCheckpoint = checkpoint };
 

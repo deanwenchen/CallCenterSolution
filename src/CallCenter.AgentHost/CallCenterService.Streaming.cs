@@ -32,7 +32,7 @@ public partial class CallCenterService
             case StartWorkflowResult start:
             {
                 await using var run = await InProcessExecution.RunStreamingAsync(
-                    _refundWorkflow, start.InitialMessage, _checkpointManager,
+                    start.Workflow, start.InitialMessage, _checkpointManager,
                     sessionId: sessionId, cancellationToken: ct).ConfigureAwait(false);
 
                 await foreach (var sse in DriveStreamingAsync(sessionId, run, isResumeMode: false, ct).ConfigureAwait(false))
@@ -52,7 +52,7 @@ public partial class CallCenterService
                 }
 
                 await using var run = await InProcessExecution.ResumeStreamingAsync(
-                    _refundWorkflow, checkpoint, _checkpointManager, ct).ConfigureAwait(false);
+                    resumeResult.Workflow, checkpoint, _checkpointManager, ct).ConfigureAwait(false);
 
                 await foreach (var sse in DriveStreamingAsync(sessionId, run, isResumeMode: true, ct).ConfigureAwait(false))
                 {

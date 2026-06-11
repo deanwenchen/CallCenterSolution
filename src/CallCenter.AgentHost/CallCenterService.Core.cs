@@ -31,7 +31,7 @@ public partial class CallCenterService : IDisposable
     private readonly AuditLogger _auditLogger;
     private readonly IBusinessEventBus _eventBus;
     private readonly JsonlLogger _logger;
-    private readonly Workflow _refundWorkflow;
+    private readonly Dictionary<string, Workflow> _workflows;
     private readonly AgentSkillsProvider _skillsProvider;
     private readonly Channel<string> _inputChannel;
     private readonly CancellationTokenSource _inputCts = new();
@@ -72,7 +72,11 @@ public partial class CallCenterService : IDisposable
             await Task.CompletedTask;
         });
         _logger = _provider.GetRequiredService<JsonlLogger>();
-        _refundWorkflow = _provider.GetRequiredService<Workflow>();
+        _workflows = new Dictionary<string, Workflow>
+        {
+            ["RefundWorkflow"] = _provider.GetRequiredService<Workflow>(),
+            // Future: ["ExchangeWorkflow"] = ... (when implemented)
+        };
         _skillsProvider = _provider.GetRequiredService<AgentSkillsProvider>();
 
         _checkpointManager = CheckpointManager.Default;
@@ -119,7 +123,11 @@ public partial class CallCenterService : IDisposable
             await Task.CompletedTask;
         });
         _logger = provider.GetRequiredService<JsonlLogger>();
-        _refundWorkflow = provider.GetRequiredService<Workflow>();
+        _workflows = new Dictionary<string, Workflow>
+        {
+            ["RefundWorkflow"] = provider.GetRequiredService<Workflow>(),
+            // Future: ["ExchangeWorkflow"] = ... (when implemented)
+        };
         _skillsProvider = provider.GetRequiredService<AgentSkillsProvider>();
 
         _checkpointManager = CheckpointManager.Default;

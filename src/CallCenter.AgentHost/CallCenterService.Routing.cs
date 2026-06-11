@@ -115,7 +115,12 @@ public partial class CallCenterService
             var currentIntent = GetIntentForWorkflow(activeWorkflow);
             if (currentIntent != null && intent.Intent == currentIntent)
             {
-                return ProcessResult.ResumeExisting(_refundWorkflow);
+                var workflow = _workflows.GetValueOrDefault(activeWorkflow);
+                if (workflow == null)
+                {
+                    return ProcessResult.NoIntent($"抱歉，工作流 {activeWorkflow} 未实现。");
+                }
+                return ProcessResult.ResumeExisting(workflow);
             }
 
             // Intent switch — terminate old workflow
@@ -141,13 +146,18 @@ public partial class CallCenterService
             {
                 var orderId = newIntent.Parameters.GetValueOrDefault("OrderId");
                 await SetActiveWorkflowAsync(sessionId, "RefundWorkflow", ct);
-                return ProcessResult.StartWorkflow(new RefundIntent(orderId, "U100"), _refundWorkflow);
+                return ProcessResult.StartWorkflow(new RefundIntent(orderId, "U100"), _workflows["RefundWorkflow"]);
+            }
+            case "exchange":
+            {
+                // Exchange is registered as a placeholder but not yet implemented
+                return ProcessResult.NoIntent("换货功能即将上线，敬请期待。目前仅支持退款功能。");
             }
             // Add new intents here:
-            // case "exchange":
+            // case "logistics":
             //     var orderId2 = newIntent.Parameters.GetValueOrDefault("OrderId");
-            //     await SetActiveWorkflowAsync(sessionId, "ExchangeWorkflow", ct);
-            //     return ProcessResult.StartWorkflow(new ExchangeIntent(orderId2, "U100"), _exchangeWorkflow);
+            //     await SetActiveWorkflowAsync(sessionId, "LogisticsQueryWorkflow", ct);
+            //     return ProcessResult.StartWorkflow(new LogisticsQueryIntent(orderId2, "U100"), _workflows["LogisticsQueryWorkflow"]);
         }
 
         // Intent not matched — return error

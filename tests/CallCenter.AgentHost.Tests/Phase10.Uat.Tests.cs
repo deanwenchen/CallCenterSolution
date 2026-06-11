@@ -77,6 +77,7 @@ public class Phase10UatTests
         services.AddKeyedSingleton<IChatClient>("base", fakeClient);
         services.AddSingleton<IChatClient>(fakeClient);
         services.AddSingleton(store);
+        services.AddSingleton<ISessionStore>(store);
         services.AddSingleton(logger);
         services.AddSingleton<IBusinessEventBus>(eventBus);
         services.AddSingleton<CallCenter.Framework.Logging.JsonlLogger>();
@@ -236,6 +237,7 @@ public class Phase10UatTests
         services.AddKeyedSingleton<IChatClient>("base", fakeClient);
         services.AddSingleton<IChatClient>(fakeClient);
         services.AddSingleton(sessionStore);
+        services.AddSingleton<ISessionStore>(sessionStore);
         services.AddSingleton(auditLogger);
         services.AddSingleton<IBusinessEventBus>(eventBus);
         services.AddSingleton<CallCenter.Framework.Logging.JsonlLogger>();
